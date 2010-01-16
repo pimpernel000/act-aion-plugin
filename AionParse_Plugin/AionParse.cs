@@ -54,6 +54,7 @@
         Regex rReceivedContDmg = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
+        Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ]*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         
         string lastActivatedSkill = "";
         int lastActivatedSkillGlobalTime = -1;
@@ -156,6 +157,7 @@
             if (str == "Invalid target.") return;
             if (str == "You stopped using the Macro.") return;
             if (str == "The skill was cancelled.") return;
+            if (str.StartsWith("You restored your flight time by")) return;
 
 
             int num2;
@@ -435,92 +437,70 @@
      */
 
 
-            /* > You restored 74 of Becca's HP by using Word of Revival IV. 
-             * it's probably self heals or unknown healer
-             */
-            else if ((str.IndexOf("restored") != -1) && (str.IndexOf("'s HP by using") != -1))
-            {
-                outName = str.Substring(0, str.IndexOf("restored") - 1);
-                outName = this.CheckYou(outName);
-                incName = str.Substring(str.IndexOf(" of ") + 4, str.IndexOf("'s HP by using") - (str.IndexOf(" of ") + 4));
-                incName = this.CheckYou(incName);
-                swingType = 3;
-                theAttackType = str.Substring(str.IndexOf("'s HP by using") + 15, (str.Length - (str.IndexOf("'s HP by using") + 15)) - 2);
-                damage = str.Substring(str.IndexOf("restored") + 9, str.IndexOf(" of ") - (str.IndexOf("restored") + 9));
-                damage = this.DamageNumberFix(damage);
-                if (ActGlobals.oFormActMain.InCombat)
+            // match "You restored xx of xxx's HP by using xxx."  the actor in this case is ambigious and not really you.
+            if (str.StartsWith("You restored")) {
+                Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+,)?\d+) of (?<target>[a-zA-Z ]*)'s HP by using (?<skill>[a-zA-Z \-']*?)\.");
+                Match match = rYouRestoreHP.Match(str);
+                if (!match.Success)
                 {
-                    int num13;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num13 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, theAttackType, int.Parse(damage), logInfo.detectedTime, num13, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
+                    ui.AddText("Exception-Unable to parse[e2]: " + str);
+                    return;
                 }
-            }
-            else if ((str.IndexOf("recovered") != -1) && (str.IndexOf("HP by using") != -1))
-            {
-                incName = str.Substring(0, str.IndexOf("recovered") - 1);
-                incName = this.CheckYou(incName);
-                outName = incName;
-                outName = this.CheckYou(outName);
-                swingType = 3;
-                theAttackType = str.Substring(str.IndexOf("HP by using") + 12, (str.Length - (str.IndexOf("HP by using") + 12)) - 2);
-                damage = str.Substring(str.IndexOf("recovered") + 10, (str.IndexOf("HP by using") - (str.IndexOf("recovered") + 10)) - 1);
-                damage = this.DamageNumberFix(damage);
-                if (ActGlobals.oFormActMain.InCombat)
+                incName = match.Groups["target"].Value;
+                damage = DamageNumberFix(match.Groups["hp"].Value);
+                theAttackType=match.Groups["skill"].Value;
+                
+                if (theAttackType.StartsWith("Revival Mantra"))
                 {
-                    int num14;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num14 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, theAttackType, int.Parse(damage), logInfo.detectedTime, num14, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
+                    outName = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
                 }
+                else if (theAttackType.StartsWith("Blood Rune"))
+                {
+                    outName = incName; // Blood Rune heals caster
+                }
+                else
+                {
+                    outName = "Unknown";
+                }
+
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
+                return;
             }
-            else if ((str.IndexOf("restored") != -1) && (str.IndexOf(" HP.") != -1))
-            {
-                outName = str.Substring(0, str.IndexOf("restored") - 1);
-                outName = this.CheckYou(outName);
+
+            // match "xx restored xx HP."
+            if (str.EndsWith(" HP.") && str.Contains("restored")) {
+                Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ]*) restored (?<hp>(\d+,)?\d+) HP\.");
+                Match match = rYouRestoreHP.Match(str);
+                if (!match.Success)
+                {
+                    ui.AddText("Exception-Unable to parse: " + str);
+                    return;
+                }
+                outName = match.Groups["actor"].Value;
                 incName = outName;
-                incName = this.CheckYou(incName);
-                swingType = 3;
-                theAttackType = "Heal";
-                damage = str.Substring(str.IndexOf("restored") + 9, str.IndexOf(" HP.") - (str.IndexOf("restored") + 9));
-                damage = this.DamageNumberFix(damage);
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num15;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num15 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, theAttackType, int.Parse(damage), logInfo.detectedTime, num15, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
+                damage = DamageNumberFix(match.Groups["hp"].Value);
+                theAttackType = "Unknown";
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
+                return;
             }
-            else if (((str.IndexOf("recovered") != -1) && (str.IndexOf("HP because") != -1)) && (str.IndexOf(" used ") != -1))
+
+            // match "xxx recovered xx HP ..."
+            if (rRecoverHP.IsMatch(str))
             {
-                incName = str.Substring(0, str.IndexOf("recovered") - 1);
-                incName = this.CheckYou(incName);
-                outName = str.Substring(str.IndexOf("HP because") + 11, str.IndexOf(" used ") - (str.IndexOf("HP because") + 11));
-                outName = this.CheckYou(outName);
-                swingType = 3;
-                theAttackType = str.Substring(str.IndexOf(" used ") + 6, (str.Length - (str.IndexOf(" used ") + 6)) - 2);
-                damage = str.Substring(str.IndexOf("recovered") + 10, (str.IndexOf("HP because") - (str.IndexOf("recovered") + 10)) - 1);
-                damage = this.DamageNumberFix(damage);
-                if (ActGlobals.oFormActMain.InCombat)
+                Match match = rRecoverHP.Match(str);
+                incName = CheckYou(match.Groups["target"].Value);
+                if (match.Groups["actor"].Success)
                 {
-                    int num16;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num16 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, theAttackType, int.Parse(damage), logInfo.detectedTime, num16, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
+                    outName = CheckYou(match.Groups["actor"].Value);
                 }
+                else
+                {
+                    outName = incName;
+                }
+                damage = DamageNumberFix(match.Groups["hp"].Value);
+                theAttackType = match.Groups["skill"].Value;
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
+                return;
             }
 
             // match "xxx recovered x MP ..."
