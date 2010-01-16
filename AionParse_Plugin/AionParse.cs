@@ -7,21 +7,55 @@
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
 
+    /* TODO
+     * 
+     * Spirits from Summoners
+     *  The spirit used a skill on Iceghost Priest because Coszet used Spirit Thunderbolt Claw I.
+     *  
+     * Holy Spirit from Clerics
+     *  You summoned Holy Servant by using Summon Holy Servant II to let it attack Pale Worg.
+     *  
+     * Resists to you
+     *  Alpine Gorgon resisted Chastisement I.
+     *  
+     * Heals over time should be attributed to Unknown
+     *  You restored 127 of Nwins's HP by using Healing. 
+     *  You restored 55 of Lucija's HP by using Light of Rejuvenation III. 
+     *  You restored 47 of Catfishjack's HP by using Word of Revival II. 
+     *  You restored 23 of Samzors's HP by using Healing Conduit I.
+     *  You restored 412 of Fbixxx's HP by using Blood Rune I Additional Effect.
+     *  You restored 91 of Fire Spirit's HP by using Spirit Armor of Darkness III. 
+     *  
+     * Delayed Blast
+     *  Hunter Arachna received the delayed explosion effect as you used Delayed Blast II. 
+     *  Hunter Arachna received 1,118 damage due to the effect of Delayed Blast II. 
+     *  
+     * Due to the Effect of bugs (usually this is DoT, but sometimes not; also make sure it doesn't assign actor as blank)
+     *  Black Branch Gnarl received 475 damage due to the effect of Promise of Wind III Effect. 
+     *  Shining Malekor received 412 damage due to the effect of Blood Rune I Additional Effect. 
+     * 
+     * fixes: (cuts off last character)
+     *  Lilac resisted Mist Mane Scratcher's Snare. 
+
+     */
+
     public class AionParse : IActPluginV1
     {
-        Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z ]*)");
+        Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z ']*)");
         Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ]*?)( has)? inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z ]*)");
         Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) damage from (?<attacker>[a-zA-Z ]*)");
-        Regex rUsingAttack = new Regex("^(?<victimclause>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ]*)");
+        Regex rUsingAttack = new Regex("^(?<victimclause>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ']*)");
         Regex rPatternEngraving = new Regex("^(?<victim>[a-zA-Z ]*) and caused the (?<special>[a-zA-Z ]*) effect");
-        Regex rIgniteAether = new Regex("^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z ]*)"); // I think only Ignite Aether spells has this line
+        Regex rIgniteAether = new Regex("^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z ']*)"); // I think only Ignite Aether spells has this line
         Regex rReflect = new Regex("^(?<victim>[a-zA-Z ]*) by reflecting the attack");
-        Regex rStateAbility = new Regex("^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z ]*)");
-        Regex rWeakened = new Regex("^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ]*)");
-        Regex rActivated = new Regex("^(?<skill>[a-zA-Z ]*) Effect has been activated");
-        Regex rContDmg1 = new Regex("^(?<actor>[a-zA-Z ]*) inflicted continuous damage on (?<target>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ]*)");
-        Regex rContDmg2 = new Regex("^(?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z ]*) to inflict the continuous damage effect on (?<target>[a-zA-Z ]*)");
-
+        Regex rStateAbility = new Regex("^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z ']*)");
+        Regex rWeakened = new Regex("^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ']*)");
+        Regex rActivated = new Regex("^(?<skill>[a-zA-Z ']*) Effect has been activated");
+        Regex rContDmg1 = new Regex("^(?<actor>[a-zA-Z ]*) inflicted continuous damage on (?<target>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ']*)");
+        Regex rContDmg2 = new Regex("^(?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<target>[a-zA-Z ]*)");
+        Regex rContDmg3 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z ]*) damage after you used (?<skill>[a-zA-Z ']*)");
+        Regex rReceivedContDmg = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z ']*)");
+        
         string lastActivatedSkill = "";
         int lastActivatedSkillGlobalTime = -1;
         DateTime lastActivedSkillTime = DateTime.MinValue;
@@ -79,6 +113,7 @@
             bool flag2 = false;
 
             if (str.Contains("[charname:")) return; //ignore chats ([charname:...] is a link to a name
+            if (str.StartsWith(CheckYou("you") + ":")) return; // ignore your own chats
             if (str.Contains("You are gathering")) return;
             if (str.Contains("You must level up to raise your skill level.")) return;
             if (str.Contains("gathered successfully")) return;
@@ -112,6 +147,7 @@
             if (str.StartsWith("You were killed")) return;
             if (str.StartsWith("You have earned")) return;
             if (str.StartsWith("Legion Message:")) return;
+            if (str.Contains("speed has decreased")) return;
 
 
             int num2;
@@ -270,6 +306,25 @@
                 return;
             }
 
+            // match "xxx received xxx damage due to the effect of xxx"
+            if (rReceivedContDmg.IsMatch(str))
+            {
+                Match match = rReceivedContDmg.Match(str);
+                incName = CheckYou(match.Groups["victim"].Value);
+                damage = DamageNumberFix(match.Groups["damage"].Value);
+                theAttackType = match.Groups["skill"].Value;
+                
+                outName = continuousDamageSet.GetActor(incName, theAttackType, logInfo.detectedTime);
+                if (String.IsNullOrEmpty(outName))
+                {
+                    outName = "Unknown";
+                }
+             
+                SetEncounter(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.NonMelee, flag2);
+                return;
+            }
+
+
             // match "xxx inflicted xxx damage and the rune carve effect on you by using xxx ."
             var mInflictDamageOnYou = rInflictDamageOnYou.Match(str);
             if (mInflictDamageOnYou.Success)
@@ -294,6 +349,20 @@
                 SetEncounter(logInfo, outName, incName, "Melee", critical, "", damage, SwingTypeEnum.Melee, flag2);
                 return;
             }
+
+            // match "xxx recieved xxx yyy damage after you used xxx" 
+            if (rContDmg3.IsMatch(str))
+            {
+                Match match = rContDmg3.Match(str);
+                outName = "YOU (ambigious)";
+                incName = match.Groups["victim"].Value;
+                damage = match.Groups["damage"].Value;
+                string damageType = match.Groups["damagetype"].Value;
+                theAttackType = match.Groups["skill"].Value; // only DoT skills: Poison, Poison Arrow, or Wind Cut Down skills match this... often mob skills
+                SetEncounter(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.NonMelee, flag2, damageType);
+                return;
+            }
+                
 
             // match "xxx is in the xxx state..."
             if (rStateAbility.IsMatch(str))
@@ -348,33 +417,9 @@
     /* NOTE: here's an example of battle data
      * > You received continuous damage because Black Blaze Spirit used Wing Ignition.
      * > Vyn inflicted 45 damage on you by using Wing Ignition. 
-     * 
-     * > You inflicted continuous damage on Black Blaze Spirit by using Flame Cage II. 
-     * > Black Blaze Spirit received 153 damage due to the effect of Flame Cage II. 
-     * The logs don't tell when the DoT ends tho. =(
      */
 
 
-            else if ((str.IndexOf("received") != -1) && (str.IndexOf("damage due to the effect of") != -1))
-            {
-                incName = str.Substring(0, str.IndexOf("received") - 1);
-                incName = this.CheckYou(incName);
-                outName = "Unknown";
-                swingType = 2;
-                theAttackType = str.Substring(str.IndexOf("damage due to the effect of") + 0x1c, (str.Length - (str.IndexOf("damage due to the effect of") + 0x1c)) - 2);
-                damage = str.Substring(str.IndexOf("received") + 9, (str.IndexOf("damage due to the effect of") - (str.IndexOf("received") + 9)) - 1);
-                damage = this.DamageNumberFix(damage);
-                if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
-                {
-                    int num12;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num12 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, theAttackType, int.Parse(damage), logInfo.detectedTime, num12, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Blue.ToArgb();
-                    }
-                }
-            }
             /* > You restored 74 of Becca's HP by using Word of Revival IV. 
              * it's probably self heals or unknown healer
              */
@@ -725,14 +770,18 @@
             }
         }
 
-
         private void SetEncounter(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, bool flag)
+        {
+            SetEncounter(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, flag, string.Empty);
+        }
+
+        private void SetEncounter(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, bool flag, string damageType)
         {
             if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim))
             {
                 int num8;
                 ActGlobals.oFormActMain.GlobalTimeSorter = (num8 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                ActGlobals.oFormActMain.AddCombatAction((int)swingType, critical, special, attacker, theAttackType, int.Parse(damage), logInfo.detectedTime, num8, victim, string.Empty);
+                ActGlobals.oFormActMain.AddCombatAction((int)swingType, critical, special, attacker, theAttackType, int.Parse(damage), logInfo.detectedTime, num8, victim, damageType);
                 if (flag)
                 {
                     logInfo.detectedType = Color.Red.ToArgb();
