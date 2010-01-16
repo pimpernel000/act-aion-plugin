@@ -1,0 +1,7 @@
+syntax: glob
+*.csproj.user
+*.suo
+bin/
+obj/
+_UpgradeReport_Files/
+AionParse.Properties.Resources.resources
