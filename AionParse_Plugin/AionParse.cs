@@ -16,7 +16,7 @@
         Regex rPatternEngraving = new Regex("^(?<victim>[a-zA-Z ]*) and caused the (?<special>[a-zA-Z ]*) effect");
         Regex rIgniteAether = new Regex("^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z ]*)"); // I think only Ignite Aether spells has this line
         Regex rReflect = new Regex("^(?<victim>[a-zA-Z ]*) by reflecting the attack");
-        Regex rStateAbility = new Regex("^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state because (?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z ]*)");
+        Regex rStateAbility = new Regex("^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z ]*)");
         Regex rWeakened = new Regex("^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ]*)");
         Regex rActivated = new Regex("^(?<skill>[a-zA-Z ]*) Effect has been activated");
         Regex rContDmg1 = new Regex("^(?<actor>[a-zA-Z ]*) inflicted continuous damage on (?<target>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ]*)");
@@ -93,6 +93,14 @@
             if (str.Contains("has conquered")) return; // ignore fortress
             if (str.Contains("is no longer vulnerable")) return; // ignore fortress
             if (str.Contains("is no longer immobilized.")) return;
+            if (str.Contains("became stunned because")) return;
+            if (str.Contains("is no longer stunned.")) return;
+            if (str.Contains("fell down from shock because")) return;
+            if (str.Contains("is no longer shocked.")) return;
+            if (str.Contains("is spinning because")) return;
+            if (str.Contains("is no longer spinning.")) return;
+            if (str.Contains("was knocked back from shock because")) return;
+            if (str.Contains("is no longer staggering.")) return;
             if (str.Contains("is unable to fly because")) return;
             if (str.Contains("The target is too far away")) return;
             if (str.StartsWith("Quest updated:")) return;
@@ -100,8 +108,10 @@
             if (str.StartsWith("You interrupted the target's skill.")) return;
             if (str.StartsWith("You are no longer")) return;
             if (str.StartsWith("You have stopped gathering.")) return;
-            if (str.StartsWith("You are released from the Aerial Snare.")) return;
+            if (str.Contains("released from the Aerial Snare.")) return;
             if (str.StartsWith("You were killed")) return;
+            if (str.StartsWith("You have earned")) return;
+            if (str.StartsWith("Legion Message:")) return;
 
 
             int num2;
@@ -288,7 +298,11 @@
             // match "xxx is in the xxx state..."
             if (rStateAbility.IsMatch(str))
             {
-                //Match match = rStateAbility.Match(str);
+                Match match = rStateAbility.Match(str);
+                string target = CheckYou(match.Groups["target"].Value);
+                string actor = CheckYou(match.Groups["actor"].Value);
+                if (String.IsNullOrEmpty(actor)) actor = target;
+                string skill = match.Groups["skill"].Value;
                 return;
             }
 
