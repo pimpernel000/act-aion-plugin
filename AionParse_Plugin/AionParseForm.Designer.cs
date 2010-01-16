@@ -28,25 +28,78 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.TextboxLog = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.TextboxDefaultCharacter = new System.Windows.Forms.TextBox();
+            this.ApplyDefaultCharacter = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // textBox1
+            // TextboxLog
             // 
-            this.textBox1.Location = new System.Drawing.Point(23, 30);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(375, 438);
-            this.textBox1.TabIndex = 0;
+            this.TextboxLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextboxLog.Location = new System.Drawing.Point(34, 37);
+            this.TextboxLog.Margin = new System.Windows.Forms.Padding(4);
+            this.TextboxLog.Multiline = true;
+            this.TextboxLog.Name = "TextboxLog";
+            this.TextboxLog.ReadOnly = true;
+            this.TextboxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.TextboxLog.Size = new System.Drawing.Size(560, 538);
+            this.TextboxLog.TabIndex = 0;
+            this.TextboxLog.TabStop = false;
+            this.TextboxLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextboxLog_KeyDown);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(34, 14);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(34, 16);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Log";
+            // 
+            // TextboxDefaultCharacter
+            // 
+            this.TextboxDefaultCharacter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.TextboxDefaultCharacter.Location = new System.Drawing.Point(623, 37);
+            this.TextboxDefaultCharacter.Name = "TextboxDefaultCharacter";
+            this.TextboxDefaultCharacter.Size = new System.Drawing.Size(122, 22);
+            this.TextboxDefaultCharacter.TabIndex = 2;
+            // 
+            // ApplyDefaultCharacter
+            // 
+            this.ApplyDefaultCharacter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ApplyDefaultCharacter.Location = new System.Drawing.Point(762, 36);
+            this.ApplyDefaultCharacter.Name = "ApplyDefaultCharacter";
+            this.ApplyDefaultCharacter.Size = new System.Drawing.Size(75, 23);
+            this.ApplyDefaultCharacter.TabIndex = 3;
+            this.ApplyDefaultCharacter.Text = "Apply";
+            this.ApplyDefaultCharacter.UseVisualStyleBackColor = true;
+            this.ApplyDefaultCharacter.Click += new System.EventHandler(this.ApplyDefaultCharacter_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(620, 14);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(128, 16);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "Default Character";
             // 
             // AionParseForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(444, 513);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.ApplyDefaultCharacter);
+            this.Controls.Add(this.TextboxDefaultCharacter);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.TextboxLog);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AionParseForm";
-            this.Text = "AionParseForm";
+            this.Size = new System.Drawing.Size(1334, 631);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -54,6 +107,10 @@
 
 		#endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox TextboxLog;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox TextboxDefaultCharacter;
+        private System.Windows.Forms.Button ApplyDefaultCharacter;
+        private System.Windows.Forms.Label label2;
 	}
 }

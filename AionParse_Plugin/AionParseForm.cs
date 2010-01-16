@@ -10,14 +10,36 @@ namespace AionParse_Plugin
 {
     public partial class AionParseForm : UserControl
 	{
+        AionParse plugin;
+
 		public AionParseForm(AionParse plugin)
 		{
 			InitializeComponent();
+            this.plugin = plugin;
 		}
 
         public void AddText(string text)
         {
-            textBox1.Text += text + Environment.NewLine;
+            TextboxLog.Text += text + Environment.NewLine;
         }
-	}
+
+        private void ApplyDefaultCharacter_Click(object sender, EventArgs e)
+        {
+            plugin.SetCharName(TextboxDefaultCharacter.Text);
+            AddText("Default character changed to " + TextboxDefaultCharacter.Text);
+        }
+
+        internal void InitFromPlugin(string lastCharName)
+        {
+            TextboxDefaultCharacter.Text = lastCharName;
+        }
+
+        private void TextboxLog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                ApplyDefaultCharacter_Click(sender, e);
+            }
+        }
+    }
 }
