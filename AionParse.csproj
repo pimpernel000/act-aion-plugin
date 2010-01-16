@@ -64,12 +64,14 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing">
       <Name>System.Drawing</Name>
     </Reference>
     <Reference Include="System.Windows.Forms">
       <Name>System.Windows.Forms</Name>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AionParse\Properties\Resources.cs">
@@ -78,6 +80,13 @@
     <Compile Include="AionParse_Plugin\AionParse.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="AionParse_Plugin\AionParseForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="AionParse_Plugin\AionParseForm.Designer.cs">
+      <DependentUpon>AionParseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AionParse_Plugin\ContinuousDamageRecord.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -85,6 +94,9 @@
       <SubType>Code</SubType>
     </Compile>
     <EmbeddedResource Include="AionParse.Properties.Resources.resources" />
+    <EmbeddedResource Include="AionParse_Plugin\AionParseForm.resx">
+      <DependentUpon>AionParseForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
