@@ -38,22 +38,22 @@
 
     public class AionParse : IActPluginV1
     {
-        Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
-        Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ]*?)( has)? inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
-        Regex rUsingAttack = new Regex("^(?<victimclause>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ']*)$", RegexOptions.Compiled);
-        Regex rPatternEngraving = new Regex("^(?<victim>[a-zA-Z ]*) and caused the (?<special>[a-zA-Z ]*) effect$", RegexOptions.Compiled);
-        Regex rIgniteAether = new Regex("^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z ']*)$", RegexOptions.Compiled); // I think only Ignite Aether spells has this line
-        Regex rReflect = new Regex("^(?<victim>[a-zA-Z ]*) by reflecting the attack$", RegexOptions.Compiled);
+        Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ]*?)( has)? inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
+        Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ]*) and caused the (?<special>[a-zA-Z ]*) effect$", RegexOptions.Compiled);
+        Regex rIgniteAether = new Regex(@"^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // I think only Ignite Aether spells has this line
+        Regex rReflect = new Regex(@"^(?<victim>[a-zA-Z ]*) by reflecting the attack$", RegexOptions.Compiled);
         Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) damage from (?<attacker>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
-        Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
-        Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z ']*) Effect has been activated\.$", RegexOptions.Compiled);
-        Regex rContDmg1 = new Regex(@"^(?<actor>[a-zA-Z ]*) inflicted continuous damage on (?<target>[a-zA-Z ]*) by using (?<skill>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
+        Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
+        Regex rContDmg1 = new Regex(@"^(?<actor>[a-zA-Z ]*) inflicted continuous damage on (?<target>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<target>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rContDmg3 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z ]*) damage after you used (?<skill>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
-        Regex rReceivedContDmg = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
+        Regex rContDmg3 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z ]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rReceivedContDmg = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
-        Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using) (?<skill>[a-zA-Z ']*?)\( Effect)?\.$", RegexOptions.Compiled);
+        Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         
         string lastActivatedSkill = "";
         int lastActivatedSkillGlobalTime = -1;
@@ -117,7 +117,8 @@
             if (str.Contains("You must level up to raise your skill level.")) return;
             if (str.Contains("gathered successfully")) return;
             if (str.Contains("failed to gather")) return;
-            if (str.Contains("You have acquired")) return;
+            if (str.StartsWith("You have acquired [item:")) return;
+            if (str.Contains("has acquired [item:")) return;
             if (str.Contains("has logged in")) return;
             if (str.StartsWith("You changed the connection status")) return;
             if (str.StartsWith("You changed the group")) return;
@@ -126,7 +127,11 @@
             if (str.StartsWith("You boosted your")) return; // ignore You boosted your evasion by using Focused Evasion I. 
             if (str.Contains("has conquered")) return; // ignore fortress
             if (str.Contains("is no longer vulnerable")) return; // ignore fortress
-            if (str.Contains("is no longer immobilized.")) return;
+            if (str.EndsWith("restored its movement speed.")) return;
+            if (str.EndsWith("restored its attack speed.")) return;
+            if (str.EndsWith("is no longer immobilized.")) return;
+            if (str.EndsWith("is no longer poisoned.")) return;
+            if (str.EndsWith("woke up.")) return;
             if (str.Contains("became stunned because")) return;
             if (str.Contains("is no longer stunned.")) return;
             if (str.Contains("fell down from shock because")) return;
@@ -148,6 +153,9 @@
             if (str.StartsWith("Legion Message:")) return;
             if (str.Contains("speed has decreased")) return;
             if (str.Contains("was affected by its own")) return;
+            if (str == "Invalid target.") return;
+            if (str == "You stopped using the Macro.") return;
+            if (str == "The skill was cancelled.") return;
 
 
             int num2;
@@ -313,7 +321,18 @@
                 outName = continuousDamageSet.GetActor(incName, theAttackType, logInfo.detectedTime);
                 if (String.IsNullOrEmpty(outName)) // skills like Promise of Wind or Blood Rune
                 {
-                    outName = "Unknown";
+                    if (theAttackType.StartsWith("Promise of Wind"))
+                    {
+                        outName = "Unknown (Priest)";
+                    }
+                    else if (theAttackType.StartsWith("Blood Rune"))
+                    {
+                        outName = "Unknown (Assassin)";
+                    }
+                    else
+                    {
+                        outName = "Unknown";
+                    }
                 }
              
                 AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.NonMelee);
@@ -504,20 +523,16 @@
                 }
             }
 
-                /* You recovered 220 MP due to the effect of Gain Mana I. (self cast)
-                 * You recovered 55 MP due to the effect of Mana Treatment III. (self cast)
-                 * Azkarvaz recovered 1,706 MP due to the effect of Spirit Absorption I Effect. (self cast)  Soul Ab (self cast) Promise of Aether
-                 * Clement Mind Mantra (not self cast!)  Invincibility Mantra
-                 */
+            // match "xxx recovered x MP ..."
             if (rRecoverMP.IsMatch(str))
             {
                 Match match = rRecoverMP.Match(str);
                 incName = CheckYou(match.Groups["target"].Value);
                 damage = DamageNumberFix(match.Groups["mp"].Value);
                 theAttackType = match.Groups["skill"].Value;
-                if (theAttackType.Contains("Mantra") || theAttackType.StartsWith("Magic Recovery"))
+                if (theAttackType.Contains("Clement Mind Mantra") || theAttackType.Contains("Invincibility Mantra") || theAttackType.StartsWith("Magic Recovery"))
                 {
-                    outName = "Unknown"; // TODO: try to guess the chanter based on who casted the mantra
+                    outName = "Unknown (Chanter)"; // TODO: try to guess the chanter based on who casted the mantra
                 }
                 else
                 {
@@ -528,6 +543,7 @@
                 return;
             }
 
+            // match "xxx restored x MP."
             if (str.EndsWith(" MP.") && str.Contains("restored"))
             {
                 if (ActGlobals.oFormActMain.InCombat)
@@ -630,7 +646,7 @@
                     }
                 }
             }
-            else if ((str.IndexOf("resisted") != -1) && (str.IndexOf(". ") != -1))
+            else if ((str.IndexOf("resisted") != -1) && (str.IndexOf(".") != -1))
             {
                 incName = str.Substring(0, str.IndexOf(" resisted "));
                 incName = this.CheckYou(incName);
@@ -747,6 +763,16 @@
                         logInfo.detectedType = Color.Green.ToArgb();
                     }
                 }
+            }
+            if (str.StartsWith("Your abnormal physical conditions were removed because"))
+            {
+                Regex rDispelOnYou = new Regex(@"Your abnormal physical conditions were removed because (?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*?) on you", RegexOptions.Compiled);
+                Match match = rDispelOnYou.Match(str);
+                incName = CheckYou("you");
+                outName = match.Groups["actor"].Value;
+                theAttackType = match.Groups["skill"].Value;
+                AddCombatAction(logInfo, outName, incName, theAttackType, false, string.Empty, "0", SwingTypeEnum.CureDispel);
+                return;
             }
             else
             {

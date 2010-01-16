@@ -44,10 +44,9 @@
             this.TextboxLog.Name = "TextboxLog";
             this.TextboxLog.ReadOnly = true;
             this.TextboxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextboxLog.Size = new System.Drawing.Size(560, 538);
+            this.TextboxLog.Size = new System.Drawing.Size(560, 437);
             this.TextboxLog.TabIndex = 0;
             this.TextboxLog.TabStop = false;
-            this.TextboxLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextboxLog_KeyDown);
             // 
             // label1
             // 
@@ -66,6 +65,7 @@
             this.TextboxDefaultCharacter.Name = "TextboxDefaultCharacter";
             this.TextboxDefaultCharacter.Size = new System.Drawing.Size(122, 22);
             this.TextboxDefaultCharacter.TabIndex = 2;
+            this.TextboxDefaultCharacter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextboxDefaultCharacter_KeyDown);
             // 
             // ApplyDefaultCharacter
             // 
@@ -99,7 +99,7 @@
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AionParseForm";
-            this.Size = new System.Drawing.Size(1334, 631);
+            this.Size = new System.Drawing.Size(1334, 507);
             this.ResumeLayout(false);
             this.PerformLayout();
 

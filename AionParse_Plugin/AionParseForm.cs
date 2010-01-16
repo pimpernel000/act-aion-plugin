@@ -34,7 +34,7 @@ namespace AionParse_Plugin
             TextboxDefaultCharacter.Text = lastCharName;
         }
 
-        private void TextboxLog_KeyDown(object sender, KeyEventArgs e)
+        private void TextboxDefaultCharacter_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
