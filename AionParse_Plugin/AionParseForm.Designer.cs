@@ -33,6 +33,8 @@
             this.TextboxDefaultCharacter = new System.Windows.Forms.TextBox();
             this.ApplyDefaultCharacter = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.CheckboxGuessDoTCasters = new System.Windows.Forms.CheckBox();
+            this.CheckboxDebugParse = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // TextboxLog
@@ -87,10 +89,40 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Default Character";
             // 
+            // CheckboxGuessDoTCasters
+            // 
+            this.CheckboxGuessDoTCasters.AutoSize = true;
+            this.CheckboxGuessDoTCasters.Checked = true;
+            this.CheckboxGuessDoTCasters.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckboxGuessDoTCasters.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxGuessDoTCasters.Location = new System.Drawing.Point(623, 79);
+            this.CheckboxGuessDoTCasters.Name = "CheckboxGuessDoTCasters";
+            this.CheckboxGuessDoTCasters.Size = new System.Drawing.Size(145, 20);
+            this.CheckboxGuessDoTCasters.TabIndex = 5;
+            this.CheckboxGuessDoTCasters.Text = "Guess DoT Casters";
+            this.CheckboxGuessDoTCasters.UseVisualStyleBackColor = true;
+            this.CheckboxGuessDoTCasters.CheckedChanged += new System.EventHandler(this.CheckboxGuessDoTCasters_CheckedChanged);
+            // 
+            // CheckboxDebugParse
+            // 
+            this.CheckboxDebugParse.AutoSize = true;
+            this.CheckboxDebugParse.Checked = true;
+            this.CheckboxDebugParse.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckboxDebugParse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxDebugParse.Location = new System.Drawing.Point(623, 457);
+            this.CheckboxDebugParse.Name = "CheckboxDebugParse";
+            this.CheckboxDebugParse.Size = new System.Drawing.Size(109, 17);
+            this.CheckboxDebugParse.TabIndex = 6;
+            this.CheckboxDebugParse.Text = "Debug Messages";
+            this.CheckboxDebugParse.UseVisualStyleBackColor = true;
+            this.CheckboxDebugParse.CheckedChanged += new System.EventHandler(this.CheckboxDebugParse_CheckedChanged);
+            // 
             // AionParseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.CheckboxDebugParse);
+            this.Controls.Add(this.CheckboxGuessDoTCasters);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.ApplyDefaultCharacter);
             this.Controls.Add(this.TextboxDefaultCharacter);
@@ -112,5 +144,7 @@
         private System.Windows.Forms.TextBox TextboxDefaultCharacter;
         private System.Windows.Forms.Button ApplyDefaultCharacter;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox CheckboxGuessDoTCasters;
+        private System.Windows.Forms.CheckBox CheckboxDebugParse;
 	}
 }

@@ -13,6 +13,10 @@
      *  The spirit used a skill on Iceghost Priest because Coszet used Spirit Thunderbolt Claw I.
      *  The spirit used a skill on Brutal Mist Mane Pawsoldier because Hexis used Spirit Erosion I.
      *  
+     * Servants from Summoners
+     *  Konata has summoned Water Energy to attack Brutal Mist Mane Grappler by using Summon Water Energy I. 
+     *  Wind Servant inflicted 301 damage on Brutal Mist Mane Pawsoldier. (wind servant attacks 6 times over 10 secs)
+
      * Holy Spirit from Clerics
      *  You summoned Holy Servant by using Summon Holy Servant II to let it attack Pale Worg.
      *  Azshadela has summoned Holy Servant to attack Infiltrator by using Summon Holy Servant II. 
@@ -24,6 +28,19 @@
      * Delayed Blast
      *  Hunter Arachna received the delayed explosion effect as you used Delayed Blast II. 
      *  Hunter Arachna received 1,118 damage due to the effect of Delayed Blast II. 
+     *  
+     * Cause
+     *   Malemodel has caused you to summon Water Energy by using Summon Water Energy I.  (elyos summoning water servant on you in pvp)
+     *   You received 97 damage from Water Energy. 
+     *   Bondmetoo has caused you to summon Holy Servant by using Summon Holy Servant III.  (elyos summoning holy servant on you in pvp)
+     *   You resisted Holy Servant's Summon Holy Servant III Effect. 
+     *   Vyrana has caused Holy Servant to recover HP over time by using Light of Rejuvenation II. 
+     *   Scout Captain caused you to bleed by using Area Cause Wound on you. 
+
+
+
+
+     * 
      */
 
     public class AionParse : IActPluginV1
@@ -47,14 +64,22 @@
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ]*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rResist = new Regex(@"^(?<target>[a-zA-Z ]*) resisted ((?<actor>[a-zA-Z ]*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
 
-
+        // for Robe of Ice damage reflect
         string lastActivatedSkill = "";
         int lastActivatedSkillGlobalTime = -1;
         DateTime lastActivedSkillTime = DateTime.MinValue;
 
+        // for using potions by you
+        string lastPotion;
+        int lastPotionGlobalTime = -1;
+        DateTime lastPotionTime = DateTime.MinValue;
+
+        // for remembering who cast DoTs
         ContinuousDamageSet continuousDamageSet = new ContinuousDamageSet();
 
         string lastCharName = ActGlobals.charName;
+        bool guessDotCasters = true;
+        bool debugParse = true;
 
         AionParseForm ui;
 
@@ -74,7 +99,7 @@
             pluginScreenSpace.Controls.Add(ui);
             ui.Dock = DockStyle.Fill;
             ui.AddText("Plugin Initialized with current character as " + lastCharName + ".");
-            ui.InitFromPlugin(lastCharName);
+            ui.InitFromPlugin(lastCharName, guessDotCasters, debugParse);
         }
 
         public void DeInitPlugin()
@@ -88,6 +113,10 @@
             lastActivatedSkill = "";
             lastActivatedSkillGlobalTime = -1;
             lastActivedSkillTime = DateTime.MinValue;
+
+            string lastPotion;
+            int lastPotionGlobalTime = -1;
+            DateTime lastPotionTime = DateTime.MinValue;
 
             continuousDamageSet.Clear();
         }
@@ -203,6 +232,16 @@
                 str = str.Substring(14, str.Length - 14);
             }
 
+            // match "You have used xxx Potion."
+            if (str.StartsWith("You have used") && str.EndsWith("Potion."))
+            {
+                Match match = (new Regex("You have used (?<potion>[a-zA-Z ]*).", RegexOptions.Compiled)).Match(str);
+                lastPotion = match.Groups["potion"].Value;
+                lastPotionGlobalTime = ActGlobals.oFormActMain.GlobalTimeSorter;
+                lastPotionTime = logInfo.detectedTime;
+                return;
+            }
+
             // match "xxx has been activated." for use in damage shields like Robe of Cold
             if (rActivated.IsMatch(str))
             {
@@ -263,10 +302,10 @@
                     }
 
                     var inflictSwingType = SwingTypeEnum.NonMelee;
-                    if (mInflict.Groups[1].Value == "you" &&
-                        (theAttackType.Contains("Healing Wind") || theAttackType.Contains("Light of Recovery") ||
-                        theAttackType.Contains("Healing Light") || theAttackType.Contains("Radiant Cure") ||
-                        theAttackType.Contains("Flash of Recovery")))
+                    if (incName == CheckYou("you") &&
+                        (theAttackType.StartsWith("Healing Wind") || theAttackType.StartsWith("Light of Recovery") ||
+                        theAttackType.StartsWith("Healing Light") || theAttackType.StartsWith("Radiant Cure") ||
+                        theAttackType.StartsWith("Flash of Recovery")))
                     {
                         inflictSwingType = SwingTypeEnum.Healing;
                     }
@@ -394,11 +433,30 @@
             if (rContDmg3.IsMatch(str))
             {
                 Match match = rContDmg3.Match(str);
-                outName = "Unknown";
                 incName = match.Groups["victim"].Value;
                 damage = match.Groups["damage"].Value;
                 string damageType = match.Groups["damagetype"].Value;
                 theAttackType = match.Groups["skill"].Value; // only DoT skills: Poison, Poison Arrow, or Wind Cut Down skills match this... often mob skills
+                if (theAttackType.StartsWith("Wind Cut Down"))
+                {
+                    outName = "Unknown (Sorcerer)";
+                }
+                else if (theAttackType.StartsWith("Slash Artery"))
+                {
+                    outName = "Unknown (Templar)";
+                }
+                else if (theAttackType.StartsWith("Apply Poison") || theAttackType.StartsWith("Poison Slash")) // not sure, is Poison Slash an Assassin ability?!?
+                {
+                    outName = "Unknown (Assassin)";
+                }
+                else if (theAttackType.StartsWith("Poison Arrow") || theAttackType.StartsWith("Poisoning Trap"))
+                {
+                    outName = "Unknown (Ranger)";
+                }
+                else
+                {
+                    outName = "Unknown"; // unknown class abilities are: Poison, Poison Slash (assassin?), Bleeding (spiritmaster?)
+                }
                 AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.NonMelee, damageType);
                 return;
             }
@@ -426,109 +484,124 @@
              * > Vyn inflicted 45 damage on you by using Wing Ignition. 
              */
 
-
-            // match "You restored xx of xxx's HP by using xxx."  the actor in this case is ambigious and not really you.
-            if (str.StartsWith("You restored"))
+            if (ActGlobals.oFormActMain.InCombat)
             {
-                Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+,)?\d+) of (?<target>[a-zA-Z ]*)'s HP by using (?<skill>[a-zA-Z \-']*?)\.");
-                Match match = rYouRestoreHP.Match(str);
-                if (!match.Success)
+                // match "You restored xx of xxx's HP by using xxx."  the actor in this case is ambigious and not really you.
+                if (str.StartsWith("You restored"))
                 {
-                    ui.AddText("Exception-Unable to parse[e2]: " + str);
+                    Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+,)?\d+) of (?<target>[a-zA-Z ]*)'s HP by using (?<skill>[a-zA-Z \-']*?)\.");
+                    Match match = rYouRestoreHP.Match(str);
+                    if (!match.Success)
+                    {
+                        ui.AddText("Exception-Unable to parse[e2]: " + str);
+                        return;
+                    }
+                    incName = match.Groups["target"].Value;
+                    damage = match.Groups["hp"].Value;
+                    theAttackType = match.Groups["skill"].Value;
+
+                    if (theAttackType.StartsWith("Revival Mantra"))
+                    {
+                        outName = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
+                    }
+                    else if (theAttackType.StartsWith("Blood Rune"))
+                    {
+                        outName = incName; // Blood Rune heals caster
+                    }
+                    else
+                    {
+                        outName = "Unknown";
+                    }
+
+                    AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
                     return;
                 }
-                incName = match.Groups["target"].Value;
-                damage = match.Groups["hp"].Value;
-                theAttackType = match.Groups["skill"].Value;
 
-                if (theAttackType.StartsWith("Revival Mantra"))
+                // match "xx restored xx HP."
+                if (str.EndsWith(" HP.") && str.Contains("restored"))
                 {
-                    outName = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
-                }
-                else if (theAttackType.StartsWith("Blood Rune"))
-                {
-                    outName = incName; // Blood Rune heals caster
-                }
-                else
-                {
-                    outName = "Unknown";
-                }
+                    Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ]*) restored (?<hp>(\d+,)?\d+) HP\.");
+                    Match match = rYouRestoreHP.Match(str);
+                    if (!match.Success)
+                    {
+                        ui.AddText("Exception-Unable to parse[e3]: " + str);
+                        return;
+                    }
+                    outName = match.Groups["actor"].Value;
+                    incName = outName;
+                    damage = match.Groups["hp"].Value;
+                    theAttackType = "Unknown";
+                    if (incName == CheckYou("you") && (ActGlobals.oFormActMain.GlobalTimeSorter == lastPotionGlobalTime || (logInfo.detectedTime - lastPotionTime).TotalSeconds < 2))
+                    {
+                        theAttackType = lastPotion;
+                    }
 
-                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
-                return;
-            }
-
-            // match "xx restored xx HP."
-            if (str.EndsWith(" HP.") && str.Contains("restored"))
-            {
-                Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ]*) restored (?<hp>(\d+,)?\d+) HP\.");
-                Match match = rYouRestoreHP.Match(str);
-                if (!match.Success)
-                {
-                    ui.AddText("Exception-Unable to parse[e3]: " + str);
+                    AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
                     return;
                 }
-                outName = match.Groups["actor"].Value;
-                incName = outName;
-                damage = match.Groups["hp"].Value;
-                theAttackType = "Unknown";
-                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
-                return;
-            }
 
-            // match "xxx recovered xx HP ..."
-            if (rRecoverHP.IsMatch(str))
-            {
-                Match match = rRecoverHP.Match(str);
-                incName = CheckYou(match.Groups["target"].Value);
-                if (match.Groups["actor"].Success)
+                // match "xxx recovered xx HP ..."
+                if (rRecoverHP.IsMatch(str))
                 {
-                    outName = CheckYou(match.Groups["actor"].Value);
-                }
-                else
-                {
-                    outName = incName;
-                }
-                damage = match.Groups["hp"].Value;
-                theAttackType = match.Groups["skill"].Value;
-                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
-                return;
-            }
-
-            // match "xxx recovered x MP ..."
-            if (rRecoverMP.IsMatch(str))
-            {
-                Match match = rRecoverMP.Match(str);
-                incName = CheckYou(match.Groups["target"].Value);
-                damage = match.Groups["mp"].Value;
-                theAttackType = match.Groups["skill"].Value;
-                if (theAttackType.Contains("Clement Mind Mantra") || theAttackType.Contains("Invincibility Mantra") || theAttackType.StartsWith("Magic Recovery"))
-                {
-                    outName = "Unknown (Chanter)"; // TODO: try to guess the chanter based on who casted the mantra
-                }
-                else
-                {
-                    outName = incName; // almost any MP recovery spell/potion is self cast
+                    Match match = rRecoverHP.Match(str);
+                    incName = CheckYou(match.Groups["target"].Value);
+                    if (match.Groups["actor"].Success)
+                    {
+                        outName = CheckYou(match.Groups["actor"].Value);
+                    }
+                    else
+                    {
+                        outName = incName;
+                    }
+                    damage = match.Groups["hp"].Value;
+                    theAttackType = match.Groups["skill"].Value;
+                    AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.Healing);
+                    return;
                 }
 
-                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.PowerHealing);
-                return;
-            }
+                // match "xxx recovered x MP ..."
+                if (rRecoverMP.IsMatch(str))
+                {
+                    Match match = rRecoverMP.Match(str);
+                    incName = CheckYou(match.Groups["target"].Value);
+                    damage = match.Groups["mp"].Value;
+                    theAttackType = match.Groups["skill"].Value;
+                    if (theAttackType.Contains("Clement Mind Mantra") || theAttackType.Contains("Invincibility Mantra") || theAttackType.StartsWith("Magic Recovery"))
+                    {
+                        outName = "Unknown (Chanter)"; // TODO: try to guess the chanter based on who casted the mantra
+                    }
+                    else
+                    {
+                        outName = incName; // almost any MP recovery spell/potion is self cast
+                    }
 
-            // match "xxx restored x MP."
-            if (str.EndsWith(" MP.") && str.Contains("restored"))
-            {
-                if (ActGlobals.oFormActMain.InCombat)
+                    AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.PowerHealing);
+                    return;
+                }
+
+                // match "xxx restored x MP."
+                if (str.EndsWith(" MP.") && str.Contains("restored"))
                 {
                     Match match = (new Regex(@"^(?<actor>[a-zA-Z ]*) restored (?<mp>.*) MP\.$", RegexOptions.Compiled)).Match(str);
+                    if (!match.Success)
+                    {
+                        ui.AddText("Exception-Unable to parse[e5]: " + str);
+                        return;
+                    }
+
                     incName = CheckYou(match.Groups["actor"].Value);
                     outName = incName; // assume: this log comes from a self action
                     damage = match.Groups["mp"].Value;
                     theAttackType = "Unknown";
+                    if (incName == CheckYou("you") && (ActGlobals.oFormActMain.GlobalTimeSorter == lastPotionGlobalTime || (logInfo.detectedTime - lastPotionTime).TotalSeconds < 2))
+                    {
+                        theAttackType = lastPotion;
+                    }
+
                     AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.PowerHealing);
+                    return;
                 }
-                return;
-            }
+            } // ignore heals/mp out of combat
 
             if (str.Contains("blocked"))
             {
@@ -807,7 +880,8 @@
             }
             else
             {
-                ui.AddText("Unable to parse: " + str);
+                if (debugParse)
+                    ui.AddText("Ignored: " + str);
             }
 
         }
@@ -882,6 +956,16 @@
         {
             lastCharName = charName;
             ActGlobals.charName = charName;
+        }
+
+        internal void SetGuessDotCasters(bool guessDotCasters)
+        {
+            this.guessDotCasters = guessDotCasters;
+        }
+
+        internal void SetDebugParse(bool debugParse)
+        {
+            this.debugParse = debugParse;
         }
     }
 }
