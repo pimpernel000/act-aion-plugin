@@ -104,7 +104,7 @@
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ]*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
-        Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ]*) resisted ((?<attacker>[a-zA-Z ]*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ]*) resisted ((?<attacker>[a-zA-Z ]*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);  // TODO: should we remove the word "Effect" from the end for traps and holy servant attacks?  need to be consistent.
         #endregion
 
         #region private members
@@ -795,6 +795,7 @@
                 {
                     Match match = rResist.Match(str);
 
+                    SwingTypeEnum swingType = SwingTypeEnum.NonMelee;
                     victim = CheckYou(match.Groups["victim"].Value);
                     if (match.Groups["attacker"].Success)
                     {
@@ -802,58 +803,22 @@
                     }
                     else
                     {
-                        attacker = "Unknown";
+                        attacker = CheckYou("you");
                     }
 
-                    if (match.Groups["skill"].Success)
-                    {
-                        skill = match.Groups["skill"].Value;
-                    }
-                    else
-                    {
-                        skill = "Unknown";
+                    skill = match.Groups["skill"].Value;
+                    if (skill == "your attack" || skill == "attack") { // match the generic "attack" word
+                        skill = "Melee"; // are these elemental melee attacks being resisted?  I mostly see assassin's attacks being resisted here, but also saw a ranger attack in my personal logs and well as my own sorc attacks.  (speaking of which, I haven't seen in my logs where my sorc's attacks were evaded.)
+                        swingType = SwingTypeEnum.Melee;
                     }
 
-                    if (attacker == "Aether" && skill.StartsWith("Hold"))
+                    if (attacker == "Aether" && skill.StartsWith("Hold I"))
                     {
                         skill = "Aether's " + skill;
-                        attacker = "Unknown (Sorcerer)";
+                        attacker = CheckYou("you");
                     }
 
-                    AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resist"), SwingTypeEnum.NonMelee);
-                    return;
-                }
-
-                if (((str.IndexOf("resisted") != -1) && (str.IndexOf("'s ") != -1)) && (str.IndexOf("Effect.") != -1))
-                {
-                    victim = str.Substring(0, str.IndexOf(" resisted "));
-                    victim = this.CheckYou(victim);
-                    attacker = str.Substring(str.IndexOf(" resisted ") + 10, str.IndexOf("'s ") - (str.IndexOf("resisted") + 10));
-                    attacker = this.CheckYou(attacker);
-                    skill = str.Substring(str.IndexOf("'s ") + 3, str.IndexOf(" Effect.") - (str.IndexOf("'s ") + 3));
-                    AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resist"), SwingTypeEnum.NonMelee);
-                    return;
-                }
-
-                if ((str.IndexOf("resisted") != -1) && (str.IndexOf("'s ") != -1))
-                {
-                    victim = str.Substring(0, str.IndexOf(" resisted "));
-                    victim = this.CheckYou(victim);
-                    attacker = str.Substring(str.IndexOf(" resisted ") + 10, str.IndexOf("'s ") - (str.IndexOf(" resisted") + 10));
-                    attacker = this.CheckYou(attacker);
-                    skill = str.Substring(str.IndexOf("'s ") + 3, (str.Length - (str.IndexOf("'s ") + 3)) - 2);
-                    AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resist"), SwingTypeEnum.NonMelee);
-                    return;
-                }
-
-                if ((str.IndexOf("resisted") != -1) && (str.IndexOf(".") != -1))
-                {
-                    victim = str.Substring(0, str.IndexOf(" resisted "));
-                    victim = this.CheckYou(victim);
-                    attacker = "You";
-                    attacker = this.CheckYou(attacker);
-                    skill = str.Substring(str.IndexOf(" resisted ") + 10, (str.Length - (str.IndexOf(" resisted ") + 10)) - 2);
-                    AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resist"), SwingTypeEnum.NonMelee);
+                    AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resisted"), swingType);
                     return;
                 }
             }
