@@ -7,20 +7,22 @@
     using System.Windows.Forms;
     using Advanced_Combat_Tracker;
 
-    /* TODO
+    /* TODO: things to parse
+     * TODO: have a UI option that saves your party member's class info while in dungeons
+     *         -also determine the class base on their skills
      * 
-     * Spirits from Summoners
+     * Spirits from Summoners (TODO: pet damage should be summoner's damage)
      *  The spirit used a skill on Iceghost Priest because Coszet used Spirit Thunderbolt Claw I.
      *  The spirit used a skill on Brutal Mist Mane Pawsoldier because Hexis used Spirit Erosion I.
      *  
-     * Servants from Summoners
+     * Servants from Summoners (TODO: pet damage should be summoner's damage)
      *  Konata has summoned Water Energy to attack Brutal Mist Mane Grappler by using Summon Water Energy I. 
      *  Wind Servant inflicted 301 damage on Brutal Mist Mane Pawsoldier. (wind servant attacks 6 times over 10 secs)
      *  (NOTE: in pvp, you get a weird message that sounds like you who summoned the servant; likely this is bad translation)
      *  Malemodel has caused you to summon Water Energy by using Summon Water Energy I.
      *  You received 97 damage from Water Energy. 
 
-     * Holy Spirit from Clerics (clerics are pet summoners too)
+     * Holy Spirit from Clerics (clerics are pet summoners too) (TODO: pet damage should be summoner's damage)
      *  You summoned Holy Servant by using Summon Holy Servant II to let it attack Pale Worg.
      *  Azshadela has summoned Holy Servant to attack Infiltrator by using Summon Holy Servant II. 
      *  Holy Servant inflicted 300 damage on Sergeant by using Summon Holy Servant II Effect. 
@@ -31,35 +33,38 @@
      * Resists to you (and maybe others?)   TODO: put resists in their class specific Unknown (class)... and perhaps in the future, give option to specify name... i.e. all Unknown (Sorcerer) will be defaulted to MyDefaultName
      *  Alpine Gorgon resisted Chastisement I.
      *  
-     * Bleeding
-     *   You caused Merciless Fire Spirit to bleed by using Wind Cut Down I.
-     *   Merciless Fire Spirit received 304 bleeding damage after you used Wind Cut Down I. 
-     *   Patroller caused you to bleed by using Area Cause Wound on you.
-     *   You received 53 bleeding damage due to the effect of Area Cause Wound. 
-     *   Ione is bleeding because Recondo used Area Cause Wound.
-     *   Ione received 53 bleeding damage after you used Area Cause Wound.
-     * 
-     * Poisoning
-     *   
-     *   Brutal Mist Mane Tamer received 197 poisoning damage after you used Poison Arrow II. 
-     *   (NOTE: rangers are pet summoners too, they summon trap pets)
+     * Poison Traps by Rangers (rangers are pet summoners too) (TODO: pet damage should be summoner's damage)
      *   Fluid summoned Poisoning Trap by using Poisoning Trap III.
      *   Brutal Mist Mane Pawsoldier became poisoned because Poisoning Trap used Poisoning Trap III Effect. 
      *   Brutal Mist Mane Pawsoldier received 361 poisoning damage after you used Poisoning Trap III Effect. 
-     *   (NOTE: it seems that Apply Poison doesn't have a "became poisoned" message when it procs)
+     *   
+     * Poisoning by unknown assassins (TODO: make a UI option to let certian skills be associated with your party's assassin)
+     *   (NOTE: it seems that Apply Poison doesn't have a "became poisoned" message when it procs, so logs alone cannot determine caster)
      *   You received 51 poisoning damage due to the effect of Apply Poison II Effect. 
      * 
- 
-     * Healing Holy Servants (need more data)
+     * Healing Holy Servants (TODO: need to parse this as healing but also put an option to not parse this as it is pet healing) (Need more data, does healing SM's pets also look like this?)
      *   Vyrana has caused Holy Servant to recover HP over time by using Light of Rejuvenation II. 
-
-     * Special DoTs on you?
+     *   
+     * Special DoTs on you?  (Why does this DoT seem like I'm hurting myself?)
      *  You received continuous damage because Black Blaze Spirit used Wing Ignition.
      *  Vyn inflicted 45 damage on you by using Wing Ignition. 
      * 
-     * Bodyguard transfering damage
+     * Bodyguard transfering damage  (How does this information even get handled by ACT?)
      *  Brutal Mist Mane Bodyguard received 577 damage inflicted on Brutal Mist Mane Dark Mage by Ikite. because of the protection effect cast on it.
      *  
+     * Continuous HP recovery by Word of Life for 10 secs (NOTE: the caster in the example is not you, but Jessex)
+     *  Jessex is in the continuous HP recovery state because he used Word of Life I.
+     *  Ione is in the continuous HP recovery state because Jessex used Word of Life I. 
+     *  Jessex is continuously restoring your HP by using Word of Life I. 
+     *  You restored 295 of Jessex's HP by using Word of Life I.
+     *  You restored 295 of Ione's HP by using Word of Life I. 
+     *  (TODO: what does it look like when Word of Life restores your hp?)
+     *  
+     * Mantras by Chanters (does turning off mantras show up on logs? TODO: have a UI option that saves mantra casters while in dungeons.)
+     *  Jessex started using Clement Mind Mantra II. 
+     *  You recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
+     *  Ione recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
+     * 
      */
 
     public partial class AionParse : IActPluginV1
@@ -72,21 +77,25 @@
         Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // only for Ignite Aether spell
         Regex rReflect = new Regex(@"^(?<victim>[a-zA-Z ]*) by reflecting the attack$", RegexOptions.Compiled);
         Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) damage from (?<attacker>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rReceiveEffect = new Regex(@"^(?<victim>[a-zA-Z ]*) received the (?<statuseffect>[a-zA-Z ]*) effect (as (?<attacker>you)|because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Delayed Blast spell
+        Regex rReceiveEffect = new Regex(@"^(?<victim>[a-zA-Z ]*) received the (?<statuseffect>[a-zA-Z ]*) effect (as (?<attacker>you)|because) (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Delayed Blast spell
         Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ]*) became poisoned because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: there are other status effects (see comments below), but we're only interested in damage
         Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ]*) is bleeding because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: there are other status effects (see comments below), but we're only interested in damage
-        Regex rStatusEffectByYou1 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to become poisoned by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
-        Regex rStatusEffectByYou2 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to bleed by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rStatusEffectByYou1 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ]*) to become poisoned by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
+        Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ]*) to bleed by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) poisoned (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) caused (?<victim>you) to bleed by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
         //Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         //Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         //Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ]*) became (?<statuseffect>[a-zA-Z ]*) because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. (also for stunned, snared (by Aether's Hold), snared in mid-air (by Aerial Lockdown), paralyzed, silenced, bound, blinded)
         //Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ]*) is (?<statuseffect>[a-zA-Z ]*) because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Ione is bleeding because Recondo used Area Cause Wound. (also other effects are: unable to fly and spinning)  NOTE: this also matches the "is in xxx state" so that must be used before this one.
-        //Regex rStatusEffectByYou1 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to become (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
-        //Regex rStatusEffectByYou2 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rStatusEffectByYou1 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ]*) to become (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
+        //Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ]*) to (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) (?<statuseffect>[a-zA-Z ]*) (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) caused (?<victim>you) to (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
         Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
         Regex rContDmg1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted continuous damage on (?<victim>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z ]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
@@ -393,30 +402,89 @@
                 return;
             }
 
-            // match "xxx inflicted continuous damage on xxx by using xxx."
-            if (rContDmg1.IsMatch(str))
+            if (str.Contains("continuous"))
             {
-                Match match = rContDmg1.Match(str);
-                string attacker = CheckYou(match.Groups["attacker"].Value);
-                string victim = CheckYou(match.Groups["victim"].Value);
-                string skill = match.Groups["skill"].Value;
-                if (guessDotCasters)
-                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
-                //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
-                return;
+                // match "xxx inflicted continuous damage on xxx by using xxx."
+                if (rContDmg1.IsMatch(str))
+                {
+                    Match match = rContDmg1.Match(str);
+                    string attacker = CheckYou(match.Groups["attacker"].Value);
+                    string victim = CheckYou(match.Groups["victim"].Value);
+                    string skill = match.Groups["skill"].Value;
+                    if (guessDotCasters)
+                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
+                    return;
+                }
+
+                // match "xxx used xxx to inflict continuous damage effect on xxx."
+                if (rContDmg2.IsMatch(str))
+                {
+                    Match match = rContDmg2.Match(str);
+                    string attacker = CheckYou(match.Groups["attacker"].Value);
+                    string victim = CheckYou(match.Groups["victim"].Value);
+                    string skill = match.Groups["skill"].Value;
+                    if (guessDotCasters)
+                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
+                    return;
+                }
             }
 
-            // match "xxx used xxx to inflict continuous damage effect on xxx."
-            if (rContDmg2.IsMatch(str))
-            {
-                Match match = rContDmg2.Match(str);
-                string attacker = CheckYou(match.Groups["attacker"].Value);
-                string victim = CheckYou(match.Groups["victim"].Value);
-                string skill = match.Groups["skill"].Value;
-                if (guessDotCasters)
-                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
-                //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
-                return;
+            if (str.Contains("poisoned")) {
+                Match poisonMatch = null;
+
+                // match "xxx became poisoned because xxx used xxx."
+                if (rStatusEffect1.IsMatch(str))
+                    poisonMatch = rStatusEffect1.Match(str);
+                
+                // match "You caused xxx to become poisoned by using xxx."
+                if (rStatusEffectByYou1.IsMatch(str))
+                    poisonMatch = rStatusEffectByYou1.Match(str);
+
+                // match "xxx poisoned you by using xxx."
+                if (rStatusEffectToYou1.IsMatch(str))
+                    poisonMatch = rStatusEffectToYou1.Match(str);
+
+                if (poisonMatch != null && poisonMatch.Success)
+                {
+                    if (guessDotCasters)
+                    {
+                        string attacker = CheckYou(poisonMatch.Groups["attacker"].Value);
+                        string victim = CheckYou(poisonMatch.Groups["victim"].Value);
+                        string skill = poisonMatch.Groups["skill"].Value;
+                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    }
+                    return;
+                }
+            }
+
+            if (str.Contains("bleed")) {
+                Match bleedMatch = null;
+
+                // match "xxx is bleeding because xxx used xxx."
+                if (rStatusEffect2.IsMatch(str))
+                    bleedMatch = rStatusEffect2.Match(str);
+
+                // match "You caused xxx to bleed by using xxx."
+                if (rStatusEffectByYou2.IsMatch(str))
+                    bleedMatch = rStatusEffectByYou2.Match(str);
+
+                // match "xxx caused you to bleed by using xxx."
+                if (rStatusEffectToYou2.IsMatch(str))
+                    bleedMatch = rStatusEffectToYou2.Match(str);
+
+                if (bleedMatch != null && bleedMatch.Success)
+                {
+                    if (guessDotCasters)
+                    {
+                        string attacker = CheckYou(bleedMatch.Groups["attacker"].Value);
+                        string victim = CheckYou(bleedMatch.Groups["victim"].Value);
+                        string skill = bleedMatch.Groups["skill"].Value;
+                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    }
+                    return;
+                }
             }
 
             // match "xxx received the xxx effect because xxx used xxx"  occurs when you use Delayed Blast
@@ -549,7 +617,12 @@
                     damage = match.Groups["hp"].Value;
                     theAttackType = match.Groups["skill"].Value;
 
-                    if (theAttackType.StartsWith("Revival Mantra") || theAttackType.StartsWith("Word of Life"))
+                    if (theAttackType == "Healing")
+                    {
+                        outName = incName;
+                        theAttackType = "Unknown (Potion?)";
+                    }
+                    else if (theAttackType.StartsWith("Revival Mantra") || theAttackType.StartsWith("Word of Life"))
                     {
                         outName = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
                     }
@@ -566,7 +639,7 @@
                     return;
                 }
 
-                // match "xx restored xx HP."
+                // match "xx restored xx HP."  most likely due to potion
                 if (str.EndsWith(" HP.") && str.Contains("restored"))
                 {
                     Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ]*) restored (?<hp>(\d+,)?\d+) HP\.");
@@ -579,7 +652,7 @@
                     outName = match.Groups["actor"].Value;
                     incName = outName;
                     damage = match.Groups["hp"].Value;
-                    theAttackType = "Unknown";
+                    theAttackType = "Unknown (Potion?)";
                     if (incName == CheckYou("you") && (ActGlobals.oFormActMain.GlobalTimeSorter == lastPotionGlobalTime || (logInfo.detectedTime - lastPotionTime).TotalSeconds < 2))
                     {
                         theAttackType = lastPotion;

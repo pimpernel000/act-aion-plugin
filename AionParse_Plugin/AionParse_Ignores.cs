@@ -19,7 +19,7 @@ namespace AionParse_Plugin
             if (str.Contains("was knocked back from shock because")) return true; // knockback by others
 
             if (str.Contains("to sleep by using")) return true;
-            if (str.StartsWith("transformed") && str.Contains("into Cursed Tree")) return true;
+            if (str.Contains("transformed") && str.Contains("into Cursed Tree")) return true;
             if (str.Contains("boosted") && (str.Contains("by using Curse of Roots") || str.Contains("by using Sleep"))) return true;
 
 
@@ -93,6 +93,7 @@ namespace AionParse_Plugin
                 "is unable to fly because",
                 "loot rate has increased because",
                 "changed his Physical Attack by using",
+                "has boosted your",
                 "was affected by its own",
                 "gathered successfully","failed to gather",
                 "has logged in",
@@ -119,6 +120,7 @@ namespace AionParse_Plugin
 
             if (str.Contains("is in the") && (str.Contains("state because") || str.Contains("state as it used"))) return true;
             if (str.Contains("has weakened") && str.Contains("by using")) return true;
+            if (str.Contains("casting speed by using") && str.Contains("changed")) return true;
 
             if (str.EndsWith("existing skill.") && str.Contains("conflicted with")) return true;
             if (str.StartsWith("You have played for") && str.EndsWith("Please take a break.")) return true;
