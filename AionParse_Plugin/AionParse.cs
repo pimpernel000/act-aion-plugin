@@ -16,14 +16,16 @@
      * Servants from Summoners
      *  Konata has summoned Water Energy to attack Brutal Mist Mane Grappler by using Summon Water Energy I. 
      *  Wind Servant inflicted 301 damage on Brutal Mist Mane Pawsoldier. (wind servant attacks 6 times over 10 secs)
-     *  Malemodel has caused you to summon Water Energy by using Summon Water Energy I.  (elyos summoning water servant on you in pvp)
+     *  (NOTE: in pvp, you get a weird message that sounds like you who summoned the servant; likely this is bad translation)
+     *  Malemodel has caused you to summon Water Energy by using Summon Water Energy I.
      *  You received 97 damage from Water Energy. 
 
-     * Holy Spirit from Clerics
+     * Holy Spirit from Clerics (clerics are pet summoners too)
      *  You summoned Holy Servant by using Summon Holy Servant II to let it attack Pale Worg.
      *  Azshadela has summoned Holy Servant to attack Infiltrator by using Summon Holy Servant II. 
      *  Holy Servant inflicted 300 damage on Sergeant by using Summon Holy Servant II Effect. 
-     *  Bondmetoo has caused you to summon Holy Servant by using Summon Holy Servant III.  (elyos summoning holy servant on you in pvp)
+     *  (NOTE: in pvp, you get a weird message that sounds like you who summoned the servant; likely this is bad translation)
+     *  Bondmetoo has caused you to summon Holy Servant by using Summon Holy Servant III.  
      *  You resisted Holy Servant's Summon Holy Servant III Effect. 
      * 
      * Resists to you (and maybe others?)   TODO: put resists in their class specific Unknown (class)... and perhaps in the future, give option to specify name... i.e. all Unknown (Sorcerer) will be defaulted to MyDefaultName
@@ -35,8 +37,19 @@
      *   Patroller caused you to bleed by using Area Cause Wound on you.
      *   You received 53 bleeding damage due to the effect of Area Cause Wound. 
      *   Ione is bleeding because Recondo used Area Cause Wound.
-     *   Ione received 53 bleeding damage after you used Area Cause Wound. 
-     *   
+     *   Ione received 53 bleeding damage after you used Area Cause Wound.
+     * 
+     * Poisoning
+     *   Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. 
+     *   Brutal Mist Mane Tamer received 197 poisoning damage after you used Poison Arrow II. 
+     *   (NOTE: rangers are pet summoners too, they summon trap pets)
+     *   Fluid summoned Poisoning Trap by using Poisoning Trap III.
+     *   Brutal Mist Mane Pawsoldier became poisoned because Poisoning Trap used Poisoning Trap III Effect. 
+     *   Brutal Mist Mane Pawsoldier received 361 poisoning damage after you used Poisoning Trap III Effect. 
+     *   (NOTE: it seems that Apply Poison doesn't have a "became poisoned" message when it procs)
+     *   You received 51 poisoning damage due to the effect of Apply Poison II Effect. 
+     * 
+ 
      * Healing Holy Servants (need more data)
      *   Vyrana has caused Holy Servant to recover HP over time by using Light of Rejuvenation II. 
 
@@ -97,8 +110,9 @@
         AionParseForm ui;
         string lastCharName = ActGlobals.charName;
         bool guessDotCasters = true;
-        bool debugParse = true; // for debugging purposes, shows 
+        bool debugParse = true; // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
         bool tagBlockedAttacks = true;
+        bool linkPets = false;
         #endregion
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
@@ -371,7 +385,7 @@
                 return;
             }
 
-            // match "continuous damage"
+            // match "xxx inflicted continuous damage on xxx by using xxx."
             if (rContDmg1.IsMatch(str))
             {
                 Match match = rContDmg1.Match(str);
@@ -383,6 +397,8 @@
                 //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
                 return;
             }
+
+            // match "xxx used xxx to inflict continuous damage effect on xxx."
             if (rContDmg2.IsMatch(str))
             {
                 Match match = rContDmg2.Match(str);
@@ -996,6 +1012,12 @@
         {
             this.tagBlockedAttacks = tagBlockedAttacks;
         }
+  
+        internal void SetLinkPets(bool linkPets)
+        {
+            this.linkPets = linkPets;
+        }
         #endregion
+
     }
 }

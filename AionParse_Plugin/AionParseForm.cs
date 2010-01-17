@@ -62,5 +62,10 @@ namespace AionParse_Plugin
         {
             plugin.SetTagBlockedAttacks(CheckboxTagBlockedAttacks.Checked);
         }
+
+        private void CheckboxLinkPets_CheckedChanged(object sender, EventArgs e)
+        {
+            plugin.SetLinkPets(CheckboxLinkPets.Checked);
+        }
     }
 }

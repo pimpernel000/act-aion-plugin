@@ -39,6 +39,7 @@
             this.CheckboxTagBlockedAttacks = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
+            this.CheckboxLinkPets = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // TextboxLog
@@ -143,10 +144,25 @@
             this.toolTip2.InitialDelay = 500;
             this.toolTip2.ReshowDelay = 100;
             // 
+            // CheckboxLinkPets
+            // 
+            this.CheckboxLinkPets.AutoSize = true;
+            this.CheckboxLinkPets.Enabled = false;
+            this.CheckboxLinkPets.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxLinkPets.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.CheckboxLinkPets.Location = new System.Drawing.Point(623, 133);
+            this.CheckboxLinkPets.Name = "CheckboxLinkPets";
+            this.CheckboxLinkPets.Size = new System.Drawing.Size(174, 20);
+            this.CheckboxLinkPets.TabIndex = 100;
+            this.CheckboxLinkPets.Text = "Link Pets with Summoner";
+            this.CheckboxLinkPets.UseVisualStyleBackColor = true;
+            this.CheckboxLinkPets.CheckedChanged += new System.EventHandler(this.CheckboxLinkPets_CheckedChanged);
+            // 
             // AionParseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.CheckboxLinkPets);
             this.Controls.Add(this.CheckboxTagBlockedAttacks);
             this.Controls.Add(this.CheckboxDebugParse);
             this.Controls.Add(this.CheckboxGuessDoTCasters);
@@ -177,5 +193,6 @@
         private System.Windows.Forms.CheckBox CheckboxTagBlockedAttacks;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolTip toolTip2;
+        private System.Windows.Forms.CheckBox CheckboxLinkPets;
 	}
 }
