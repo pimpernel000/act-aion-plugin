@@ -38,7 +38,7 @@ namespace AionParse_Plugin
             List<BlockedRecord> blockedRecordList = attackerHistory[attacker];
             foreach (BlockedRecord record in blockedRecordList)
             {
-                if (record.BlockedTime == DateTime.MinValue || (time - record.BlockedTime).TotalSeconds > 2)
+                if (record.BlockedTime == DateTime.MinValue || (time - record.BlockedTime).TotalSeconds > 1)
                     return "";
 
                 if (record.Defender == defender)

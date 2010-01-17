@@ -48,6 +48,7 @@
 
     public partial class AionParse : IActPluginV1
     {
+        #region regex
         Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ]*?)( has)? inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
@@ -67,7 +68,9 @@
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ]*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rResist = new Regex(@"^(?<target>[a-zA-Z ]*) resisted ((?<actor>[a-zA-Z ]*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        #endregion
 
+        #region private members
         // for Robe of Ice damage reflect
         string lastActivatedSkill = "";
         int lastActivatedSkillGlobalTime = -1;
@@ -84,14 +87,16 @@
         // remembering who who got blocked
         BlockedSet blockedHistory = new BlockedSet();
 
+        // list of skills that also contain DoT component or secondary payload damage later but cannot be found outside of rUsingAttack regex
+        System.Collections.Generic.List<string> extraDamageSkills;
+
+        // ui variables
+        AionParseForm ui;
         string lastCharName = ActGlobals.charName;
         bool guessDotCasters = true;
         bool debugParse = true; // for debugging purposes, shows 
         bool tagBlockedAttacks = true;
-
-        AionParseForm ui;
-
-        System.Collections.Generic.List<string> extraDamageSkills; // list of skills that also contain DoT component or secondary payload damage later but cannot be found outside of rUsingAttack regex
+        #endregion
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
         {
@@ -517,7 +522,7 @@
                     damage = match.Groups["hp"].Value;
                     theAttackType = match.Groups["skill"].Value;
 
-                    if (theAttackType.StartsWith("Revival Mantra"))
+                    if (theAttackType.StartsWith("Revival Mantra") || theAttackType.StartsWith("Word of Life"))
                     {
                         outName = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
                     }
@@ -770,34 +775,25 @@
             #region evaded
             else if (str.Contains("evaded"))
             {
-                if ((str.IndexOf("evaded") != -1) && (str.IndexOf("'s ") != -1))
+                Regex rEvaded = new Regex(@"^(?<victim>[a-zA-Z ]*) evaded (?<attacker>[a-zA-Z ]*?)'s (attack|(?<skill>[a-zA-Z \-']*?))\.$");
+                Match match = rEvaded.Match(str);
+
+                incName = CheckYou(match.Groups["victim"].Value);
+                outName = CheckYou(match.Groups["attacker"].Value);
+                SwingTypeEnum swingType;
+                if (match.Groups["skill"].Success)
                 {
-                    incName = str.Substring(0, str.IndexOf(" evaded "));
-                    incName = this.CheckYou(incName);
-                    outName = str.Substring(str.IndexOf(" evaded ") + 7, str.IndexOf("'s ") - (str.IndexOf(" evaded") + 7));
-                    outName = this.CheckYou(outName);
-                    int swingType = 1;
-                    if (str.IndexOf(" attack. ") != -1)
-                    {
-                        theAttackType = "Melee";
-                        swingType = 1;
-                    }
-                    else
-                    {
-                        theAttackType = str.Substring(str.IndexOf("'s ") + 3, (str.Length - (str.IndexOf("'s ") + 3)) - 2);
-                        swingType = 2;
-                    }
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
-                    {
-                        int num25;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num25 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "evaded"), logInfo.detectedTime, num25, incName, string.Empty);
-                        if (flag2)
-                        {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
-                        }
-                    }
+                    swingType = SwingTypeEnum.NonMelee;
+                    theAttackType = match.Groups["skill"].Value;
                 }
+                else
+                {
+                    swingType = SwingTypeEnum.Melee;
+                    theAttackType = "Melee";
+                }
+
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.Miss, "evaded"), swingType);
+                return;
             }
             #endregion
 
@@ -917,6 +913,7 @@
 
         }
 
+        #region AddCombatAction overloads
         private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
@@ -951,7 +948,9 @@
                 ActGlobals.oFormActMain.AddCombatAction((int)swingType2, critical, special, attacker, theAttackType, int.Parse(damage), logInfo.detectedTime, globalTime, victim, string.Empty);
             }
         }
+        #endregion
 
+        #region utility methods
         private DateTime ParseDateTime(string FullLogLine)
         {
             string str = FullLogLine.Substring(0, 4) + "-" + FullLogLine.Substring(5, 2) + FullLogLine.Substring(8, 2);
@@ -972,12 +971,6 @@
             }
         }
 
-        private string DamageNumberFixX(string damage)
-        {
-            damage = Regex.Replace(damage, "[^0-9]", "");
-            return damage;
-        }
-
         private Dnum NewDnum(string damage, string damageString)
         {
             int d = int.Parse(damage.Replace(",", "").Trim());
@@ -991,17 +984,14 @@
             }
         }
 
-        private string FindAttacker(string victim, string spellname)
-        {
-            return "me?!?";
-        }
-
         internal void SetCharName(string charName)
         {
             lastCharName = charName;
             ActGlobals.charName = charName;
         }
+        #endregion
 
+        #region ui setters
         internal void SetGuessDotCasters(bool guessDotCasters)
         {
             this.guessDotCasters = guessDotCasters;
@@ -1016,5 +1006,6 @@
         {
             this.tagBlockedAttacks = tagBlockedAttacks;
         }
+        #endregion
     }
 }

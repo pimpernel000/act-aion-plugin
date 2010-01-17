@@ -85,6 +85,7 @@ namespace AionParse_Plugin
                 "became snared in mid-air because",
                 "was released from the aerial snare because",
                 "fell down from shock because",
+                "has knocked you back by using",
                 "fell asleep because",
                 "is unable to fly because",
                 "loot rate has increased because",
