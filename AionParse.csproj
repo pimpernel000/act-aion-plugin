@@ -86,6 +86,8 @@
     <Compile Include="AionParse_Plugin\AionParseForm.Designer.cs">
       <DependentUpon>AionParseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AionParse_Plugin\AionParse_Ignores.cs" />
+    <Compile Include="AionParse_Plugin\BlockedRecord.cs" />
     <Compile Include="AionParse_Plugin\ContinuousDamageRecord.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
