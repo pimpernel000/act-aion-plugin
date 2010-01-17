@@ -26,7 +26,7 @@
      *  Bondmetoo has caused you to summon Holy Servant by using Summon Holy Servant III.  (elyos summoning holy servant on you in pvp)
      *  You resisted Holy Servant's Summon Holy Servant III Effect. 
      * 
-     * Resists to you
+     * Resists to you (and maybe others?)   TODO: put resists in their class specific Unknown (class)... and perhaps in the future, give option to specify name... i.e. all Unknown (Sorcerer) will be defaulted to MyDefaultName
      *  Alpine Gorgon resisted Chastisement I.
      *  
      * Bleeding
@@ -44,6 +44,9 @@
      *  You received continuous damage because Black Blaze Spirit used Wing Ignition.
      *  Vyn inflicted 45 damage on you by using Wing Ignition. 
      * 
+     * Bodyguard transfering damage
+     *  Brutal Mist Mane Bodyguard received 577 damage inflicted on Brutal Mist Mane Dark Mage by Ikite. because of the protection effect cast on it.
+     *  
      */
 
     public partial class AionParse : IActPluginV1
@@ -623,7 +626,11 @@
                     AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, damage, SwingTypeEnum.PowerHealing);
                     return;
                 }
-            } // ignore heals/mp out of combat
+            }
+            else if (str.Contains(" HP ") || str.EndsWith(" HP.") || str.Contains(" MP ") || str.EndsWith(" MP."))
+            {
+                return; // ignore heals/mp out of combat
+            }
             #endregion
 
             #region blocked
@@ -804,17 +811,8 @@
                 outName = this.CheckYou(outName);
                 incName = outName;
                 theAttackType = str.Substring(str.IndexOf("removed its abnormal physical conditions by using") + 50, (str.Length - (str.IndexOf("removed its abnormal physical conditions by using") + 50)) - 2);
-                special = "Cure";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num26;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num26 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num26, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                return;
             }
             else if ((str.IndexOf("removed abnormal physical conditions from") != -1) && (str.IndexOf("by using") != -1))
             {
@@ -823,17 +821,8 @@
                 incName = str.Substring(str.IndexOf("removed abnormal physical conditions from") + 0x2a, (str.IndexOf("by using") - (str.IndexOf("removed abnormal physical conditions from") + 0x2a)) - 1);
                 incName = this.CheckYou(incName);
                 theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                special = "Cure";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num27;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num27 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num27, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                return;
             }
             else if ((str.IndexOf("dispelled the magical buffs from") != -1) && (str.IndexOf("by using") != -1))
             {
@@ -842,35 +831,35 @@
                 incName = str.Substring(str.IndexOf("dispelled the magical buffs from") + 0x21, (str.IndexOf("by using") - (str.IndexOf("dispelled the magical buffs from") + 0x21)) - 1);
                 incName = this.CheckYou(incName);
                 theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                special = "Dispelled";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num28;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num28 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "dispelled"), logInfo.detectedTime, num28, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "dispel"), SwingTypeEnum.CureDispel);
+                return;
             }
-            else if (str.IndexOf("dispelled its magic effect by using") != -1)
+            else if ((str.IndexOf("dispelled the magical debuffs from") != -1) && (str.IndexOf("by using") != -1))
+            {
+                outName = str.Substring(0, str.IndexOf("dispelled the magical debuffs from") - 1);
+                outName = this.CheckYou(outName);
+                incName = str.Substring(str.IndexOf("dispelled the magical debuffs from") + 0x21, (str.IndexOf("by using") - (str.IndexOf("dispelled the magical debuffs from") + 0x21)) - 1);
+                incName = this.CheckYou(incName);
+                theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                return;
+            }
+            else if (str.IndexOf("dispelled its magic effect by using") != -1) // Blind Leap
             {
                 outName = str.Substring(0, str.IndexOf("dispelled its magic effect by using") - 1);
                 outName = this.CheckYou(outName);
                 incName = outName;
                 theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                special = "Cure";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num2;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num2 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num2, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                return;
+            }
+            else if (str.Contains("dispelled its magical debuffs by using"))
+            {
+                outName = CheckYou(str.Substring(0, str.IndexOf("dispelled its magical debuffs") - 1));
+                incName = outName;
+                theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                return;
             }
             else if (str.StartsWith("Your abnormal physical conditions were removed because"))
             {
@@ -879,9 +868,10 @@
                 incName = CheckYou("you");
                 outName = match.Groups["actor"].Value;
                 theAttackType = match.Groups["skill"].Value;
-                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
                 return;
             }
+
             #endregion
 
             #region state parses

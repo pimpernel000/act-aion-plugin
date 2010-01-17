@@ -19,7 +19,7 @@ namespace AionParse_Plugin
             if (str.Contains("was knocked back from shock because")) return true; // knockback by others
 
             if (str.Contains("to sleep by using")) return true;
-            if (str.StartsWith("You transformed") && str.Contains("into Cursed Tree by using Curse of Roots")) return true;
+            if (str.StartsWith("transformed") && str.Contains("into Cursed Tree")) return true;
             if (str.Contains("boosted") && (str.Contains("by using Curse of Roots") || str.Contains("by using Sleep"))) return true;
 
 
@@ -71,7 +71,8 @@ namespace AionParse_Plugin
                 "is no longer spinning.",
                 "released from the Aerial Snare.",
                 "is no longer staggering.",
-                "woke up."
+                "woke up.",
+                "is no longer silenced."
             };
 
             List<string> containParts = new List<string>{
@@ -84,11 +85,14 @@ namespace AionParse_Plugin
                 "is spinning because",
                 "became snared in mid-air because",
                 "was released from the aerial snare because",
+                "from the Aerial Snare by using",
                 "fell down from shock because",
                 "has knocked you back by using",
                 "fell asleep because",
+                "became silenced because",
                 "is unable to fly because",
                 "loot rate has increased because",
+                "changed his Physical Attack by using",
                 "was affected by its own",
                 "gathered successfully","failed to gather",
                 "has logged in",
