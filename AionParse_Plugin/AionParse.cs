@@ -40,7 +40,7 @@
      *   Ione received 53 bleeding damage after you used Area Cause Wound.
      * 
      * Poisoning
-     *   Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. 
+     *   
      *   Brutal Mist Mane Tamer received 197 poisoning damage after you used Poison Arrow II. 
      *   (NOTE: rangers are pet summoners too, they summon trap pets)
      *   Fluid summoned Poisoning Trap by using Poisoning Trap III.
@@ -68,22 +68,30 @@
         Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ]*?)( has)? inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
-        Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ]*) and caused the (?<special>[a-zA-Z ]*) effect$", RegexOptions.Compiled);
-        Regex rIgniteAether = new Regex(@"^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // I think only Ignite Aether spells has this line
+        Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ]*) and caused the (?<statuseffect>[a-zA-Z ]*) effect$", RegexOptions.Compiled);
+        Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ]*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // only for Ignite Aether spell
         Regex rReflect = new Regex(@"^(?<victim>[a-zA-Z ]*) by reflecting the attack$", RegexOptions.Compiled);
-        Regex rReceiveState = new Regex(@"^(?<victim>[a-zA-Z ]*) received the (?<special>[a-zA-Z ]*) effect as you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) damage from (?<attacker>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rReceiveEffect = new Regex(@"^(?<victim>[a-zA-Z ]*) received the (?<statuseffect>[a-zA-Z ]*) effect (as (?<attacker>you)|because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Delayed Blast spell
+        Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ]*) became poisoned because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: there are other status effects (see comments below), but we're only interested in damage
+        Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ]*) is bleeding because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: there are other status effects (see comments below), but we're only interested in damage
+        Regex rStatusEffectByYou1 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to become poisoned by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
+        Regex rStatusEffectByYou2 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to bleed by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ]*) became (?<statuseffect>[a-zA-Z ]*) because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. (also for stunned, snared (by Aether's Hold), snared in mid-air (by Aerial Lockdown), paralyzed, silenced, bound, blinded)
+        //Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ]*) is (?<statuseffect>[a-zA-Z ]*) because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Ione is bleeding because Recondo used Area Cause Wound. (also other effects are: unable to fly and spinning)  NOTE: this also matches the "is in xxx state" so that must be used before this one.
+        //Regex rStatusEffectByYou1 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to become (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
+        //Regex rStatusEffectByYou2 = new Regex(@"^You caused (?<victim>[a-zA-Z ]*) to (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
-        Regex rContDmg1 = new Regex(@"^(?<actor>[a-zA-Z ]*) inflicted continuous damage on (?<target>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rContDmg2 = new Regex(@"^(?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<target>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rContDmg3 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z ]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rReceivedContDmg = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rContDmg1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted continuous damage on (?<victim>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z ]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ]*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ]*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
-        Regex rResist = new Regex(@"^(?<target>[a-zA-Z ]*) resisted ((?<actor>[a-zA-Z ]*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ]*) resisted ((?<attacker>[a-zA-Z ]*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         #endregion
 
         #region private members
@@ -112,7 +120,7 @@
         bool guessDotCasters = true;
         bool debugParse = true; // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
         bool tagBlockedAttacks = true;
-        bool linkPets = false;
+        bool linkPets = false; // TODO: link pets with their summoners for damage totalling; maybe label all pet skills as "Pet Skill (petname)" and name pet melee as "Melee (petname)"
         #endregion
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
@@ -239,7 +247,7 @@
                     if (mPatternEngraving.Success)
                     {
                         incName = CheckYou(mPatternEngraving.Groups["victim"].Value);
-                        //special = mPatternEngraving.Groups["special"].Value;
+                        //special = mPatternEngraving.Groups["statuseffect"].Value;
                     }
                     else
                     {
@@ -283,7 +291,7 @@
                 }
 
                 // submatch "and dispelled buffs using Ignite Aether"
-                var mIgniteAether = rIgniteAether.Match(targetClause);
+                var mIgniteAether = rAndDispelled.Match(targetClause);
                 if (mIgniteAether.Success)
                 {
                     incName = CheckYou(mIgniteAether.Groups["victim"].Value);
@@ -389,11 +397,11 @@
             if (rContDmg1.IsMatch(str))
             {
                 Match match = rContDmg1.Match(str);
-                string actor = CheckYou(match.Groups["actor"].Value);
-                string target = CheckYou(match.Groups["target"].Value);
+                string attacker = CheckYou(match.Groups["attacker"].Value);
+                string victim = CheckYou(match.Groups["victim"].Value);
                 string skill = match.Groups["skill"].Value;
                 if (guessDotCasters)
-                    continuousDamageSet.Add(actor, target, skill, logInfo.detectedTime);
+                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                 //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
                 return;
             }
@@ -402,20 +410,20 @@
             if (rContDmg2.IsMatch(str))
             {
                 Match match = rContDmg2.Match(str);
-                string actor = CheckYou(match.Groups["actor"].Value);
-                string target = CheckYou(match.Groups["target"].Value);
+                string attacker = CheckYou(match.Groups["attacker"].Value);
+                string victim = CheckYou(match.Groups["victim"].Value);
                 string skill = match.Groups["skill"].Value;
                 if (guessDotCasters)
-                    continuousDamageSet.Add(actor, target, skill, logInfo.detectedTime);
+                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                 //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
                 return;
             }
 
-            // match "xxx received the xxx effect as you used xxx"  occurs when you use Delayed Blast
-            if (rReceiveState.IsMatch(str))
+            // match "xxx received the xxx effect because xxx used xxx"  occurs when you use Delayed Blast
+            if (rReceiveEffect.IsMatch(str))
             {
-                Match match = rReceiveState.Match(str);
-                string actor = CheckYou("you");
+                Match match = rReceiveEffect.Match(str);
+                string actor = CheckYou(match.Groups["attacker"].Value);
                 string target = match.Groups["victim"].Value;
                 string skill = match.Groups["skill"].Value;
                 if (!guessDotCasters)
@@ -427,9 +435,9 @@
 
             #region continuous/extra damage from specific skills
             // match "xxx received xxx damage due to the effect of xxx"
-            if (rReceivedContDmg.IsMatch(str))
+            if (rIndirectDmg2.IsMatch(str))
             {
-                Match match = rReceivedContDmg.Match(str);
+                Match match = rIndirectDmg2.Match(str);
                 incName = CheckYou(match.Groups["victim"].Value);
                 damage = match.Groups["damage"].Value;
                 theAttackType = match.Groups["skill"].Value;
@@ -462,9 +470,9 @@
             }
 
             // match "xxx recieved xxx yyy damage after you used xxx" 
-            if (rContDmg3.IsMatch(str))
+            if (rIndirectDmg1.IsMatch(str))
             {
-                Match match = rContDmg3.Match(str);
+                Match match = rIndirectDmg1.Match(str);
                 incName = match.Groups["victim"].Value;
                 damage = match.Groups["damage"].Value;
                 string damageType = match.Groups["damagetype"].Value;
@@ -710,10 +718,10 @@
                 {
                     Match match = rResist.Match(str);
 
-                    incName = CheckYou(match.Groups["target"].Value);
-                    if (match.Groups["actor"].Success)
+                    incName = CheckYou(match.Groups["victim"].Value);
+                    if (match.Groups["attacker"].Success)
                     {
-                        outName = CheckYou(match.Groups["actor"].Value);
+                        outName = CheckYou(match.Groups["attacker"].Value);
                     }
                     else
                     {
@@ -891,8 +899,9 @@
             #endregion
 
             #region state parses
+            /*
             // match "xxx is in the xxx state..."
-            else if (rStateAbility.IsMatch(str))
+            if (rStateAbility.IsMatch(str))
             {
 
                 Match match = rStateAbility.Match(str);
@@ -903,12 +912,12 @@
                 return;
             }
 
-            // TODO remove these useless else ifs
             else if (rWeakened.IsMatch(str))
             {
                 //Match match = rWeakened.Match(str);
                 return;
             }
+             */
             #endregion
 
             else
