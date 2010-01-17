@@ -137,20 +137,11 @@
             this.CheckboxTagBlockedAttacks.UseVisualStyleBackColor = true;
             this.CheckboxTagBlockedAttacks.CheckedChanged += new System.EventHandler(this.CheckboxTagBlockedAttacks_CheckedChanged);
             // 
-            // toolTip1
-            // 
-            this.toolTip1.IsBalloon = true;
-            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.toolTip1.ToolTipTitle = "Tag Blocked Attacks";
-            // 
             // toolTip2
             // 
             this.toolTip2.AutoPopDelay = 7000;
             this.toolTip2.InitialDelay = 500;
-            this.toolTip2.IsBalloon = true;
             this.toolTip2.ReshowDelay = 100;
-            this.toolTip2.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.toolTip2.ToolTipTitle = "Guess DoT Casters";
             // 
             // AionParseForm
             // 
