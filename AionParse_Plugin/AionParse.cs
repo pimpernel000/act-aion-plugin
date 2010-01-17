@@ -626,7 +626,7 @@
                         attacker = victim;
                         skill = "Unknown (Potion?)";
                     }
-                    else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life"))
+                    else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life") || skill.StartsWith("Word of Revival"))
                     {
                         attacker = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
                     }
@@ -827,7 +827,7 @@
             #region evaded
             else if (str.Contains("evaded"))
             {
-                Regex rEvaded = new Regex(@"^(?<victim>[a-zA-Z ]*) evaded (?<attacker>[a-zA-Z ]*?)'s (attack|(?<skill>[a-zA-Z \-']*?))\.$");
+                Regex rEvaded = new Regex(@"^(?<victim>[a-zA-Z ]*) evaded (?<attacker>[a-zA-Z ]*?)'s (attack|(?<skill>[a-zA-Z \-']*?))\.$", RegexOptions.Compiled);
                 Match match = rEvaded.Match(str);
 
                 victim = CheckYou(match.Groups["victim"].Value);
@@ -941,11 +941,13 @@
              */
             #endregion
 
+            #region debug output
             else
             {
                 if (debugParse && !IsIgnore(str))
                     ui.AddText("unparsed: " + str);
             }
+            #endregion
 
         }
 

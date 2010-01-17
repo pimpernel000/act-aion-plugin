@@ -121,6 +121,7 @@ namespace AionParse_Plugin
             if (str.Contains("is in the") && (str.Contains("state because") || str.Contains("state as it used"))) return true;
             if (str.Contains("has weakened") && str.Contains("by using")) return true;
             if (str.Contains("casting speed by using") && str.Contains("changed")) return true;
+            if (str.Contains("casting speed has changed because he used")) return true;
 
             if (str.EndsWith("existing skill.") && str.Contains("conflicted with")) return true;
             if (str.StartsWith("You have played for") && str.EndsWith("Please take a break.")) return true;
