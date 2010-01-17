@@ -89,6 +89,7 @@
         string lastCharName = ActGlobals.charName;
         bool guessDotCasters = true;
         bool debugParse = true;
+        bool tagBlockedAttacks = true;
 
         AionParseForm ui;
 
@@ -110,7 +111,7 @@
             pluginScreenSpace.Controls.Add(ui);
             ui.Dock = DockStyle.Fill;
             ui.AddText("Plugin Initialized with current character as " + lastCharName + ".");
-            ui.InitFromPlugin(lastCharName, guessDotCasters, debugParse);
+            ui.InitFromPlugin(lastCharName, guessDotCasters, debugParse, tagBlockedAttacks);
 
             extraDamageSkills = new System.Collections.Generic.List<string> {
                 "Blood Rune",
@@ -286,8 +287,8 @@
 
                 // no ability submatch
                 incName = CheckYou(targetClause);
-                if (blockedHistory.IsBlocked(outName, incName, logInfo.detectedTime)) special = "blocked";
-                AddCombatAction(logInfo, outName, incName, "Melee", critical, String.Empty, damage, SwingTypeEnum.Melee);
+                if (blockedHistory.IsBlocked(outName, incName, logInfo.detectedTime, false)) special = "blocked";  // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
+                AddCombatAction(logInfo, outName, incName, "Melee", critical, special, damage, SwingTypeEnum.Melee);
                 return;
             }
 
@@ -578,57 +579,44 @@
                 // match "The attack was blocked by the xxx effect cast on xxx."  means your next attack has reduced dmg
                 if (str.StartsWith("The attack was blocked by the "))
                 {
-                    Regex rBlockAnon = new Regex(@"The attack was blocked by the (?<skill>[a-zA-Z \-']*?) effect cast on (?<target>[a-zA-Z ]*)\.", RegexOptions.Compiled);
-                    Match match = rBlockAnon.Match(str);
-                    if (!match.Success)
+                    if (tagBlockedAttacks)
                     {
-                        ui.AddText("Exception-Unable to parse[e4]: " + str);
-                        return;
+                        Regex rBlockYou = new Regex(@"The attack was blocked by the (?<skill>[a-zA-Z \-']*?) effect cast on (?<target>[a-zA-Z ]*)\.", RegexOptions.Compiled);
+                        Match match = rBlockYou.Match(str);
+                        if (!match.Success)
+                        {
+                            ui.AddText("Exception-Unable to parse[e4]: " + str);
+                            return;
+                        }
+                        incName = CheckYou(match.Groups["target"].Value);
+                        //theAttackType = match.Groups["skill"].Value;
+                        //AddCombatAction(logInfo, "Unknown", incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.Melee); // don't add action; this event occurs even on spells if they have armor up
+                        blockedHistory.Add(CheckYou("you"), incName, logInfo.detectedTime);
                     }
-                    incName = CheckYou(match.Groups["target"].Value);
-                    theAttackType = match.Groups["skill"].Value;
-                    //AddCombatAction(logInfo, "Unknown", incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.Melee); // don't add action; this event occurs even on spells if they have armor up
-                    blockedHistory.Add(CheckYou("you"), incName, logInfo.detectedTime);
                     return;
                 }
+                else
+                {
+                    // match "xxx blocked xxx's attack with the xxx effect."
+                    Regex rBlock = new Regex(@"(?<victim>[a-zA-Z ]*) blocked (?<attacker>[a-zA-Z ]*)'s attack( with the (?<skill>[a-zA-Z \-']*?) effect)?\.");
+                    Match match = rBlock.Match(str);
+                    if (!match.Success)
+                    {
+                        ui.AddText("Exception-Unable to parse[e8]: " + str);
+                        return;
+                    }
 
-                else if ((str.IndexOf("blocked") != -1) && (str.IndexOf("'s attack with the") != -1))
-                {
-                    incName = str.Substring(0, str.IndexOf("blocked") - 1);
-                    incName = this.CheckYou(incName);
-                    outName = str.Substring(str.IndexOf("blocked") + 8, str.IndexOf("'s attack with the") - (str.IndexOf("blocked") + 8));
-                    outName = this.CheckYou(outName);
-                    special = str.Substring(str.IndexOf("'s attack with the") + 0x13, (str.Length - (str.IndexOf("'s attack with the") + 0x13)) - 9);
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
+                    if (tagBlockedAttacks)
                     {
-                        int num19;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num19 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "blocked"), logInfo.detectedTime, num19, incName, string.Empty);
-                        if (flag2)
-                        {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
-                        }
+                        incName = match.Groups["victim"].Value;
+                        outName = match.Groups["attacker"].Value;
+                        //theAttackType = match.Groups["skill"].Value;
+                        blockedHistory.Add(outName, incName, logInfo.detectedTime);
                     }
-                }
-                else if ((str.IndexOf("blocked") != -1) && (str.IndexOf("'s attack") != -1))
-                {
-                    incName = str.Substring(0, str.IndexOf("blocked") - 1);
-                    incName = this.CheckYou(incName);
-                    outName = str.Substring(str.IndexOf("blocked") + 8, str.IndexOf("'s attack") - (str.IndexOf("blocked") + 8));
-                    outName = this.CheckYou(outName);
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
-                    {
-                        int num20;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num20 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "blocked"), logInfo.detectedTime, num20, incName, string.Empty);
-                        if (flag2)
-                        {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
-                        }
-                    }
+                    return;
                 }
             }
-            #endregion 
+            #endregion
 
             #region parried
             else if ((str.IndexOf("parried") != -1) && (str.IndexOf("'s attack") != -1))
@@ -649,247 +637,247 @@
                 }
                 return;
             }
-            #endregion 
+            #endregion
 
             #region resisted
             else
-            if (str.Contains("resisted"))
-            {
-                if (rResist.IsMatch(str))
+                if (str.Contains("resisted"))
                 {
-                    Match match = rResist.Match(str);
+                    if (rResist.IsMatch(str))
+                    {
+                        Match match = rResist.Match(str);
 
-                    incName = CheckYou(match.Groups["target"].Value);
-                    if (match.Groups["actor"].Success)
-                    {
-                        outName = CheckYou(match.Groups["actor"].Value);
-                    }
-                    else
-                    {
-                        outName = "Unknown";
-                    }
-
-                    if (match.Groups["skill"].Success)
-                    {
-                        theAttackType = match.Groups["skill"].Value;
-                    }
-                    else
-                    {
-                        theAttackType = "Unknown";
-                    }
-
-                    if (outName == "Aether" && theAttackType.StartsWith("Hold"))
-                    {
-                        theAttackType = "Aether's " + theAttackType;
-                        outName = "Unknown (Sorcerer)";
-                    }
-
-                    AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, Dnum.Resist, SwingTypeEnum.NonMelee);
-                }
-
-                else if (((str.IndexOf("resisted") != -1) && (str.IndexOf("'s ") != -1)) && (str.IndexOf("Effect.") != -1))
-                {
-                    incName = str.Substring(0, str.IndexOf(" resisted "));
-                    incName = this.CheckYou(incName);
-                    outName = str.Substring(str.IndexOf(" resisted ") + 10, str.IndexOf("'s ") - (str.IndexOf("resisted") + 10));
-                    outName = this.CheckYou(outName);
-                    theAttackType = str.Substring(str.IndexOf("'s ") + 3, str.IndexOf(" Effect.") - (str.IndexOf("'s ") + 3));
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
-                    {
-                        int num22;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num22 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "resisted"), logInfo.detectedTime, num22, incName, string.Empty);
-                        if (flag2)
+                        incName = CheckYou(match.Groups["target"].Value);
+                        if (match.Groups["actor"].Success)
                         {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
+                            outName = CheckYou(match.Groups["actor"].Value);
+                        }
+                        else
+                        {
+                            outName = "Unknown";
+                        }
+
+                        if (match.Groups["skill"].Success)
+                        {
+                            theAttackType = match.Groups["skill"].Value;
+                        }
+                        else
+                        {
+                            theAttackType = "Unknown";
+                        }
+
+                        if (outName == "Aether" && theAttackType.StartsWith("Hold"))
+                        {
+                            theAttackType = "Aether's " + theAttackType;
+                            outName = "Unknown (Sorcerer)";
+                        }
+
+                        AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, Dnum.Resist, SwingTypeEnum.NonMelee);
+                    }
+
+                    else if (((str.IndexOf("resisted") != -1) && (str.IndexOf("'s ") != -1)) && (str.IndexOf("Effect.") != -1))
+                    {
+                        incName = str.Substring(0, str.IndexOf(" resisted "));
+                        incName = this.CheckYou(incName);
+                        outName = str.Substring(str.IndexOf(" resisted ") + 10, str.IndexOf("'s ") - (str.IndexOf("resisted") + 10));
+                        outName = this.CheckYou(outName);
+                        theAttackType = str.Substring(str.IndexOf("'s ") + 3, str.IndexOf(" Effect.") - (str.IndexOf("'s ") + 3));
+                        if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
+                        {
+                            int num22;
+                            ActGlobals.oFormActMain.GlobalTimeSorter = (num22 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                            ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "resisted"), logInfo.detectedTime, num22, incName, string.Empty);
+                            if (flag2)
+                            {
+                                logInfo.detectedType = Color.Yellow.ToArgb();
+                            }
                         }
                     }
-                }
-                else if ((str.IndexOf("resisted") != -1) && (str.IndexOf("'s ") != -1))
-                {
-                    incName = str.Substring(0, str.IndexOf(" resisted "));
-                    incName = this.CheckYou(incName);
-                    outName = str.Substring(str.IndexOf(" resisted ") + 10, str.IndexOf("'s ") - (str.IndexOf(" resisted") + 10));
-                    outName = this.CheckYou(outName);
-                    theAttackType = str.Substring(str.IndexOf("'s ") + 3, (str.Length - (str.IndexOf("'s ") + 3)) - 2);
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
+                    else if ((str.IndexOf("resisted") != -1) && (str.IndexOf("'s ") != -1))
                     {
-                        int num23;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num23 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "resisted"), logInfo.detectedTime, num23, incName, string.Empty);
-                        if (flag2)
-                        {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
-                        }
-                    }
-                }
-                else if ((str.IndexOf("resisted") != -1) && (str.IndexOf(".") != -1))
-                {
-                    incName = str.Substring(0, str.IndexOf(" resisted "));
-                    incName = this.CheckYou(incName);
-                    outName = "You";
-                    outName = this.CheckYou(outName);
-                    theAttackType = str.Substring(str.IndexOf(" resisted ") + 10, (str.Length - (str.IndexOf(" resisted ") + 10)) - 2);
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
-                    {
-                        int num24;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num24 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "resisted"), logInfo.detectedTime, num24, incName, string.Empty);
-                        if (flag2)
-                        {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
-                        }
-                    }
-                }
-            }
-            #endregion
-
-            #region evaded
-            else if (str.Contains("evaded"))
-            {
-                if ((str.IndexOf("evaded") != -1) && (str.IndexOf("'s ") != -1))
-                {
-                    incName = str.Substring(0, str.IndexOf(" evaded "));
-                    incName = this.CheckYou(incName);
-                    outName = str.Substring(str.IndexOf(" evaded ") + 7, str.IndexOf("'s ") - (str.IndexOf(" evaded") + 7));
-                    outName = this.CheckYou(outName);
-                    int swingType = 1;
-                    if (str.IndexOf(" attack. ") != -1)
-                    {
-                        theAttackType = "Melee";
-                        swingType = 1;
-                    }
-                    else
-                    {
+                        incName = str.Substring(0, str.IndexOf(" resisted "));
+                        incName = this.CheckYou(incName);
+                        outName = str.Substring(str.IndexOf(" resisted ") + 10, str.IndexOf("'s ") - (str.IndexOf(" resisted") + 10));
+                        outName = this.CheckYou(outName);
                         theAttackType = str.Substring(str.IndexOf("'s ") + 3, (str.Length - (str.IndexOf("'s ") + 3)) - 2);
-                        swingType = 2;
-                    }
-                    if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
-                    {
-                        int num25;
-                        ActGlobals.oFormActMain.GlobalTimeSorter = (num25 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                        ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "evaded"), logInfo.detectedTime, num25, incName, string.Empty);
-                        if (flag2)
+                        if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
                         {
-                            logInfo.detectedType = Color.Yellow.ToArgb();
+                            int num23;
+                            ActGlobals.oFormActMain.GlobalTimeSorter = (num23 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                            ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "resisted"), logInfo.detectedTime, num23, incName, string.Empty);
+                            if (flag2)
+                            {
+                                logInfo.detectedType = Color.Yellow.ToArgb();
+                            }
+                        }
+                    }
+                    else if ((str.IndexOf("resisted") != -1) && (str.IndexOf(".") != -1))
+                    {
+                        incName = str.Substring(0, str.IndexOf(" resisted "));
+                        incName = this.CheckYou(incName);
+                        outName = "You";
+                        outName = this.CheckYou(outName);
+                        theAttackType = str.Substring(str.IndexOf(" resisted ") + 10, (str.Length - (str.IndexOf(" resisted ") + 10)) - 2);
+                        if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
+                        {
+                            int num24;
+                            ActGlobals.oFormActMain.GlobalTimeSorter = (num24 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                            ActGlobals.oFormActMain.AddCombatAction(1, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "resisted"), logInfo.detectedTime, num24, incName, string.Empty);
+                            if (flag2)
+                            {
+                                logInfo.detectedType = Color.Yellow.ToArgb();
+                            }
                         }
                     }
                 }
-            }
             #endregion
 
-            #region removed/dispel
-            else if (str.IndexOf("removed its abnormal physical conditions by using") != -1)
-            {
-                outName = str.Substring(0, str.IndexOf("removed its abnormal physical conditions by using") - 1);
-                outName = this.CheckYou(outName);
-                incName = outName;
-                theAttackType = str.Substring(str.IndexOf("removed its abnormal physical conditions by using") + 50, (str.Length - (str.IndexOf("removed its abnormal physical conditions by using") + 50)) - 2);
-                special = "Cure";
-                if (ActGlobals.oFormActMain.InCombat)
+                #region evaded
+                else if (str.Contains("evaded"))
                 {
-                    int num26;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num26 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num26, incName, string.Empty);
-                    if (flag2)
+                    if ((str.IndexOf("evaded") != -1) && (str.IndexOf("'s ") != -1))
                     {
-                        logInfo.detectedType = Color.Green.ToArgb();
+                        incName = str.Substring(0, str.IndexOf(" evaded "));
+                        incName = this.CheckYou(incName);
+                        outName = str.Substring(str.IndexOf(" evaded ") + 7, str.IndexOf("'s ") - (str.IndexOf(" evaded") + 7));
+                        outName = this.CheckYou(outName);
+                        int swingType = 1;
+                        if (str.IndexOf(" attack. ") != -1)
+                        {
+                            theAttackType = "Melee";
+                            swingType = 1;
+                        }
+                        else
+                        {
+                            theAttackType = str.Substring(str.IndexOf("'s ") + 3, (str.Length - (str.IndexOf("'s ") + 3)) - 2);
+                            swingType = 2;
+                        }
+                        if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, outName, incName))
+                        {
+                            int num25;
+                            ActGlobals.oFormActMain.GlobalTimeSorter = (num25 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                            ActGlobals.oFormActMain.AddCombatAction(swingType, critical, special, outName, "Melee", new Dnum((int)Dnum.Unknown, "evaded"), logInfo.detectedTime, num25, incName, string.Empty);
+                            if (flag2)
+                            {
+                                logInfo.detectedType = Color.Yellow.ToArgb();
+                            }
+                        }
                     }
                 }
-            }
-            else if ((str.IndexOf("removed abnormal physical conditions from") != -1) && (str.IndexOf("by using") != -1))
-            {
-                outName = str.Substring(0, str.IndexOf("removed abnormal physical conditions from") - 1);
-                outName = this.CheckYou(outName);
-                incName = str.Substring(str.IndexOf("removed abnormal physical conditions from") + 0x2a, (str.IndexOf("by using") - (str.IndexOf("removed abnormal physical conditions from") + 0x2a)) - 1);
-                incName = this.CheckYou(incName);
-                theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                special = "Cure";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num27;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num27 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num27, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
-            }
-            else if ((str.IndexOf("dispelled the magical buffs from") != -1) && (str.IndexOf("by using") != -1))
-            {
-                outName = str.Substring(0, str.IndexOf("dispelled the magical buffs from") - 1);
-                outName = this.CheckYou(outName);
-                incName = str.Substring(str.IndexOf("dispelled the magical buffs from") + 0x21, (str.IndexOf("by using") - (str.IndexOf("dispelled the magical buffs from") + 0x21)) - 1);
-                incName = this.CheckYou(incName);
-                theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                special = "Dispelled";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num28;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num28 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "dispelled"), logInfo.detectedTime, num28, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
-            }
-            else if (str.IndexOf("dispelled its magic effect by using") != -1)
-            {
-                outName = str.Substring(0, str.IndexOf("dispelled its magic effect by using") - 1);
-                outName = this.CheckYou(outName);
-                incName = outName;
-                theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                special = "Cure";
-                if (ActGlobals.oFormActMain.InCombat)
-                {
-                    int num2;
-                    ActGlobals.oFormActMain.GlobalTimeSorter = (num2 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
-                    ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num2, incName, string.Empty);
-                    if (flag2)
-                    {
-                        logInfo.detectedType = Color.Green.ToArgb();
-                    }
-                }
-            }
-            else if (str.StartsWith("Your abnormal physical conditions were removed because"))
-            {
-                Regex rDispelOnYou = new Regex(@"Your abnormal physical conditions were removed because (?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*?) on you", RegexOptions.Compiled);
-                Match match = rDispelOnYou.Match(str);
-                incName = CheckYou("you");
-                outName = match.Groups["actor"].Value;
-                theAttackType = match.Groups["skill"].Value;
-                AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.CureDispel);
-                return;
-            }
-            #endregion
+                #endregion
 
-            #region state parses
-            else
-                // match "xxx is in the xxx state..."
-            if (rStateAbility.IsMatch(str))
-            {
-                Match match = rStateAbility.Match(str);
-                string target = CheckYou(match.Groups["target"].Value);
-                string actor = CheckYou(match.Groups["actor"].Value);
-                if (String.IsNullOrEmpty(actor)) actor = target;
-                string skill = match.Groups["skill"].Value;
-                return;
-            }
-            else // TODO remove these useless else ifs
-            if (rWeakened.IsMatch(str))
-            {
-                //Match match = rWeakened.Match(str);
-                return;
-            }
-            #endregion
+                #region removed/dispel
+                else if (str.IndexOf("removed its abnormal physical conditions by using") != -1)
+                {
+                    outName = str.Substring(0, str.IndexOf("removed its abnormal physical conditions by using") - 1);
+                    outName = this.CheckYou(outName);
+                    incName = outName;
+                    theAttackType = str.Substring(str.IndexOf("removed its abnormal physical conditions by using") + 50, (str.Length - (str.IndexOf("removed its abnormal physical conditions by using") + 50)) - 2);
+                    special = "Cure";
+                    if (ActGlobals.oFormActMain.InCombat)
+                    {
+                        int num26;
+                        ActGlobals.oFormActMain.GlobalTimeSorter = (num26 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                        ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num26, incName, string.Empty);
+                        if (flag2)
+                        {
+                            logInfo.detectedType = Color.Green.ToArgb();
+                        }
+                    }
+                }
+                else if ((str.IndexOf("removed abnormal physical conditions from") != -1) && (str.IndexOf("by using") != -1))
+                {
+                    outName = str.Substring(0, str.IndexOf("removed abnormal physical conditions from") - 1);
+                    outName = this.CheckYou(outName);
+                    incName = str.Substring(str.IndexOf("removed abnormal physical conditions from") + 0x2a, (str.IndexOf("by using") - (str.IndexOf("removed abnormal physical conditions from") + 0x2a)) - 1);
+                    incName = this.CheckYou(incName);
+                    theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
+                    special = "Cure";
+                    if (ActGlobals.oFormActMain.InCombat)
+                    {
+                        int num27;
+                        ActGlobals.oFormActMain.GlobalTimeSorter = (num27 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                        ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num27, incName, string.Empty);
+                        if (flag2)
+                        {
+                            logInfo.detectedType = Color.Green.ToArgb();
+                        }
+                    }
+                }
+                else if ((str.IndexOf("dispelled the magical buffs from") != -1) && (str.IndexOf("by using") != -1))
+                {
+                    outName = str.Substring(0, str.IndexOf("dispelled the magical buffs from") - 1);
+                    outName = this.CheckYou(outName);
+                    incName = str.Substring(str.IndexOf("dispelled the magical buffs from") + 0x21, (str.IndexOf("by using") - (str.IndexOf("dispelled the magical buffs from") + 0x21)) - 1);
+                    incName = this.CheckYou(incName);
+                    theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
+                    special = "Dispelled";
+                    if (ActGlobals.oFormActMain.InCombat)
+                    {
+                        int num28;
+                        ActGlobals.oFormActMain.GlobalTimeSorter = (num28 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                        ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "dispelled"), logInfo.detectedTime, num28, incName, string.Empty);
+                        if (flag2)
+                        {
+                            logInfo.detectedType = Color.Green.ToArgb();
+                        }
+                    }
+                }
+                else if (str.IndexOf("dispelled its magic effect by using") != -1)
+                {
+                    outName = str.Substring(0, str.IndexOf("dispelled its magic effect by using") - 1);
+                    outName = this.CheckYou(outName);
+                    incName = outName;
+                    theAttackType = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
+                    special = "Cure";
+                    if (ActGlobals.oFormActMain.InCombat)
+                    {
+                        int num2;
+                        ActGlobals.oFormActMain.GlobalTimeSorter = (num2 = ActGlobals.oFormActMain.GlobalTimeSorter) + 1;
+                        ActGlobals.oFormActMain.AddCombatAction(20, critical, special, outName, "Melee", new Dnum(0, "cured"), logInfo.detectedTime, num2, incName, string.Empty);
+                        if (flag2)
+                        {
+                            logInfo.detectedType = Color.Green.ToArgb();
+                        }
+                    }
+                }
+                else if (str.StartsWith("Your abnormal physical conditions were removed because"))
+                {
+                    Regex rDispelOnYou = new Regex(@"Your abnormal physical conditions were removed because (?<actor>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*?) on you", RegexOptions.Compiled);
+                    Match match = rDispelOnYou.Match(str);
+                    incName = CheckYou("you");
+                    outName = match.Groups["actor"].Value;
+                    theAttackType = match.Groups["skill"].Value;
+                    AddCombatAction(logInfo, outName, incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.CureDispel);
+                    return;
+                }
+                #endregion
 
-            else
-            {
-                if (debugParse && !IsIgnore(str))
-                    ui.AddText("unparsed: " + str);
-            }
+                #region state parses
+                else
+                    // match "xxx is in the xxx state..."
+                    if (rStateAbility.IsMatch(str))
+                    {
+                        Match match = rStateAbility.Match(str);
+                        string target = CheckYou(match.Groups["target"].Value);
+                        string actor = CheckYou(match.Groups["actor"].Value);
+                        if (String.IsNullOrEmpty(actor)) actor = target;
+                        string skill = match.Groups["skill"].Value;
+                        return;
+                    }
+                    else // TODO remove these useless else ifs
+                        if (rWeakened.IsMatch(str))
+                        {
+                            //Match match = rWeakened.Match(str);
+                            return;
+                        }
+                #endregion
+
+                        else
+                        {
+                            if (debugParse && !IsIgnore(str))
+                                ui.AddText("unparsed: " + str);
+                        }
 
         }
 
@@ -973,6 +961,11 @@
         internal void SetDebugParse(bool debugParse)
         {
             this.debugParse = debugParse;
+        }
+
+        internal void SetTagBlockedAttacks(bool tagBlockedAttacks)
+        {
+            this.tagBlockedAttacks = tagBlockedAttacks;
         }
     }
 }

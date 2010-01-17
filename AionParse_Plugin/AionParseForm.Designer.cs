@@ -28,6 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
+            this.components = new System.ComponentModel.Container();
             this.TextboxLog = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.TextboxDefaultCharacter = new System.Windows.Forms.TextBox();
@@ -35,6 +36,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.CheckboxGuessDoTCasters = new System.Windows.Forms.CheckBox();
             this.CheckboxDebugParse = new System.Windows.Forms.CheckBox();
+            this.CheckboxTagBlockedAttacks = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // TextboxLog
@@ -112,15 +116,47 @@
             this.CheckboxDebugParse.Location = new System.Drawing.Point(623, 457);
             this.CheckboxDebugParse.Name = "CheckboxDebugParse";
             this.CheckboxDebugParse.Size = new System.Drawing.Size(109, 17);
-            this.CheckboxDebugParse.TabIndex = 6;
+            this.CheckboxDebugParse.TabIndex = 99;
             this.CheckboxDebugParse.Text = "Debug Messages";
             this.CheckboxDebugParse.UseVisualStyleBackColor = true;
             this.CheckboxDebugParse.CheckedChanged += new System.EventHandler(this.CheckboxDebugParse_CheckedChanged);
+            // 
+            // CheckboxTagBlockedAttacks
+            // 
+            this.CheckboxTagBlockedAttacks.AutoSize = true;
+            this.CheckboxTagBlockedAttacks.Checked = true;
+            this.CheckboxTagBlockedAttacks.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckboxTagBlockedAttacks.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxTagBlockedAttacks.Location = new System.Drawing.Point(623, 106);
+            this.CheckboxTagBlockedAttacks.Name = "CheckboxTagBlockedAttacks";
+            this.CheckboxTagBlockedAttacks.Size = new System.Drawing.Size(152, 20);
+            this.CheckboxTagBlockedAttacks.TabIndex = 7;
+            this.CheckboxTagBlockedAttacks.Text = "Tag Blocked Attacks";
+            this.toolTip1.SetToolTip(this.CheckboxTagBlockedAttacks, "When checked, the parser will parse blocked attacks and attempt to label the foll" +
+                    "owing attack as (special) blocked.");
+            this.CheckboxTagBlockedAttacks.UseVisualStyleBackColor = true;
+            this.CheckboxTagBlockedAttacks.CheckedChanged += new System.EventHandler(this.CheckboxTagBlockedAttacks_CheckedChanged);
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.IsBalloon = true;
+            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.toolTip1.ToolTipTitle = "Tag Blocked Attacks";
+            // 
+            // toolTip2
+            // 
+            this.toolTip2.AutoPopDelay = 7000;
+            this.toolTip2.InitialDelay = 500;
+            this.toolTip2.IsBalloon = true;
+            this.toolTip2.ReshowDelay = 100;
+            this.toolTip2.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.toolTip2.ToolTipTitle = "Guess DoT Casters";
             // 
             // AionParseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.CheckboxTagBlockedAttacks);
             this.Controls.Add(this.CheckboxDebugParse);
             this.Controls.Add(this.CheckboxGuessDoTCasters);
             this.Controls.Add(this.label2);
@@ -132,6 +168,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AionParseForm";
             this.Size = new System.Drawing.Size(1334, 507);
+            this.Load += new System.EventHandler(this.AionParseForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -146,5 +183,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox CheckboxGuessDoTCasters;
         private System.Windows.Forms.CheckBox CheckboxDebugParse;
+        private System.Windows.Forms.CheckBox CheckboxTagBlockedAttacks;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.ToolTip toolTip2;
 	}
 }

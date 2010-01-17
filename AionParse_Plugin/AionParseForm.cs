@@ -13,16 +13,25 @@ namespace AionParse_Plugin
             this.plugin = plugin;
 		}
 
+        private void AionParseForm_Load(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(CheckboxTagBlockedAttacks,
+                "When checked, the parser will attempt to tag attacks after a block as special:blocked");
+            toolTip2.SetToolTip(CheckboxGuessDoTCasters,
+                "When checked, the parser will store who cast skills that cause DoT or damage after a delay, \nas to associate the later damage to the caster.");
+        }
+
         public void AddText(string text)
         {
             TextboxLog.Text += text + Environment.NewLine;
         }
 
-        internal void InitFromPlugin(string lastCharName, bool guessDotCasters, bool debugParse)
+        internal void InitFromPlugin(string lastCharName, bool guessDotCasters, bool debugParse, bool tagBlockedAttacks)
         {
             TextboxDefaultCharacter.Text = lastCharName;
             CheckboxGuessDoTCasters.Checked = guessDotCasters;
             CheckboxDebugParse.Checked = debugParse;
+            CheckboxTagBlockedAttacks.Checked = tagBlockedAttacks;
         }
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)
@@ -47,6 +56,11 @@ namespace AionParse_Plugin
         private void CheckboxDebugParse_CheckedChanged(object sender, EventArgs e)
         {
             plugin.SetDebugParse(CheckboxDebugParse.Checked);
+        }
+
+        private void CheckboxTagBlockedAttacks_CheckedChanged(object sender, EventArgs e)
+        {
+            plugin.SetTagBlockedAttacks(CheckboxTagBlockedAttacks.Checked);
         }
     }
 }

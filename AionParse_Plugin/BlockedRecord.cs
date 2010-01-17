@@ -27,16 +27,24 @@ namespace AionParse_Plugin
 
         public bool IsBlocked(string attacker, string defender, DateTime time)
         {
+            return IsBlocked(attacker, defender, time, true);
+        }
+
+        public bool IsBlocked(string attacker, string defender, DateTime time, bool consume)
+        {
             if (!attackerHistory.ContainsKey(attacker)) return false;
 
             List<BlockedRecord> blockedRecordList = attackerHistory[attacker];
             foreach (BlockedRecord record in blockedRecordList)
             {
-                if ((time - record.BlockedTime).TotalSeconds > 2)
+                if (record.BlockedTime == DateTime.MinValue || (time - record.BlockedTime).TotalSeconds > 2)
                     return false;
 
                 if (record.Defender == defender)
+                {
+                    if (consume) record.BlockedTime = DateTime.MinValue; // consume the block record
                     return true;
+                }
             }
 
             return false;
