@@ -18,7 +18,7 @@ namespace AionParse_Plugin
             toolTip1.SetToolTip(CheckboxTagBlockedAttacks,
                 "When checked, the parser will attempt to tag attacks after a block as special:blocked");
             toolTip2.SetToolTip(CheckboxGuessDoTCasters,
-                "When checked, the parser will store who cast skills that cause DoT or damage after a delay, \nas to associate the later damage to the caster.");
+                "When checked, the parser will store who cast skills that cause DoT or damage after a delay, \nas to associate the later damage to the caster. This is also used to track healing done by Word of Life.");
         }
 
         public void AddText(string text)

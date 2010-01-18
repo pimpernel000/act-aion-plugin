@@ -55,14 +55,7 @@
      * 
      * Bodyguard transfering damage  (How does this information even get handled by ACT?)
      *  Brutal Mist Mane Bodyguard received 577 damage inflicted on Brutal Mist Mane Dark Mage by Ikite. because of the protection effect cast on it.
-     *  
-     * Continuous HP recovery by Word of Life for 10 secs (NOTE: the caster in the example is not you, but Jessex)
-     *  Jessex is in the continuous HP recovery state because he used Word of Life I.
-     *  Ione is in the continuous HP recovery state because Jessex used Word of Life I. 
-     *  Jessex is continuously restoring your HP by using Word of Life I. 
-     *  You restored 295 of Jessex's HP by using Word of Life I.
-     *  You restored 295 of Ione's HP by using Word of Life I. 
-     *  (TODO: what does it look like when Word of Life restores your hp?)
+
      *  
      * Mantras by Chanters (does turning off mantras show up on logs? TODO: have a UI option that saves mantra casters while in dungeons.)
      *  Jessex started using Clement Mind Mantra II. 
@@ -88,7 +81,7 @@
         Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ]*) to bleed by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) poisoned (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) caused (?<victim>you) to bleed by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
-        //Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        //Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ]*) is in the (?<buff>[a-zA-Z ]*) state (because (?<actor>[a-zA-Z ]*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: the only one we care about is the continuous recovery state caused by Word of Life (the only one I know of); so I put a special handling in the continuous section
         //Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ]*) has weakened (?<target>[a-zA-Z ]*)'s (?<stat>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         //Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ]*) became (?<statuseffect>[a-zA-Z ]*) because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. (also for stunned, snared (by Aether's Hold), snared in mid-air (by Aerial Lockdown), paralyzed, silenced, bound, blinded)
         //Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ]*) is (?<statuseffect>[a-zA-Z ]*) because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Ione is bleeding because Recondo used Area Cause Wound. (also other effects are: unable to fly and spinning)  NOTE: this also matches the "is in xxx state" so that must be used before this one.
@@ -433,6 +426,37 @@
                     //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
                     return;
                 }
+
+                /* Continuous HP recovery by Word of Life for 10 secs
+                 *   TODO: what does the log line look like when you are the caster of Word of Life?
+                 */
+                Match contHPMatch = null;
+
+                // match "xxx is in the continuous HP recovery state because he/xxx used xxx."
+                Regex rContHP = new Regex(@"^(?<victim>[a-zA-Z ]*) is in the continuous HP recovery state because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+                if (rContHP.IsMatch(str))
+                {
+                    contHPMatch = rContHP.Match(str);
+                    victim = contHPMatch.Groups["victim"].Value;
+                    attacker = contHPMatch.Groups["attacker"].Value;
+                    if (attacker == "he" || attacker == "she") attacker = victim;
+                }
+
+                // match "xxx is continuously restoring your HP by using xxx."
+                Regex rContHPYou = new Regex(@"^(?<attacker>[a-zA-Z ]*) is continuously restoring your HP by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+                if (rContHPYou.IsMatch(str))
+                {
+                    contHPMatch = rContHPYou.Match(str);
+                    victim = CheckYou("you");
+                    attacker = contHPMatch.Groups["attacker"].Value;
+                }
+
+                if (contHPMatch != null)
+                {
+                    skill = contHPMatch.Groups["skill"].Value;
+                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    return;
+                }
             }
 
             if (str.Contains("poisoned")) {
@@ -621,22 +645,30 @@
                     damage = match.Groups["hp"].Value;
                     skill = match.Groups["skill"].Value;
 
-                    if (skill == "Healing")
+                    if (guessDotCasters)
                     {
-                        attacker = victim;
-                        skill = "Unknown (Potion?)";
+                        attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past record, specifically Word of Life
                     }
-                    else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life") || skill.StartsWith("Word of Revival"))
+
+                    if (string.IsNullOrEmpty(attacker))
                     {
-                        attacker = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
-                    }
-                    else if (skill.StartsWith("Blood Rune"))
-                    {
-                        attacker = victim; // Blood Rune heals caster
-                    }
-                    else
-                    {
-                        attacker = "Unknown";
+                        if (skill == "Healing")
+                        {
+                            attacker = victim;
+                            skill = "Unknown (Potion?)";
+                        }
+                        else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life") || skill.StartsWith("Word of Revival"))
+                        {
+                            attacker = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
+                        }
+                        else if (skill.StartsWith("Blood Rune"))
+                        {
+                            attacker = victim; // Blood Rune heals caster
+                        }
+                        else
+                        {
+                            attacker = "Unknown";
+                        }
                     }
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.Healing);
