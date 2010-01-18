@@ -38,7 +38,23 @@ namespace AionParse_Plugin
 
         public void Clear()
         {
-            list.Clear();
+            if (list.Count == 0) return;
+
+            DateTime lastTime = list[0].Start;
+            bool listStale = false;
+            int staleIndex = -1;
+            for (int i = 1; i < list.Count; i++)
+            {
+                if ((lastTime - list[i].Start).TotalSeconds > LOOKBACK_LIMIT)
+                {
+                    listStale = true;
+                    staleIndex = i;
+                    break;
+                }
+            }
+
+            if (listStale)
+                list.RemoveRange(staleIndex, list.Count - staleIndex);
         }
 	}
 }
