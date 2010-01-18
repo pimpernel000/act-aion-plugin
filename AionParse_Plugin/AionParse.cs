@@ -49,10 +49,6 @@
      * Healing Holy Servants (TODO: need to parse this as healing but also put an option to not parse this as it is pet healing) (Need more data, does healing SM's pets also look like this?)
      *   Vyrana has caused Holy Servant to recover HP over time by using Light of Rejuvenation II. 
      *   
-     * Special DoTs on you?  (Why does this DoT seem like I'm hurting myself?)
-     *  You received continuous damage because Black Blaze Spirit used Wing Ignition.
-     *  Vyn inflicted 45 damage on you by using Wing Ignition. 
-     * 
      * Bodyguard transfering damage  (How does this information even get handled by ACT?)
      *  Brutal Mist Mane Bodyguard received 577 damage inflicted on Brutal Mist Mane Dark Mage by Ikite. because of the protection effect cast on it.
 
@@ -90,8 +86,9 @@
         //Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) (?<statuseffect>[a-zA-Z ]*) (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         //Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) caused (?<victim>you) to (?<statuseffect>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
         Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
-        Regex rContDmg1 = new Regex(@"^(?<attacker>[a-zA-Z ]*) inflicted continuous damage on (?<victim>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rContDmg1 = new Regex(@"^You inflicted continuous damage on (?<victim>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
+        Regex rContDmg3 = new Regex(@"^You received continuous damage because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: this causes log lines to say that you start damaging yourself... i.e. my name is Vyn, but if I am hit by Chastisement in PvP, log lines will say: Vyn inflicted 70 damage on you by using Chastisement I.
         Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
@@ -183,7 +180,6 @@
             string skill = string.Empty;
             string special = string.Empty;
             bool critical = false;
-            bool flag2 = false;
 
             #region misc parse
             // zone change
@@ -290,6 +286,14 @@
                         skill.StartsWith("Flash of Recovery")))
                     {
                         inflictSwingType = SwingTypeEnum.Healing;
+                    }
+
+                    // correct the false self damage message that are actually continuous damage from others to you
+                    if (attacker == victim && attacker == CheckYou("you"))
+                    {
+                        string realAttacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
+                        if (!String.IsNullOrEmpty(realAttacker))
+                            attacker = realAttacker;
                     }
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, inflictSwingType);
@@ -401,29 +405,35 @@
 
             if (str.Contains("continuous"))
             {
-                // match "xxx inflicted continuous damage on xxx by using xxx."
+                Match contDmgMatch = null;
+
+                // match "You inflicted continuous damage on xxx by using xxx."
                 if (rContDmg1.IsMatch(str))
                 {
-                    Match match = rContDmg1.Match(str);
-                    attacker = CheckYou(match.Groups["attacker"].Value);
-                    victim = CheckYou(match.Groups["victim"].Value);
-                    skill = match.Groups["skill"].Value;
-                    if (guessDotCasters)
-                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
-                    //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
-                    return;
+                    contDmgMatch = rContDmg1.Match(str);
+                    attacker = CheckYou("you");
+                    victim = contDmgMatch.Groups["victim"].Value;
                 }
 
                 // match "xxx used xxx to inflict continuous damage effect on xxx."
                 if (rContDmg2.IsMatch(str))
                 {
-                    Match match = rContDmg2.Match(str);
-                    attacker = CheckYou(match.Groups["attacker"].Value);
-                    victim = CheckYou(match.Groups["victim"].Value);
-                    skill = match.Groups["skill"].Value;
+                    contDmgMatch = rContDmg2.Match(str);
+                    attacker = contDmgMatch.Groups["attacker"].Value;
+                    victim = contDmgMatch.Groups["victim"].Value;
+                }
+
+                // match "You received continuous damage because xxx used xxx."
+                if (rContDmg3.IsMatch(str)) {
+                    contDmgMatch = rContDmg3.Match(str);
+                    attacker = CheckYou("you");
+                    victim = contDmgMatch.Groups["victim"].Value;
+                }
+
+                if (contDmgMatch != null) {
+                    skill = contDmgMatch.Groups["skill"].Value;
                     if (guessDotCasters)
                         continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
-                    //AddCombatAction(logInfo, actor, target, skill, false, "DoT", Dnum.NoDamage, SwingTypeEnum.NonMelee);
                     return;
                 }
 

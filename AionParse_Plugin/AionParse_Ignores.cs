@@ -72,7 +72,8 @@ namespace AionParse_Plugin
                 "released from the Aerial Snare.",
                 "is no longer staggering.",
                 "woke up.",
-                "is no longer silenced."
+                "is no longer silenced.",
+                "has died."
             };
 
             List<string> containParts = new List<string>{
