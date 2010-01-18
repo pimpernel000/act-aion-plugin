@@ -34,12 +34,17 @@ namespace AionParse_Plugin
                 "You cannot use the item as its cooldown time has not expired yet.",
                 "You cannot use that because there is an obstacle in the way.",
                 "You cannot use that on your target.",
+                "You do not have a proper target for that skill.",
                 "You cannot receive a quest that you are already working on.",
                 "You gave up rolling the dice.",
                 "You have stopped gathering.",
                 "Starts the auto-distribution of miscellaneous items.",
                 "You must level up to raise your skill level.",
-                "You have died."
+                "You have died.",
+                "Greetings Daevas!",
+                "There have been frequent scam attempts on our players using web sites that imitate ours.",
+                "Our official sites are aiononline.com and ncsoft.com only.",
+                "Don't enter your Aion account info on any other site, or it will be stolen and your characters will be looted."
             };
 
             List<string> startParts = new List<string> {

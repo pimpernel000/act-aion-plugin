@@ -88,7 +88,7 @@
         Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
         Regex rContDmg1 = new Regex(@"^You inflicted continuous damage on (?<victim>[a-zA-Z ]*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ]*)\.$", RegexOptions.Compiled);
-        Regex rContDmg3 = new Regex(@"^You received continuous damage because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: this causes log lines to say that you start damaging yourself... i.e. my name is Vyn, but if I am hit by Chastisement in PvP, log lines will say: Vyn inflicted 70 damage on you by using Chastisement I.
+        Regex rContDmg3 = new Regex(@"^You received continuous damage because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: this usually causes log lines to say that you start damaging yourself... i.e. my name is Vyn, but if I am hit by Chastisement in PvP, log lines will say: Vyn inflicted 70 damage on you by using Chastisement I.
         Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ]*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ]*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
@@ -437,10 +437,7 @@
                     return;
                 }
 
-                /* Continuous HP recovery by Word of Life for 10 secs
-                 *   TODO: what does the log line look like when you are the caster of Word of Life?
-                 */
-                Match contHPMatch = null;
+                Match contHPMatch = null; // continuous heals like Word of Life or Light of Rejuvenation
 
                 // match "xxx is in the continuous HP recovery state because he/xxx used xxx."
                 Regex rContHP = new Regex(@"^(?<victim>[a-zA-Z ]*) is in the continuous HP recovery state because (?<attacker>[a-zA-Z ]*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
@@ -459,6 +456,15 @@
                     contHPMatch = rContHPYou.Match(str);
                     victim = CheckYou("you");
                     attacker = contHPMatch.Groups["attacker"].Value;
+                }
+
+                // match "You are continuously recovering HP because of xxx." (cast HoT on yourself)
+                Regex rContHPSelf = new Regex(@"^You are continuously recovering HP because of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+                if (rContHPSelf.IsMatch(str))
+                {
+                    contHPMatch = rContHPSelf.Match(str);
+                    victim = CheckYou("you");
+                    attacker = victim;
                 }
 
                 if (contHPMatch != null)
@@ -670,6 +676,10 @@
                         else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life") || skill.StartsWith("Word of Revival"))
                         {
                             attacker = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
+                        }
+                        else if (skill.StartsWith("Light of Rejuvenation"))
+                        {
+                            attacker = "Unknown (Cleric)";
                         }
                         else if (skill.StartsWith("Blood Rune"))
                         {
