@@ -117,11 +117,11 @@
         // list of skills that also contain DoT component or secondary payload damage later but cannot be found outside of rUsingAttack regex
         System.Collections.Generic.List<string> extraDamageSkills;
 
-        // ui variables
+        // ui variables (initial values reset by UI on init)
         AionParseForm ui;
         string lastCharName = ActGlobals.charName;
         bool guessDotCasters = true;
-        bool debugParse = true; // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
+        bool debugParse = false; // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
         bool tagBlockedAttacks = true;
         bool linkPets = false; // TODO: link pets with their summoners for damage totalling; maybe label all pet skills as "Pet Skill (petname)" and name pet melee as "Melee (petname)"
         #endregion
@@ -138,11 +138,10 @@
             ActGlobals.oFormActMain.BeforeLogLineRead += new LogLineEventDelegate(this.oFormActMain_BeforeLogLineRead);
             ActGlobals.oFormActMain.OnCombatEnd += new CombatToggleEventDelegate(this.oFormActMain_OnCombatEnd);
 
-            ui = new AionParseForm(this);
+            ui = new AionParseForm(this, lastCharName);
             pluginScreenSpace.Controls.Add(ui);
             ui.Dock = DockStyle.Fill;
             ui.AddText("Plugin Initialized with current character as " + lastCharName + ".");
-            ui.InitFromPlugin(lastCharName, guessDotCasters, debugParse, tagBlockedAttacks);
 
             extraDamageSkills = new System.Collections.Generic.List<string> {
                 "Blood Rune", // there seems to be no message that lets us know that Blood Rune also applies Blood Rune Additional Effect which deals damage/heals at a later time
@@ -757,7 +756,7 @@
                     return;
                 }
 
-                // match "xxx restored x MP."
+                // match "xxx restored x MP."  (most likely due to potion)
                 if (str.EndsWith(" MP.") && str.Contains("restored"))
                 {
                     Match match = (new Regex(@"^(?<actor>[a-zA-Z ]*) restored (?<mp>.*) MP\.$", RegexOptions.Compiled)).Match(str);
@@ -770,7 +769,7 @@
                     victim = CheckYou(match.Groups["actor"].Value);
                     attacker = victim; // assume: this log comes from a self action
                     damage = match.Groups["mp"].Value;
-                    skill = "Unknown";
+                    skill = "Unknown (Potion?)";
                     if (victim == CheckYou("you") && (ActGlobals.oFormActMain.GlobalTimeSorter == lastPotionGlobalTime || (logInfo.detectedTime - lastPotionTime).TotalSeconds < 2))
                     {
                         skill = lastPotion;

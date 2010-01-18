@@ -7,10 +7,15 @@ namespace AionParse_Plugin
 	{
         AionParse plugin;
 
-		public AionParseForm(AionParse plugin)
+		public AionParseForm(AionParse plugin, string lastCharName)
 		{
 			InitializeComponent();
             this.plugin = plugin;
+            TextboxDefaultCharacter.Text = lastCharName;
+            plugin.SetDebugParse(CheckboxDebugParse.Checked);
+            plugin.SetGuessDotCasters(CheckboxGuessDoTCasters.Checked);
+            plugin.SetLinkPets(CheckboxLinkPets.Checked);
+            plugin.SetTagBlockedAttacks(CheckboxTagBlockedAttacks.Checked);
 		}
 
         private void AionParseForm_Load(object sender, EventArgs e)
@@ -24,14 +29,6 @@ namespace AionParse_Plugin
         public void AddText(string text)
         {
             TextboxLog.Text += text + Environment.NewLine;
-        }
-
-        internal void InitFromPlugin(string lastCharName, bool guessDotCasters, bool debugParse, bool tagBlockedAttacks)
-        {
-            TextboxDefaultCharacter.Text = lastCharName;
-            CheckboxGuessDoTCasters.Checked = guessDotCasters;
-            CheckboxDebugParse.Checked = debugParse;
-            CheckboxTagBlockedAttacks.Checked = tagBlockedAttacks;
         }
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)
