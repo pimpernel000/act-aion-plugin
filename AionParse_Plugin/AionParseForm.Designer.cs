@@ -138,7 +138,7 @@
             // 
             // toolTip2
             // 
-            this.toolTip2.AutoPopDelay = 7000;
+            this.toolTip2.AutoPopDelay = 10000;
             this.toolTip2.InitialDelay = 500;
             this.toolTip2.ReshowDelay = 100;
             // 
