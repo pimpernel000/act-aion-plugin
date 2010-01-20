@@ -51,13 +51,12 @@
      *   
      * Bodyguard transfering damage  (How does this information even get handled by ACT?)
      *  Brutal Mist Mane Bodyguard received 577 damage inflicted on Brutal Mist Mane Dark Mage by Ikite. because of the protection effect cast on it.
-
      *  
      * Mantras by Chanters (does turning off mantras show up on logs? TODO: have a UI option that saves mantra casters while in dungeons.)
      *  Jessex started using Clement Mind Mantra II. 
      *  You recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
      *  Ione recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
-     * 
+     *  
      */
 
     public partial class AionParse : IActPluginV1
@@ -94,7 +93,7 @@
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ']*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ']*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
-        Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ']*) resisted ((?<attacker>[a-zA-Z ']*)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);  // TODO: should we remove the word "Effect" from the end for traps and holy servant attacks?  need to be consistent.
+        Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ']*) resisted ((?<attacker>[a-zA-Z ]*('s[a-zA-Z ]*)?)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);  // TODO: should we remove the word "Effect" from the end for traps and holy servant attacks?  need to be consistent.   NOTE: attacker match is a bit more complex to handle a string like "Guy resisted Hirmilden's Tipolid's Animal's Rights"
         #endregion
 
         #region private members
@@ -537,9 +536,9 @@
                 attacker = CheckYou(match.Groups["attacker"].Value);
                 victim = match.Groups["victim"].Value;
                 skill = match.Groups["skill"].Value;
-                if (!guessDotCasters)
+                if (guessDotCasters)
                     continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
-                //AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "delay"), SwingTypeEnum.NonMelee);
+                //AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "effect"), SwingTypeEnum.NonMelee);
                 return;
             }
             #endregion
@@ -556,9 +555,13 @@
                 attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
                 if (String.IsNullOrEmpty(attacker)) // skills like Promise of Wind or Blood Rune
                 {
-                    if (skill.StartsWith("Promise of Wind"))
+                    if (skill == "Promise of Wind I")
                     {
                         attacker = "Unknown (Priest)";
+                    }
+                    else if (skill.StartsWith("Promise of Wind"))
+                    {
+                        attacker = "Unknown (Chanter)"; // only chanters get Promise of Wind above rank I
                     }
                     else if (skill.StartsWith("Blood Rune"))
                     {
@@ -732,7 +735,12 @@
                     }
                     else
                     {
-                        attacker = victim;
+                        attacker = victim; // no healer is specified if you healed yourself
+                        if (guessDotCasters)
+                        {
+                            string healerHoT = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
+                            if (!String.IsNullOrEmpty(healerHoT)) attacker = healerHoT;
+                        }
                     }
                     damage = match.Groups["hp"].Value;
                     skill = match.Groups["skill"].Value;
@@ -867,10 +875,40 @@
                         swingType = SwingTypeEnum.Melee;
                     }
 
-                    if (attacker == "Aether" && skill.StartsWith("Hold I"))
+                    string[] skillsThatContainQuote = new string[] {
+                        "Aether's Hold I", "Heaven's Judgment I"
+                    }; // TODO: add more player skills into this list; the rank I is just there to end the skill name, so that Heaven's Judgement won't match 
+                    foreach (string skillThatContainsQuote in skillsThatContainQuote)
                     {
-                        skill = "Aether's " + skill;
-                        attacker = CheckYou("you");
+                        if ((attacker + skill).Contains(skillThatContainsQuote))
+                        {
+                            string blob = attacker + skill;
+                            int indexForSkill = blob.IndexOf(skillThatContainsQuote);
+                            string newattacker = blob.Substring(0, indexForSkill).Trim();
+                            string newskill = blob.Substring(indexForSkill);
+
+                            if (newattacker == string.Empty) // attacker not specified? is this a self cast?
+                            {
+                                if (newattacker == CheckYou(attacker)) // in the unlikely event that your character's name is Heaven, then we know your name does not appear in your own spell's resist log, so you must be a cleric and you casted Heaven's Judgment
+                                {
+                                    attacker = CheckYou("you");
+                                    skill = newskill;
+                                    break;
+                                }
+                                else
+                                {
+                                    // ambiguous case! either there is a templar nearby named Heaven who casted Judgment (unlikely but there is one on Siel), or you're a cleric who casted Heaven's Judgment
+                                    // TODO: perhaps knowing more information will help (i.e. surrounding players during encounter, your class versus the class requirement of the spell, etc.)
+                                    attacker = CheckYou("you"); // just assume it was your spell that got resisted and ignore the other possibility for now
+                                    skill = newskill;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                
+                            }
+                        }
                     }
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resisted"), swingType);
