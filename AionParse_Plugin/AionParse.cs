@@ -57,6 +57,10 @@
      *  You recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
      *  Ione recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
      *  
+     * Skills not yet implemented:
+     *  Draining Blow by Gladiators (this heals)
+     * 
+     * TODO: provide /act commands to set party members
      */
 
     public partial class AionParse : IActPluginV1
@@ -89,7 +93,7 @@
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
         Regex rContDmg3 = new Regex(@"^You received continuous damage because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: this usually causes log lines to say that you start damaging yourself... i.e. my name is Vyn, but if I am hit by Chastisement in PvP, log lines will say: Vyn inflicted 70 damage on you by using Chastisement I.
         Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+,)?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ']*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ']*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
@@ -870,29 +874,28 @@
                     }
 
                     skill = match.Groups["skill"].Value;
-                    if (skill == "your attack" || skill == "attack") { // match the generic "attack" word
+                    if (skill == "your attack" || skill == "attack")
+                    { // match the generic "attack" word
                         skill = "Melee"; // are these elemental melee attacks being resisted?  I mostly see assassin's attacks being resisted here, but also saw a ranger attack in my personal logs and well as my own sorc attacks.  (speaking of which, I haven't seen in my logs where my sorc's attacks were evaded.)
                         swingType = SwingTypeEnum.Melee;
                     }
 
+                    string blob = attacker + "'s " + skill;
                     string[] skillsThatContainQuote = new string[] {
-                        "Aether's Hold I", "Heaven's Judgment I"
-                    }; // TODO: add more player skills into this list; the rank I is just there to end the skill name, so that Heaven's Judgement won't match 
+                        "Aether's Hold I", "Heaven's Judgment I", "Earth's Wrath I", "Vaizel's Dirk I", "Triniel's Dirk I", "Vaizel's Arrow I", "Triniel's Arrow I", "Lumiel's Wrath I", "Kaisinel's Wrath I"
+                    }; // the rank I is just there to end the skill name
                     foreach (string skillThatContainsQuote in skillsThatContainQuote)
                     {
-                        if ((attacker + skill).Contains(skillThatContainsQuote))
+                        if (blob.Contains(skillThatContainsQuote))
                         {
-                            string blob = attacker + skill;
                             int indexForSkill = blob.IndexOf(skillThatContainsQuote);
                             string newattacker = blob.Substring(0, indexForSkill).Trim();
-                            string newskill = blob.Substring(indexForSkill);
+                            string newskill = blob.Substring(indexForSkill).Trim();
 
                             if (newattacker == string.Empty) // attacker not specified? is this a self cast?
                             {
-                                if (newattacker == CheckYou(attacker)) // in the unlikely event that your character's name is Heaven, then we know your name does not appear in your own spell's resist log, so you must be a cleric and you casted Heaven's Judgment
+                                if (attacker == CheckYou("you")) // in the unlikely event that your character's name is Heaven, then we know your name does not appear in your own spell's resist log, so you must be a cleric and you casted Heaven's Judgment
                                 {
-                                    attacker = CheckYou("you");
-                                    skill = newskill;
                                     break;
                                 }
                                 else
@@ -906,7 +909,9 @@
                             }
                             else
                             {
-                                
+                                attacker = newattacker.Remove(newattacker.Length-2);
+                                skill = newskill;
+                                break;
                             }
                         }
                     }
