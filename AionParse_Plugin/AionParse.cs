@@ -1054,7 +1054,6 @@
                 return;
             }
              */
-ActGlobals.oFormActMain.SetEncounter(
             #endregion
 
             #region debug output
