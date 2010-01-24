@@ -42,7 +42,7 @@
      *   Brutal Mist Mane Pawsoldier became poisoned because Poisoning Trap used Poisoning Trap III Effect. 
      *   Brutal Mist Mane Pawsoldier received 361 poisoning damage after you used Poisoning Trap III Effect. 
      *   
-     * Poisoning by unknown assassins (TODO: make a UI option to let certian skills be associated with your party's assassin)
+     * Poisoning by unknown assassins (NOTE: ACT already has a feature for Combatant Rename... so users can just rename Unknown (Assassin) to your party's assassin.)
      *   (NOTE: it seems that Apply Poison doesn't have a "became poisoned" message when it procs, so logs alone cannot determine caster)
      *   You received 51 poisoning damage due to the effect of Apply Poison II Effect. 
      * 
@@ -60,7 +60,13 @@
      * Skills not yet implemented:
      *  Draining Blow by Gladiators (this heals)
      * 
+     * NOTE: currently, resists assume that attacker can have a "'s" in their name, and that is higher priority than "'s" in skill names. A list of possible player skill names are hardcoded
+     *   in this parser and the attacker name will be corrected.  However, if there are many more skill names that have "'s" (i.e. mob skills), we might change the regex instead to exclude
+     *   "'s" from the attacker's name, and then we hardcode a list of attackers that have "'s" in their name.
+     * 
      * TODO: provide /act commands to set party members
+     * 
+     * TOD: use ActGlobals.oFormActMain.SetEncounters and a timer to 
      */
 
     public partial class AionParse : IActPluginV1
@@ -98,6 +104,16 @@
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<mp>(\d+,)?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<hp>(\d+,)?\d+) HP (because (?<actor>[a-zA-Z ']*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ']*) resisted ((?<attacker>[a-zA-Z ]*('s[a-zA-Z ]*)?)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);  // TODO: should we remove the word "Effect" from the end for traps and holy servant attacks?  need to be consistent.   NOTE: attacker match is a bit more complex to handle a string like "Guy resisted Hirmilden's Tipolid's Animal's Rights"
+        /* TODO: use timer based on skill to keep encounter going if these skills are used in case no other combat action is taking place
+        Regex rSleep1 = new Regex(@"^(?<victim>[a-zA-Z ']*) fell asleep because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
+        Regex rSleep2 = new Regex(@"^(?<attacker>You) put (?<victim>[a-zA-Z ']*) to sleep by using (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
+        Regex rSleepEnd = new Regex(@"^(?<victim>[a-zA-Z ']*) woke up.", RegexOptions.Compiled);  // TODO: ignore "You woke up." if you put yourself to sleep via Gain Mana; NOTE: Curse of Roots seem to use "woke up" inconsistently when broken.
+        Regex rRoot1 = new Regex(@"^(?<victim>[a-zA-Z ']*) is unable to fly because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
+        Regex rRoot2 = new Regex(@"^(?<attacker>You) immobilized (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
+        Regex rRootEnd = new Regex(@"^(?<victim>[a-zA-Z ']*) is no longer immobilized.", RegexOptions.Compiled);
+        Regex rCurseOfRoot1 = new Regex(@"^(?<victim>[a-zA-Z ']*) has transformed into Cursed Tree because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
+        Regex rCurseOfRoot2 = new Regex(@"^(?<attacker>You) transformed (?<victim>[a-zA-Z ']*) into Cursed Tree by using (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
+         */
         #endregion
 
         #region private members
@@ -542,6 +558,7 @@
                 skill = match.Groups["skill"].Value;
                 if (guessDotCasters)
                     continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim);
                 //AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "effect"), SwingTypeEnum.NonMelee);
                 return;
             }
@@ -1037,6 +1054,7 @@
                 return;
             }
              */
+ActGlobals.oFormActMain.SetEncounter(
             #endregion
 
             #region debug output
