@@ -72,7 +72,7 @@
     public partial class AionParse : IActPluginV1
     {
         #region regex
-        Regex rInflictDamageOnYou = new Regex(@"^(?<attacker>[a-zA-Z ']*) inflicted (?<damage>(\d+,)?\d+) damage and the rune carve effect on you by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rInflictDamageRuneCarve = new Regex(@"^(?<attacker>[a-zA-Z ']*) inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage and the rune carve effect on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ']*?)( has)? inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
         Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ']*) and caused the (?<statuseffect>[a-zA-Z ']*) effect$", RegexOptions.Compiled);
@@ -377,15 +377,16 @@
                 return;
             }
 
-            // match "xxx inflicted xxx damage and the rune carve effect on you by using xxx ."  (assassin rune abilities on you in pvp)
-            var mInflictDamageOnYou = rInflictDamageOnYou.Match(str);
-            if (mInflictDamageOnYou.Success)
+            // match "xxx inflicted xxx damage and the rune carve effect on xxx by using xxx ."  (assassin rune abilities)
+            var mInflictDamageRuneCarve = rInflictDamageRuneCarve.Match(str);
+            if (mInflictDamageRuneCarve.Success)
             {
-                attacker = mInflictDamageOnYou.Groups["attacker"].Value;
-                victim = CheckYou("you");
+                attacker = CheckYou(mInflictDamageRuneCarve.Groups["attacker"].Value);
+                victim = CheckYou(mInflictDamageRuneCarve.Groups["victim"].Value);
                 //special = "pattern engraving";
-                damage = mInflictDamageOnYou.Groups["damage"].Value;
-                skill = mInflictDamageOnYou.Groups["skill"].Value;
+                damage = mInflictDamageRuneCarve.Groups["damage"].Value;
+                skill = mInflictDamageRuneCarve.Groups["skill"].Value;
+                critical = mInflictDamageRuneCarve.Groups["critical"].Success;
                 if (tagBlockedAttacks)
                 {
                     string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
