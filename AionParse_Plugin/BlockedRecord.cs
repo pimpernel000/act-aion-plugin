@@ -9,7 +9,7 @@ namespace AionParse_Plugin
         {
             public string Defender { get; set; }
             public DateTime BlockedTime { get; set; }
-            public String BlockString { get; set; }
+            public String BlockType { get; set; }
         }
 
         Dictionary<string, List<BlockedRecord>> attackerHistory = new Dictionary<string, List<BlockedRecord>>();
@@ -23,7 +23,7 @@ namespace AionParse_Plugin
                 attackerHistory.Add(attacker, new List<BlockedRecord>());
             }
 
-            attackerHistory[attacker].Insert(0, new BlockedRecord { Defender = defender, BlockedTime = time, BlockString = blockString });
+            attackerHistory[attacker].Insert(0, new BlockedRecord { Defender = defender, BlockedTime = time, BlockType = blockString });
         }
 
         public string IsBlocked(string attacker, string defender, DateTime time)
@@ -44,7 +44,7 @@ namespace AionParse_Plugin
                 if (record.Defender == defender)
                 {
                     if (consume) record.BlockedTime = DateTime.MinValue; // consume the block record
-                    return record.BlockString;
+                    return record.BlockType;
                 }
             }
 

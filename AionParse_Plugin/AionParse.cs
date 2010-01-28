@@ -49,8 +49,9 @@
      * Healing Holy Servants (TODO: need to parse this as healing but also put an option to not parse this as it is pet healing) (Need more data, does healing SM's pets also look like this?)
      *   Vyrana has caused Holy Servant to recover HP over time by using Light of Rejuvenation II. 
      *   
-     * Bodyguard transfering damage  (How does this information even get handled by ACT?)
+     * Bodyguard transfering damage  (label damage taken as redirected damage?)
      *  Brutal Mist Mane Bodyguard received 577 damage inflicted on Brutal Mist Mane Dark Mage by Ikite. because of the protection effect cast on it.
+     *  Ione received 562 damage inflicted on Azshadela by Brutal Mist Mane Scratcher. because of the protection effect cast on it. 
      *  
      * Mantras by Chanters (does turning off mantras show up on logs? TODO: have a UI option that saves mantra casters while in dungeons.)
      *  Jessex started using Clement Mind Mantra II. 
@@ -66,10 +67,12 @@
      * 
      * TODO: provide /act commands to set party members
      * 
-     * TOD: use ActGlobals.oFormActMain.SetEncounters and a timer to 
+     * TODO: use ActGlobals.oFormActMain.SetEncounters and a timer to handle sleep durations that last 20 seconds without any combat activity.
+     *   - EQAditu mentions SetEncounter() combined with LastEstimatedTime
+     *   - he also suggests OnLogLineRead event to set encounters
      */
 
-    public partial class AionParse : IActPluginV1
+    public partial class AionParse : IActPluginV1, IDisposable
     {
         #region regex
         Regex rInflictDamageRuneCarve = new Regex(@"^(?<attacker>[a-zA-Z ']*) inflicted (?<damage>(\d+,)?\d+) (?<critical>critical )?damage and the rune carve effect on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
@@ -152,7 +155,7 @@
             ActGlobals.oFormActMain.LogPathHasCharName = false;
             ActGlobals.oFormActMain.ResetCheckLogs();
             ActGlobals.oFormActMain.TimeStampLen = 0x16;
-            ActGlobals.oFormActMain.GetDateTimeFromLog = new FormActMain.DateTimeLogParser(this.ParseDateTime);
+            ActGlobals.oFormActMain.GetDateTimeFromLog = new FormActMain.DateTimeLogParser(ParseDateTime);
             ActGlobals.oFormActMain.ZoneChangeRegex = new Regex(@"[\d :\.]{22}You have joined the (?<channel>.+?) region channel. ", RegexOptions.Compiled);
             ActGlobals.oFormActMain.BeforeLogLineRead += new LogLineEventDelegate(this.oFormActMain_BeforeLogLineRead);
             ActGlobals.oFormActMain.OnCombatEnd += new CombatToggleEventDelegate(this.oFormActMain_OnCombatEnd);
@@ -910,7 +913,7 @@
                             string newattacker = blob.Substring(0, indexForSkill).Trim();
                             string newskill = blob.Substring(indexForSkill).Trim();
 
-                            if (newattacker == string.Empty) // attacker not specified? is this a self cast?
+                            if (String.IsNullOrEmpty(newattacker)) // attacker not specified? is this a self cast?
                             {
                                 if (attacker == CheckYou("you")) // in the unlikely event that your character's name is Heaven, then we know your name does not appear in your own spell's resist log, so you must be a cleric and you casted Heaven's Judgment
                                 {
@@ -1068,22 +1071,22 @@
         }
 
         #region AddCombatAction overloads
-        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
+        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
         }
 
-        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
+        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, int.Parse(damage.Replace(",", String.Empty)), swingType, damageType);
         }
 
-        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType)
+        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
         }
 
-        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType, string damageType)
+        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType, string damageType)
         {
             if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim))
             {
@@ -1092,20 +1095,10 @@
             }
         }
 
-        private void AddCombatActionSpecial(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType1, SwingTypeEnum swingType2)
-        {
-            if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim))
-            {
-                int globalTime = ActGlobals.oFormActMain.GlobalTimeSorter++;
-                ActGlobals.oFormActMain.AddCombatAction((int)swingType1, critical, special, attacker, theAttackType, new Dnum(0, special.ToLower()), logInfo.detectedTime, globalTime, victim, string.Empty);
-                globalTime = ActGlobals.oFormActMain.GlobalTimeSorter++;
-                ActGlobals.oFormActMain.AddCombatAction((int)swingType2, critical, special, attacker, theAttackType, int.Parse(damage), logInfo.detectedTime, globalTime, victim, string.Empty);
-            }
-        }
         #endregion
 
         #region utility methods
-        private DateTime ParseDateTime(string FullLogLine)
+        private static DateTime ParseDateTime(string FullLogLine)
         {
             string str = FullLogLine.Substring(0, 4) + "-" + FullLogLine.Substring(5, 2) + FullLogLine.Substring(8, 2);
             string str2 = FullLogLine.Substring(11, 8);
@@ -1125,7 +1118,7 @@
             }
         }
 
-        private Dnum NewDnum(string damage, string damageString)
+        private static Dnum NewDnum(string damage, string damageString)
         {
             int d = int.Parse(damage.Replace(",", "").Trim());
             if (String.IsNullOrEmpty(damageString))
@@ -1167,5 +1160,20 @@
         }
         #endregion
 
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            DeInitPlugin();
+            ui.Dispose();
+        }
+
+        #endregion
     }
 }
