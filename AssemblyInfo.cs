@@ -1,5 +1,6 @@
 ﻿// Assembly AionParse, Version 0.1.3.4  (<major>.<minor>.<revision>.<build>)
 
+[assembly: System.CLSCompliant(true)]
 [assembly: System.Reflection.AssemblyVersion("0.1.3.4")]
 [assembly: System.Reflection.AssemblyTrademark("")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]

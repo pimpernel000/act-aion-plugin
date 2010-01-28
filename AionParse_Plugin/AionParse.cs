@@ -130,10 +130,16 @@
         DateTime lastPotionTime = DateTime.MinValue;
 
         // remembering who cast DoTs
-        ContinuousDamageSet continuousDamageSet = new ContinuousDamageSet();
+        UsingSkillRecordSetBase continuousDamageSet = new UsingSkillRecordSetBase();
+
+        // remembering who cast HoTs
+        UsingSkillRecordSetBase healerRecordSet = new UsingSkillRecordSetBase();
 
         // remembering who who got blocked
         BlockedSet blockedHistory = new BlockedSet();
+
+        // remembering summoners
+        UsingSkillRecordSetBase summonerRecordSet = new UsingSkillRecordSetBase();
 
         // list of skills that also contain DoT component or secondary payload damage later but cannot be found outside of rUsingAttack regex
         System.Collections.Generic.List<string> extraDamageSkills;
@@ -159,6 +165,7 @@
 
             continuousDamageSet.Clear();
             blockedHistory.Clear();
+            healerRecordSet.Clear();
         }
 
         private void BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
@@ -266,6 +273,7 @@
                             if (skill.StartsWith(extradmgskill))
                             {
                                 continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor for when it deals payload damage later or when Wind Cut Down does bleeding damage later
+                                healerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor when he heals later as single HoT tick
                                 break;
                             }
                         }
@@ -469,7 +477,7 @@
                 if (contHPMatch != null)
                 {
                     skill = contHPMatch.Groups["skill"].Value;
-                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    healerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     return;
                 }
             }
@@ -565,7 +573,7 @@
                     {
                         attacker = "Unknown (Priest)";
                     }
-                    else if (skill.StartsWith("Promise of Wind"))
+                    else if (skill.StartsWith("Promise of Wind I"))
                     {
                         attacker = "Unknown (Chanter)"; // only chanters get Promise of Wind above rank I
                     }
@@ -676,7 +684,7 @@
 
                     if (guessDotCasters)
                     {
-                        attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past record, specifically Word of Life
+                        attacker = healerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past record, specifically Word of Life
                     }
 
                     if (string.IsNullOrEmpty(attacker))
@@ -747,10 +755,10 @@
                     }
                     else
                     {
-                        attacker = victim; // no healer is specified if you healed yourself
+                        attacker = victim; // no healer is specified if you healed yourself, unless it was from a HoT (see check below)
                         if (guessDotCasters)
                         {
-                            string healerHoT = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
+                            string healerHoT = healerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
                             if (!String.IsNullOrEmpty(healerHoT)) attacker = healerHoT;
                         }
                     }

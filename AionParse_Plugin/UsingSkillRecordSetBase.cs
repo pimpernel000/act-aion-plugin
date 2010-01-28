@@ -31,6 +31,17 @@ namespace AionParse_Plugin
             recordSet.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Start = start, Duration = duration });
         }
 
+        public string GetActor(string target, string skill, DateTime now)
+        {
+            foreach (var record in recordSet)
+            {
+                if (record.Match(target, skill, now))
+                    return record.Actor;
+            }
+
+            return null;
+        }
+
         public virtual void Clear()
         {
             if (recordSet.Count == 0) return;
@@ -42,14 +53,11 @@ namespace AionParse_Plugin
         {
             if (recordSet.Count == 0) return;
 
-            for (int i = 1; i < recordSet.Count; i++)
+            for (int i = recordSet.Count - 1; i >= 0; i--)
             {
-                double lookBackDistance = (focusTime - recordSet[i].Start).TotalSeconds;
-                if (lookBackDistance > lookBackLimit)
-                {
-                    recordSet.RemoveRange(i, recordSet.Count - i);
-                    break;
-                }
+                double elapsedTime = (focusTime - recordSet[i].Start).TotalSeconds;
+                if (elapsedTime > recordSet[i].Duration)
+                    recordSet.RemoveAt(i);
             }
         }
 
@@ -61,9 +69,25 @@ namespace AionParse_Plugin
 
             public string Skill { get; set; }
 
+            public int Duration { get; set; }
+
             public DateTime Start { get; set; }
 
-            public int Duration { get; set; }
+            public DateTime End
+            {
+                get
+                {
+                    return Start.AddSeconds(Duration);
+                }
+            }
+
+            public bool Match(string target, string skill, DateTime time)
+            {
+                return
+                    target == Target &&
+                    skill == Skill &&
+                    time <= End;
+            }
         }
     }
 }

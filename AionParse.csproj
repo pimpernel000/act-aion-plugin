@@ -87,7 +87,6 @@
     <Compile Include="AionParse_Plugin\AionParse_Ignores.cs" />
     <Compile Include="AionParse_Plugin\AionParse_Utility.cs" />
     <Compile Include="AionParse_Plugin\BlockedRecord.cs" />
-    <Compile Include="AionParse_Plugin\ContinuousDamageRecord.cs" />
     <Compile Include="AionParse_Plugin\UsingSkillRecordSetBase.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>

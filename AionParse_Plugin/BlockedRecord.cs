@@ -7,7 +7,7 @@ namespace AionParse_Plugin
     {
         Dictionary<string, List<BlockedRecord>> attackerHistory = new Dictionary<string, List<BlockedRecord>>();
 
-        public void Add(string attacker, string defender, DateTime time, string blockString)
+        public void Add(string attacker, string defender, DateTime time, string blockType)
         {
             if (String.IsNullOrEmpty(attacker)) return;
 
@@ -16,7 +16,7 @@ namespace AionParse_Plugin
                 attackerHistory.Add(attacker, new List<BlockedRecord>());
             }
 
-            attackerHistory[attacker].Insert(0, new BlockedRecord { Defender = defender, BlockedTime = time, BlockType = blockString });
+            attackerHistory[attacker].Insert(0, new BlockedRecord { Defender = defender, BlockedTime = time, BlockType = blockType });
         }
 
         public string IsBlocked(string attacker, string defender, DateTime time)
