@@ -74,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AionData\Pet.cs" />
     <Compile Include="AionParse_Plugin\AionParse.cs">
       <SubType>Code</SubType>
     </Compile>

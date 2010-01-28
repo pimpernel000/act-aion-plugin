@@ -37,27 +37,59 @@ namespace AionParsePlugin
         #endregion
 
         #region AddCombatAction overloads
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
+        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
         }
 
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
+        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, int.Parse(damage.Replace(",", String.Empty)), swingType, damageType);
         }
 
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType)
+        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType)
         {
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
         }
 
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType, string damageType)
+        private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType, string damageType)
         {
-            if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim))
+            DateTime now = logInfo.detectedTime;
+            if (ActGlobals.oFormActMain.SetEncounter(now, attacker, victim))
             {
+                // redirect attacks from pets/servants as coming from summoner
+                if (AionData.Pet.IsPet(attacker))
+                {
+                    var summonerRecord = summonerRecordSet.GetSummonerRecord(victim, attacker, now);
+                    if (summonerRecord != null)
+                    {
+                        string pet = attacker;
+                        if (AionData.Pet.IsTargettedPet(pet))
+                        {
+                            attacker = summonerRecord.Actor;
+                            theAttackType = summonerRecord.Skill;
+                        }
+                        else if (linkPets)
+                        {
+                            attacker = summonerRecord.Actor;
+                            if (summonerRecord.Duration <= 60)
+                                theAttackType = summonerRecord.Skill;
+                            else
+                                theAttackType += "(" + pet + ")";
+                        }
+                    }
+                }
+                else if (AionData.Pet.IsPet(victim))
+                {
+                    if (AionData.Pet.PetDurations[victim] <= 60) return; // ignore damage done to short-duration temporary pets
+
+                    var summonerRecord = summonerRecordSet.GetSummonerRecord(null, victim, now);
+                    if (linkPets)
+                        return; // TODO: how do we treat damage done to spiritmaster's pets?
+                }
+
                 int globalTime = ActGlobals.oFormActMain.GlobalTimeSorter++;
-                ActGlobals.oFormActMain.AddCombatAction((int)swingType, critical, special, attacker, theAttackType, damage, logInfo.detectedTime, globalTime, victim, damageType);
+                ActGlobals.oFormActMain.AddCombatAction((int)swingType, critical, special, attacker, theAttackType, damage, now, globalTime, victim, damageType);
             }
         }
 

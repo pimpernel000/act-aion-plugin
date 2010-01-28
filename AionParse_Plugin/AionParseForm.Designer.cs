@@ -146,9 +146,8 @@ namespace AionParsePlugin
             // CheckboxLinkPets
             // 
             this.CheckboxLinkPets.AutoSize = true;
-            this.CheckboxLinkPets.Enabled = false;
             this.CheckboxLinkPets.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckboxLinkPets.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.CheckboxLinkPets.ForeColor = System.Drawing.SystemColors.ControlText;
             this.CheckboxLinkPets.Location = new System.Drawing.Point(623, 133);
             this.CheckboxLinkPets.Name = "CheckboxLinkPets";
             this.CheckboxLinkPets.Size = new System.Drawing.Size(174, 20);

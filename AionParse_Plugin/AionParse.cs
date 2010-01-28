@@ -570,7 +570,7 @@
                 {
                     summonMatch = rSummonSpirit.Match(str);
                     victim = null;
-                    petDuration = 3600 * 24;
+                    petDuration = 600;
                 }
 
                 if (rSummonServant1.IsMatch(str))
@@ -589,8 +589,12 @@
                 {
                     string summoner = summonMatch.Groups["summoner"].Value;
                     string pet = summonMatch.Groups["pet"].Value;
-                    ////skill = summonMatch.Groups["skill"].Value;
-                    summonerRecordSet.Add(summoner, victim, pet, logInfo.detectedTime, petDuration);
+                    skill = summonMatch.Groups["skill"].Value;
+
+                    if (AionData.Pet.PetDurations.ContainsKey(pet))
+                        petDuration = AionData.Pet.PetDurations[pet];
+
+                    summonerRecordSet.Add(summoner, victim, skill, pet, logInfo.detectedTime, petDuration);
 
                     if (!string.IsNullOrEmpty(victim))
                     {

@@ -31,12 +31,28 @@ namespace AionParsePlugin
             recordSet.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Start = start, Duration = duration });
         }
 
+        public void Add(string actor, string target, string skill, string pet, DateTime summonTime, int petDuration)
+        {
+            recordSet.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Pet = pet, Start = summonTime, Duration = petDuration });
+        }
+
         public string GetActor(string target, string skill, DateTime now)
         {
             foreach (var record in recordSet)
             {
                 if (record.Match(target, skill, now))
                     return record.Actor;
+            }
+
+            return null;
+        }
+
+        public UsingSkillRecord GetSummonerRecord(string target, string pet, DateTime now)
+        {
+            foreach (var record in recordSet)
+            {
+                if (record.MatchPet(target, pet, now))
+                    return record;
             }
 
             return null;
@@ -61,13 +77,15 @@ namespace AionParsePlugin
             }
         }
 
-        private class UsingSkillRecord
+        public class UsingSkillRecord
         {
             public string Actor { get; set; }
 
             public string Target { get; set; }
 
             public string Skill { get; set; }
+
+            public string Pet { get; set; }
 
             public int Duration { get; set; }
 
@@ -86,6 +104,14 @@ namespace AionParsePlugin
                 return
                     target == Target &&
                     skill == Skill &&
+                    time <= End;
+            }
+
+            public bool MatchPet(string target, string pet, DateTime time)
+            {
+                return
+                    (target == Target || !AionData.Pet.IsTargettedPet(pet)) &&
+                    pet == Pet &&
                     time <= End;
             }
         }
