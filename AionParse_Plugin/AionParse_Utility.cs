@@ -6,6 +6,36 @@ namespace AionParse_Plugin
 {
     public partial class AionParse : IActPluginV1
     {
+        #region ui setters
+
+        internal void SetCharName(string charName)
+        {
+            lastCharName = charName;
+            ActGlobals.charName = charName;
+        }
+
+        internal void SetGuessDotCasters(bool guessDotCasters)
+        {
+            this.guessDotCasters = guessDotCasters;
+        }
+
+        internal void SetDebugParse(bool debugParse)
+        {
+            this.debugParse = debugParse;
+        }
+
+        internal void SetTagBlockedAttacks(bool tagBlockedAttacks)
+        {
+            this.tagBlockedAttacks = tagBlockedAttacks;
+        }
+
+        internal void SetLinkPets(bool linkPets)
+        {
+            this.linkPets = linkPets;
+        }
+
+        #endregion
+
         #region AddCombatAction overloads
         private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
         {
@@ -65,28 +95,6 @@ namespace AionParse_Plugin
                 default:
                     return incName;
             }
-        }
-        #endregion
-
-        #region ui setters
-        internal void SetGuessDotCasters(bool guessDotCasters)
-        {
-            this.guessDotCasters = guessDotCasters;
-        }
-
-        internal void SetDebugParse(bool debugParse)
-        {
-            this.debugParse = debugParse;
-        }
-
-        internal void SetTagBlockedAttacks(bool tagBlockedAttacks)
-        {
-            this.tagBlockedAttacks = tagBlockedAttacks;
-        }
-
-        internal void SetLinkPets(bool linkPets)
-        {
-            this.linkPets = linkPets;
         }
         #endregion
     }

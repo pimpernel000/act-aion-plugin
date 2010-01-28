@@ -25,15 +25,17 @@ namespace AionParse_Plugin
 
         private void AionParseForm_Load(object sender, EventArgs e)
         {
-            toolTip1.SetToolTip(
-                CheckboxTagBlockedAttacks,
-                "When checked, the parser will attempt to tag attacks after a block as special:blocked");
-            toolTip2.SetToolTip(
-                CheckboxGuessDoTCasters,
+            string toolTip1Msg = 
+                "When checked, the parser will attempt to tag attacks after a block as special:blocked";
+
+            string toolTip2Msg = 
                 "When checked, the parser will store who cast skills that cause DoT or damage after a delay, \n" +
                 "as to associate the later damage to the caster. This is also used to track healing done by Word of Life.\n" +
                 "(The limitation is that this really muddles the damage if you have casters casting the same DoTs\n" +
-                " on different mobs with the same name; whoever casted second gets attributed all the damage.)");
+                " on different mobs with the same name; whoever casted second gets attributed all the damage.)";
+         
+            toolTip1.SetToolTip(CheckboxTagBlockedAttacks, toolTip1Msg);
+            toolTip2.SetToolTip(CheckboxGuessDoTCasters, toolTip2Msg);
         }
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)

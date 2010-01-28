@@ -22,7 +22,8 @@ namespace AionParse_Plugin
             if (str.Contains("transformed") && str.Contains("into Cursed Tree")) return true;
             if (str.Contains("boosted") && (str.Contains("by using Curse of Roots") || str.Contains("by using Sleep"))) return true;
 
-            List<string> fullLines = new List<string> {
+            List<string> fullLines = new List<string> 
+            {
                 "Your movement speed is restored to normal.",
                 "Your attack speed is restored to normal.",
                 "Invalid target.",
@@ -46,7 +47,8 @@ namespace AionParse_Plugin
                 "Don't enter your Aion account info on any other site, or it will be stolen and your characters will be looted."
             };
 
-            List<string> startParts = new List<string> {
+            List<string> startParts = new List<string> 
+            {
                 "You have acquired [item:",
                 "You have earned",
                 "You are gathering", 
@@ -63,7 +65,8 @@ namespace AionParse_Plugin
                 "You were killed"
             };
 
-            List<string> endParts = new List<string> {
+            List<string> endParts = new List<string> 
+            {
                 "restored its movement speed.", "restored its attack speed.",
                 "is no longer stunned.",
                 "is no longer immobilized.", 
@@ -80,7 +83,8 @@ namespace AionParse_Plugin
                 "has died."
             };
 
-            List<string> containParts = new List<string> {
+            List<string> containParts = new List<string> 
+            {
                 "has acquired [item:",
                 "rolled the dice and got a",
                 "speed has decreased",

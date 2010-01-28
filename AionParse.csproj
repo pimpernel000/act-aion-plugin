@@ -83,6 +83,7 @@
     <Compile Include="AionParse_Plugin\AionParseForm.Designer.cs">
       <DependentUpon>AionParseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="AionParse_Plugin\AionParse_ACT.cs" />
     <Compile Include="AionParse_Plugin\AionParse_Ignores.cs" />
     <Compile Include="AionParse_Plugin\AionParse_Utility.cs" />
     <Compile Include="AionParse_Plugin\BlockedRecord.cs" />
