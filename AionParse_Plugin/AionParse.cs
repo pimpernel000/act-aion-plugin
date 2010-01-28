@@ -749,9 +749,9 @@
                         {
                             attacker = "Unknown (Cleric)";
                         }
-                        else if (skill.StartsWith("Blood Rune"))
+                        else if (skill.StartsWith("Blood Rune") || skill.StartsWith("Stamina Recovery I"))
                         {
-                            attacker = victim; // Blood Rune heals caster
+                            attacker = victim; // Blood Rune is assassin skill that heals caster; Stamina Recovery is gladiator self HoT skill
                         }
                         else if (skill.EndsWith(" Potion"))
                         {
