@@ -4,34 +4,36 @@ using System.Windows.Forms;
 namespace AionParse_Plugin
 {
     public partial class AionParseForm : UserControl
-	{
-        AionParse plugin;
+    {
+        private AionParse plugin;
 
-		public AionParseForm(AionParse plugin, string lastCharName)
-		{
-			InitializeComponent();
+        public AionParseForm(AionParse plugin, string lastCharName)
+        {
+            InitializeComponent();
             this.plugin = plugin;
             TextboxDefaultCharacter.Text = lastCharName;
             plugin.SetDebugParse(CheckboxDebugParse.Checked);
             plugin.SetGuessDotCasters(CheckboxGuessDoTCasters.Checked);
             plugin.SetLinkPets(CheckboxLinkPets.Checked);
             plugin.SetTagBlockedAttacks(CheckboxTagBlockedAttacks.Checked);
-		}
-
-        private void AionParseForm_Load(object sender, EventArgs e)
-        {
-            toolTip1.SetToolTip(CheckboxTagBlockedAttacks,
-                "When checked, the parser will attempt to tag attacks after a block as special:blocked");
-            toolTip2.SetToolTip(CheckboxGuessDoTCasters,
-                "When checked, the parser will store who cast skills that cause DoT or damage after a delay, \n" +
-                "as to associate the later damage to the caster. This is also used to track healing done by Word of Life.\n" +
-                "(The limitation is that this really muddles the damage if you have casters casting the same DoTs\n" +
-                " on different mobs with the same name; whoever casted second gets attributed all the damage.)");
         }
 
         public void AddText(string text)
         {
             TextboxLog.Text += text + Environment.NewLine;
+        }
+
+        private void AionParseForm_Load(object sender, EventArgs e)
+        {
+            toolTip1.SetToolTip(
+                CheckboxTagBlockedAttacks,
+                "When checked, the parser will attempt to tag attacks after a block as special:blocked");
+            toolTip2.SetToolTip(
+                CheckboxGuessDoTCasters,
+                "When checked, the parser will store who cast skills that cause DoT or damage after a delay, \n" +
+                "as to associate the later damage to the caster. This is also used to track healing done by Word of Life.\n" +
+                "(The limitation is that this really muddles the damage if you have casters casting the same DoTs\n" +
+                " on different mobs with the same name; whoever casted second gets attributed all the damage.)");
         }
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)

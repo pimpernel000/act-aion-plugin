@@ -89,14 +89,16 @@
         Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ']*) to bleed by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ']*) poisoned (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) caused (?<victim>you) to bleed by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
-        //Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ']*) is in the (?<buff>[a-zA-Z ']*) state (because (?<actor>[a-zA-Z ']*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: the only one we care about is the continuous recovery state caused by Word of Life (the only one I know of); so I put a special handling in the continuous section
-        //Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ']*) has weakened (?<target>[a-zA-Z ']*)'s (?<stat>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        //Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ']*) became (?<statuseffect>[a-zA-Z ']*) because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. (also for stunned, snared (by Aether's Hold), snared in mid-air (by Aerial Lockdown), paralyzed, silenced, bound, blinded)
-        //Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ']*) is (?<statuseffect>[a-zA-Z ']*) because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Ione is bleeding because Recondo used Area Cause Wound. (also other effects are: unable to fly and spinning)  NOTE: this also matches the "is in xxx state" so that must be used before this one.
-        //Regex rStatusEffectByYou1 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ']*) to become (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
-        //Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ']*) to (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        //Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ']*) (?<statuseffect>[a-zA-Z ']*) (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        //Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) caused (?<victim>you) to (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
+        /*
+        Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ']*) is in the (?<buff>[a-zA-Z ']*) state (because (?<actor>[a-zA-Z ']*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: the only one we care about is the continuous recovery state caused by Word of Life (the only one I know of); so I put a special handling in the continuous section
+        Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ']*) has weakened (?<target>[a-zA-Z ']*)'s (?<stat>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ']*) became (?<statuseffect>[a-zA-Z ']*) because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. (also for stunned, snared (by Aether's Hold), snared in mid-air (by Aerial Lockdown), paralyzed, silenced, bound, blinded)
+        Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ']*) is (?<statuseffect>[a-zA-Z ']*) because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Ione is bleeding because Recondo used Area Cause Wound. (also other effects are: unable to fly and spinning)  NOTE: this also matches the "is in xxx state" so that must be used before this one.
+        Regex rStatusEffectByYou1 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ']*) to become (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // TODO: confirm this regex as this is a total guess on my part
+        Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ']*) to (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ']*) (?<statuseffect>[a-zA-Z ']*) (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) caused (?<victim>you) to (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
+         */
         Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
         Regex rContDmg1 = new Regex(@"^You inflicted continuous damage on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
@@ -121,7 +123,7 @@
 
         #region private members
         // for Robe of Ice damage reflect
-        string lastActivatedSkill = "";
+        string lastActivatedSkill = string.Empty;
         int lastActivatedSkillGlobalTime = -1;
         DateTime lastActivedSkillTime = DateTime.MinValue;
 
@@ -157,8 +159,8 @@
             ActGlobals.oFormActMain.TimeStampLen = 0x16;
             ActGlobals.oFormActMain.GetDateTimeFromLog = new FormActMain.DateTimeLogParser(ParseDateTime);
             ActGlobals.oFormActMain.ZoneChangeRegex = new Regex(@"[\d :\.]{22}You have joined the (?<channel>.+?) region channel. ", RegexOptions.Compiled);
-            ActGlobals.oFormActMain.BeforeLogLineRead += new LogLineEventDelegate(this.oFormActMain_BeforeLogLineRead);
-            ActGlobals.oFormActMain.OnCombatEnd += new CombatToggleEventDelegate(this.oFormActMain_OnCombatEnd);
+            ActGlobals.oFormActMain.BeforeLogLineRead += new LogLineEventDelegate(this.BeforeLogLineRead);
+            ActGlobals.oFormActMain.OnCombatEnd += new CombatToggleEventDelegate(this.OnCombatEnd);
 
             ui = new AionParseForm(this, lastCharName);
             pluginScreenSpace.Controls.Add(ui);
@@ -173,17 +175,23 @@
 
         public void DeInitPlugin()
         {
-            ActGlobals.oFormActMain.BeforeLogLineRead -= new LogLineEventDelegate(this.oFormActMain_BeforeLogLineRead);
-            ActGlobals.oFormActMain.OnCombatEnd -= new CombatToggleEventDelegate(this.oFormActMain_OnCombatEnd);
+            ActGlobals.oFormActMain.BeforeLogLineRead -= new LogLineEventDelegate(this.BeforeLogLineRead);
+            ActGlobals.oFormActMain.OnCombatEnd -= new CombatToggleEventDelegate(this.OnCombatEnd);
         }
 
-        private void oFormActMain_OnCombatEnd(bool isImport, CombatToggleEventArgs encounterInfo)
+        internal void SetCharName(string charName)
         {
-            lastActivatedSkill = "";
+            lastCharName = charName;
+            ActGlobals.charName = charName;
+        }
+
+        private void OnCombatEnd(bool isImport, CombatToggleEventArgs encounterInfo)
+        {
+            lastActivatedSkill = string.Empty;
             lastActivatedSkillGlobalTime = -1;
             lastActivedSkillTime = DateTime.MinValue;
 
-            lastPotion = "";
+            lastPotion = string.Empty;
             lastPotionGlobalTime = -1;
             lastPotionTime = DateTime.MinValue;
 
@@ -191,7 +199,7 @@
             blockedHistory.Clear();
         }
 
-        private void oFormActMain_BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
+        private void BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
         {
             string str = logInfo.logLine.Substring(0x16, logInfo.logLine.Length - 0x16).Trim();
             string victim = string.Empty;
@@ -241,7 +249,9 @@
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
+
                 special += "reflected";
+
                 // assume: the attack that caused the reflection is recorded on it's own line so we don't have to log an unknown attack
                 AddCombatAction(logInfo, attacker, victim, "Damage Shield", critical, special, damage, SwingTypeEnum.NonMelee);
                 return;
@@ -270,7 +280,7 @@
                     if (mPatternEngraving.Success)
                     {
                         victim = CheckYou(mPatternEngraving.Groups["victim"].Value);
-                        //special = mPatternEngraving.Groups["statuseffect"].Value;
+                        ////special = mPatternEngraving.Groups["statuseffect"].Value;
                     }
                     else
                     {
@@ -283,6 +293,7 @@
                         if (!String.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
+
                     skill = mUsingAttack.Groups["skill"].Value;
 
                     // check if skill has an extra payload damage that can't be found other than in here
@@ -332,6 +343,7 @@
                         if (!String.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
+
                     skill = mIgniteAether.Groups["skill"].Value;
                     AddCombatAction(logInfo, attacker, victim, skill, critical, string.Empty, Dnum.NoDamage, SwingTypeEnum.CureDispel);
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee);
@@ -364,18 +376,18 @@
                     return;
                 }
 
-
                 // no ability submatch
                 victim = CheckYou(targetClause);
-                if (tagBlockedAttacks)  
+                if (tagBlockedAttacks)
                 {
                     string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                     {
                         special = blockType;
-                        //damageString = blockType; // nah, I don't want to cover the numbers with damageString
+                        ////damageString = blockType; // nah, I don't want to cover the numbers with damageString
                     }
-                } 
+                }
+
                 AddCombatAction(logInfo, attacker, victim, "Melee", critical, special, NewDnum(damage, damageString), SwingTypeEnum.Melee);
                 return;
             }
@@ -386,7 +398,7 @@
             {
                 attacker = CheckYou(mInflictDamageRuneCarve.Groups["attacker"].Value);
                 victim = CheckYou(mInflictDamageRuneCarve.Groups["victim"].Value);
-                //special = "pattern engraving";
+                ////special = "pattern engraving";
                 damage = mInflictDamageRuneCarve.Groups["damage"].Value;
                 skill = mInflictDamageRuneCarve.Groups["skill"].Value;
                 critical = mInflictDamageRuneCarve.Groups["critical"].Success;
@@ -395,7 +407,8 @@
                     string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType;
-                } 
+                }
+
                 AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee);
                 return;
             }
@@ -446,13 +459,15 @@
                 }
 
                 // match "You received continuous damage because xxx used xxx."
-                if (rContDmg3.IsMatch(str)) {
+                if (rContDmg3.IsMatch(str))
+                {
                     contDmgMatch = rContDmg3.Match(str);
                     attacker = CheckYou("you");
                     victim = contDmgMatch.Groups["victim"].Value;
                 }
 
-                if (contDmgMatch != null) {
+                if (contDmgMatch != null)
+                {
                     skill = contDmgMatch.Groups["skill"].Value;
                     if (guessDotCasters)
                         continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
@@ -497,13 +512,14 @@
                 }
             }
 
-            if (str.Contains("poisoned")) {
+            if (str.Contains("poisoned"))
+            {
                 Match poisonMatch = null;
 
                 // match "xxx became poisoned because xxx used xxx."
                 if (rStatusEffect1.IsMatch(str))
                     poisonMatch = rStatusEffect1.Match(str);
-                
+
                 // match "You caused xxx to become poisoned by using xxx."
                 if (rStatusEffectByYou1.IsMatch(str))
                     poisonMatch = rStatusEffectByYou1.Match(str);
@@ -521,11 +537,13 @@
                         skill = poisonMatch.Groups["skill"].Value;
                         continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     }
+
                     return;
                 }
             }
 
-            if (str.Contains("bleed")) {
+            if (str.Contains("bleed"))
+            {
                 Match bleedMatch = null;
 
                 // match "xxx is bleeding because xxx used xxx."
@@ -549,6 +567,7 @@
                         skill = bleedMatch.Groups["skill"].Value;
                         continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     }
+
                     return;
                 }
             }
@@ -563,7 +582,7 @@
                 if (guessDotCasters)
                     continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                 ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim);
-                //AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "effect"), SwingTypeEnum.NonMelee);
+                ////AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "effect"), SwingTypeEnum.NonMelee);
                 return;
             }
             #endregion
@@ -598,12 +617,13 @@
                     }
                 }
 
-                if (tagBlockedAttacks) {
+                if (tagBlockedAttacks)
+                {
                     string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
-                //special += "DoT";
+                ////special += "DoT";
                 AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee);
                 return;
             }
@@ -640,12 +660,14 @@
                         attacker = "Unknown"; // unknown class abilities are: Poison, Poison Slash (assassin?), Bleeding (spiritmaster?)
                     }
                 }
+
                 if (tagBlockedAttacks)
                 {
                     string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType + "&";
-                } 
+                }
+
                 special += "special";
                 AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee, damageType);
                 return;
@@ -665,8 +687,9 @@
                     string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType;
-                } 
-                AddCombatAction(logInfo, attacker, victim, "Melee", critical, "", damage, SwingTypeEnum.Melee);
+                }
+
+                AddCombatAction(logInfo, attacker, victim, "Melee", critical, string.Empty, damage, SwingTypeEnum.Melee);
                 return;
             }
             #endregion
@@ -684,6 +707,7 @@
                         ui.AddText("Exception-Unable to parse[e2]: " + str);
                         return;
                     }
+
                     victim = match.Groups["target"].Value;
                     damage = match.Groups["hp"].Value;
                     skill = match.Groups["skill"].Value;
@@ -736,6 +760,7 @@
                         ui.AddText("Exception-Unable to parse[e3]: " + str);
                         return;
                     }
+
                     attacker = match.Groups["actor"].Value;
                     victim = attacker;
                     damage = match.Groups["hp"].Value;
@@ -767,6 +792,7 @@
                             if (!String.IsNullOrEmpty(healerHoT)) attacker = healerHoT;
                         }
                     }
+
                     damage = match.Groups["hp"].Value;
                     skill = match.Groups["skill"].Value;
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.Healing);
@@ -826,7 +852,7 @@
             if (str.Contains("blocked"))
             {
                 if (!tagBlockedAttacks) return;
-                 
+
                 if (str.StartsWith("The attack was blocked by the "))
                 {
                     // match "The attack was blocked by the xxx effect cast on xxx."  ( means your next attack has reduced dmg)
@@ -837,9 +863,10 @@
                         ui.AddText("Exception-Unable to parse[e4]: " + str);
                         return;
                     }
+
                     victim = CheckYou(match.Groups["target"].Value);
-                    //theAttackType = match.Groups["skill"].Value;
-                    //AddCombatAction(logInfo, "Unknown", incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.Melee); // don't add action; this event occurs even on spells if they have armor up
+                    ////theAttackType = match.Groups["skill"].Value;
+                    ////AddCombatAction(logInfo, "Unknown", incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.Melee); // don't add action; this event occurs even on spells if they have armor up
                     blockedHistory.Add(CheckYou("you"), victim, logInfo.detectedTime, "blocked");
                     return;
                 }
@@ -856,7 +883,7 @@
 
                     victim = match.Groups["victim"].Value;
                     attacker = match.Groups["attacker"].Value;
-                    //theAttackType = match.Groups["skill"].Value;
+                    ////theAttackType = match.Groups["skill"].Value;
                     blockedHistory.Add(attacker, victim, logInfo.detectedTime, "blocked");
                     return;
                 }
@@ -930,7 +957,7 @@
                             }
                             else
                             {
-                                attacker = newattacker.Remove(newattacker.Length-2);
+                                attacker = newattacker.Remove(newattacker.Length - 2);
                                 skill = newskill;
                                 break;
                             }
@@ -1067,98 +1094,7 @@
                     ui.AddText("unparsed: " + str);
             }
             #endregion
-
         }
-
-        #region AddCombatAction overloads
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
-        {
-            AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
-        }
-
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
-        {
-            AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, int.Parse(damage.Replace(",", String.Empty)), swingType, damageType);
-        }
-
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType)
-        {
-            AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, damage, swingType, string.Empty);
-        }
-
-        private static void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType, string damageType)
-        {
-            if (ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim))
-            {
-                int globalTime = ActGlobals.oFormActMain.GlobalTimeSorter++;
-                ActGlobals.oFormActMain.AddCombatAction((int)swingType, critical, special, attacker, theAttackType, damage, logInfo.detectedTime, globalTime, victim, damageType);
-            }
-        }
-
-        #endregion
-
-        #region utility methods
-        private static DateTime ParseDateTime(string FullLogLine)
-        {
-            string str = FullLogLine.Substring(0, 4) + "-" + FullLogLine.Substring(5, 2) + FullLogLine.Substring(8, 2);
-            string str2 = FullLogLine.Substring(11, 8);
-            return DateTime.ParseExact(str + "-" + str2, "yyyy-MMdd-HH:mm:ss", CultureInfo.InvariantCulture);
-        }
-
-        private string CheckYou(string IncName)
-        {
-            switch (IncName.ToUpper().Trim())
-            {
-                case "YOU":
-                case "YOUR":
-                case "YOURSELF":
-                    return ActGlobals.charName == "YOU" ? lastCharName : ActGlobals.charName;
-                default:
-                    return IncName;
-            }
-        }
-
-        private static Dnum NewDnum(string damage, string damageString)
-        {
-            int d = int.Parse(damage.Replace(",", "").Trim());
-            if (String.IsNullOrEmpty(damageString))
-            {
-                return new Dnum(d);
-            }
-            else
-            {
-                return new Dnum(d, damageString);
-            }
-        }
-
-        internal void SetCharName(string charName)
-        {
-            lastCharName = charName;
-            ActGlobals.charName = charName;
-        }
-        #endregion
-
-        #region ui setters
-        internal void SetGuessDotCasters(bool guessDotCasters)
-        {
-            this.guessDotCasters = guessDotCasters;
-        }
-
-        internal void SetDebugParse(bool debugParse)
-        {
-            this.debugParse = debugParse;
-        }
-
-        internal void SetTagBlockedAttacks(bool tagBlockedAttacks)
-        {
-            this.tagBlockedAttacks = tagBlockedAttacks;
-        }
-  
-        internal void SetLinkPets(bool linkPets)
-        {
-            this.linkPets = linkPets;
-        }
-        #endregion
 
         #region IDisposable Members
 

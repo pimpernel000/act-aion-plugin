@@ -1,10 +1,10 @@
-﻿// Assembly AionParse, Version 0.1.2.3  (<major>.<minor>.<revision>.<build>)
+﻿// Assembly AionParse, Version 0.1.3.4  (<major>.<minor>.<revision>.<build>)
 
-[assembly: System.Reflection.AssemblyVersion("0.1.2.3")]
+[assembly: System.Reflection.AssemblyVersion("0.1.3.4")]
 [assembly: System.Reflection.AssemblyTrademark("")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 [assembly: System.Runtime.InteropServices.Guid("16ff0008-e192-4f59-85fc-8fb58f48cdea")]
-[assembly: System.Runtime.CompilerServices.RuntimeCompatibility(WrapNonExceptionThrows=true)]
+[assembly: System.Runtime.CompilerServices.RuntimeCompatibility(WrapNonExceptionThrows = true)]
 [assembly: System.Reflection.AssemblyConfiguration("")]
 [assembly: System.Reflection.AssemblyCompany("Creub")]
 [assembly: System.Reflection.AssemblyTitle("Aion damage and heal parse")]

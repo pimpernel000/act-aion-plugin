@@ -3,17 +3,9 @@ using System.Collections.Generic;
 
 namespace AionParse_Plugin
 {
-	public class ContinuousDamageSet
-	{
-        const int LOOKBACK_LIMIT = 30;
-
-        class ContinuousDamageRecord
-        {
-            public string Actor { get; set; }
-            public string Target { get; set; }
-            public string Skill { get; set; }
-            public DateTime Start { get; set; }
-        }
+    public class ContinuousDamageSet
+    {
+        const int LookBackLimit = 30;
 
         private List<ContinuousDamageRecord> list = new List<ContinuousDamageRecord>();
 
@@ -26,7 +18,7 @@ namespace AionParse_Plugin
         {
             foreach (var record in list)
             {
-                if ((now - record.Start).TotalSeconds > LOOKBACK_LIMIT) 
+                if ((now - record.Start).TotalSeconds > LookBackLimit)
                     return null;
 
                 if (record.Target == target && record.Skill == skill)
@@ -45,7 +37,7 @@ namespace AionParse_Plugin
             int staleIndex = -1;
             for (int i = 1; i < list.Count; i++)
             {
-                if ((lastTime - list[i].Start).TotalSeconds > LOOKBACK_LIMIT)
+                if ((lastTime - list[i].Start).TotalSeconds > LookBackLimit)
                 {
                     listStale = true;
                     staleIndex = i;
@@ -56,5 +48,16 @@ namespace AionParse_Plugin
             if (listStale)
                 list.RemoveRange(staleIndex, list.Count - staleIndex);
         }
-	}
+    
+        class ContinuousDamageRecord
+        {
+            public string Actor { get; set; }
+
+            public string Target { get; set; }
+
+            public string Skill { get; set; }
+
+            public DateTime Start { get; set; }
+        }
+    }
 }

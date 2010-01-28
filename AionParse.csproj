@@ -84,9 +84,10 @@
       <DependentUpon>AionParseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AionParse_Plugin\AionParse_Ignores.cs" />
+    <Compile Include="AionParse_Plugin\AionParse_Utility.cs" />
     <Compile Include="AionParse_Plugin\BlockedRecord.cs" />
     <Compile Include="AionParse_Plugin\ContinuousDamageRecord.cs" />
-    <Compile Include="AionParse_Plugin\RecordBase.cs" />
+    <Compile Include="AionParse_Plugin\UsingSkillRecordSetBase.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -131,6 +132,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(ProgramFiles)\MSBuild\Microsoft\StyleCop\v4.3\Microsoft.StyleCop.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>

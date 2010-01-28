@@ -7,7 +7,7 @@ namespace AionParse_Plugin
     {
         bool IsIgnore(string str)
         {
-            if (str.Contains("[charname:")) return true; //ignore chats ([charname:...] is a link to a name
+            if (str.Contains("[charname:")) return true; // ignore chats ([charname:...] is a link to a name
             if (str.StartsWith(CheckYou("you") + ":")) return true; // ignore your own chats
 
             if (str.StartsWith("You have gained") && str.Contains("EXP")) return true;
@@ -22,7 +22,6 @@ namespace AionParse_Plugin
             if (str.Contains("transformed") && str.Contains("into Cursed Tree")) return true;
             if (str.Contains("boosted") && (str.Contains("by using Curse of Roots") || str.Contains("by using Sleep"))) return true;
 
-
             List<string> fullLines = new List<string> {
                 "Your movement speed is restored to normal.",
                 "Your attack speed is restored to normal.",
@@ -30,7 +29,7 @@ namespace AionParse_Plugin
                 "The target is too far away.",
                 "You interrupted the target's skill.",
                 "The skill was cancelled.",
-                "You stopped using the Macro.","You cannot use a Macro yet.",
+                "You stopped using the Macro.", "You cannot use a Macro yet.",
                 "You cannot use the item as its cooldown time has not expired yet.",
                 "You cannot use that because there is an obstacle in the way.",
                 "You cannot use that on your target.",
@@ -64,7 +63,7 @@ namespace AionParse_Plugin
                 "You were killed"
             };
 
-            List<string> endParts = new List<string>{
+            List<string> endParts = new List<string> {
                 "restored its movement speed.", "restored its attack speed.",
                 "is no longer stunned.",
                 "is no longer immobilized.", 
@@ -81,7 +80,7 @@ namespace AionParse_Plugin
                 "has died."
             };
 
-            List<string> containParts = new List<string>{
+            List<string> containParts = new List<string> {
                 "has acquired [item:",
                 "rolled the dice and got a",
                 "speed has decreased",
@@ -101,7 +100,7 @@ namespace AionParse_Plugin
                 "changed his Physical Attack by using",
                 "has boosted your",
                 "was affected by its own",
-                "gathered successfully","failed to gather",
+                "gathered successfully", "failed to gather",
                 "has logged in",
                 "has conquered", "is no longer vulnerable" // ignore fortress
             };

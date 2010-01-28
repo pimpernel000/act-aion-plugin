@@ -5,3 +5,5 @@ bin/
 obj/
 _UpgradeReport_Files/
 AionParse.Properties.Resources.resources
+glob:StyleCop.Cache
+glob:moveToACT.bat
