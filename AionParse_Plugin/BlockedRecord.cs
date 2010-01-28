@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AionParse_Plugin
+namespace AionParsePlugin
 {
     public class BlockedSet
     {

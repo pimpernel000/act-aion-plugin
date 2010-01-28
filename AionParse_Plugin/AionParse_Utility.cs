@@ -2,7 +2,7 @@
 using System.Globalization;
 using Advanced_Combat_Tracker;
 
-namespace AionParse_Plugin
+namespace AionParsePlugin
 {
     public partial class AionParse : IActPluginV1
     {

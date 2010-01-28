@@ -1,4 +1,4 @@
-﻿namespace AionParse_Plugin
+﻿namespace AionParsePlugin
 {
     using System;
     using System.Text.RegularExpressions;
@@ -116,6 +116,11 @@
         Regex rCurseOfRoot1 = new Regex(@"^(?<victim>[a-zA-Z ']*) has transformed into Cursed Tree because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
         Regex rCurseOfRoot2 = new Regex(@"^(?<attacker>You) transformed (?<victim>[a-zA-Z ']*) into Cursed Tree by using (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
          */
+
+        Regex rSummonSpirit = new Regex(@"^(?<summoner>[a-zA-Z ']*) summoned (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        Regex rSummonServant1 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has summoned (?<pet>[a-zA-Z ']*) to attack (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        Regex rSummonServant2 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has caused you to summon (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+
         #endregion
 
         #region private members
@@ -554,6 +559,44 @@
                 ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim);
                 ////AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "effect"), SwingTypeEnum.NonMelee);
                 return;
+            }
+
+            if (str.Contains("summon"))
+            {
+                Match summonMatch = null;
+                int petDuration = 30;
+               
+                if (rSummonSpirit.IsMatch(str) && linkPets)
+                {
+                    summonMatch = rSummonSpirit.Match(str);
+                    victim = null;
+                    petDuration = 3600 * 24;
+                }
+
+                if (rSummonServant1.IsMatch(str))
+                {
+                    summonMatch = rSummonServant1.Match(str);
+                    victim = summonMatch.Groups["victim"].Value;
+                }
+
+                if (rSummonServant2.IsMatch(str))
+                {
+                    summonMatch = rSummonServant2.Match(str);
+                    victim = CheckYou("you");
+                }
+
+                if (summonMatch != null && summonMatch.Success)
+                {
+                    string summoner = summonMatch.Groups["summoner"].Value;
+                    string pet = summonMatch.Groups["pet"].Value;
+                    ////skill = summonMatch.Groups["skill"].Value;
+                    summonerRecordSet.Add(summoner, victim, pet, logInfo.detectedTime, petDuration);
+
+                    if (!string.IsNullOrEmpty(victim))
+                    {
+                        ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, summoner, victim);
+                    }
+                }
             }
             #endregion
 

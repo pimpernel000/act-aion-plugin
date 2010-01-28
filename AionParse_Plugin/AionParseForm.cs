@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace AionParse_Plugin
+namespace AionParsePlugin
 {
     public partial class AionParseForm : UserControl
     {

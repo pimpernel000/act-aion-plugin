@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Advanced_Combat_Tracker;
 
-namespace AionParse_Plugin
+namespace AionParsePlugin
 {
     public partial class AionParse : IActPluginV1
     {

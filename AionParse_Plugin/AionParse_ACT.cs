@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Advanced_Combat_Tracker;
 
-namespace AionParse_Plugin
+namespace AionParsePlugin
 {
     public partial class AionParse : IActPluginV1
     {

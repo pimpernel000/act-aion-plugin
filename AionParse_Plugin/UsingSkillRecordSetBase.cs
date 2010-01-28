@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AionParse_Plugin
+namespace AionParsePlugin
 {
     public class UsingSkillRecordSetBase
     {
@@ -23,7 +23,7 @@ namespace AionParse_Plugin
 
         public void Add(string actor, string target, string skill, DateTime start)
         {
-            Add(actor, target, skill, start, lookBackLimit);
+            Add(actor, target, skill, start, lookBackLimit);  // TODO: instead of using lookBackLimit, do a lookup on the skill/pet durations
         }
 
         public void Add(string actor, string target, string skill, DateTime start, int duration)
