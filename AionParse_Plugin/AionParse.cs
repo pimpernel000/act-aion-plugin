@@ -54,7 +54,7 @@
      *  Jessex started using Clement Mind Mantra II. 
      *  You recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
      *  Ione recovered 24 MP due to the effect of Clement Mind Mantra II Effect. 
-     *  
+     *  You began using Celerity Mantra I.
      * Skills not yet implemented:
      *  Draining Blow by Gladiators (this heals)
      * 
@@ -120,6 +120,8 @@
         Regex rSummonSpirit = new Regex(@"^(?<summoner>[a-zA-Z ']*) summoned (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant1 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has summoned (?<pet>[a-zA-Z ']*) to attack (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant2 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has caused you to summon (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        Regex rSummonServant3 = new Regex(@"^(?<summoner>You) summoned (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?) to let it attack (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);  // NOTE: this regex is a subset of rSummonSpirit, so make sure this is matched first before the other
+
 
         #endregion
 
@@ -565,29 +567,36 @@
             {
                 Match summonMatch = null;
                 int petDuration = 30;
-               
-                if (rSummonSpirit.IsMatch(str) && linkPets)
-                {
-                    summonMatch = rSummonSpirit.Match(str);
-                    victim = null;
-                    petDuration = 600;
-                }
 
                 if (rSummonServant1.IsMatch(str))
                 {
-                    summonMatch = rSummonServant1.Match(str);
+                    summonMatch = rSummonServant1.Match(str); // xxx has summoned pet to attack xxx by using skill
                     victim = summonMatch.Groups["victim"].Value;
                 }
-
-                if (rSummonServant2.IsMatch(str))
+                else if (rSummonServant2.IsMatch(str))
                 {
-                    summonMatch = rSummonServant2.Match(str);
+                    summonMatch = rSummonServant2.Match(str); // xxx has caused you to summon pet by using skill
                     victim = CheckYou("you");
                 }
+                else if (rSummonServant3.IsMatch(str))
+                {
+                    summonMatch = rSummonServant3.Match(str); // You summoned xx by using skill to let it attack xxx
+                    victim = summonMatch.Groups["victim"].Value;
+                }
+                else if (rSummonSpirit.IsMatch(str))
+                {
+                    if (linkPets)
+                    {
+                        summonMatch = rSummonSpirit.Match(str); // xxx summoned pet by using skill
+                        victim = null;
+                        petDuration = 600;
+                    }
+                }
+
 
                 if (summonMatch != null && summonMatch.Success)
                 {
-                    string summoner = summonMatch.Groups["summoner"].Value;
+                    string summoner = CheckYou(summonMatch.Groups["summoner"].Value);
                     string pet = summonMatch.Groups["pet"].Value;
                     skill = summonMatch.Groups["skill"].Value;
 
@@ -600,7 +609,15 @@
                     {
                         ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, summoner, victim);
                     }
+
+                    if (this.debugParse)
+                        ui.AddText("match summon spirit: s[" + summoner + "], p[" + pet + "], sk[" + skill);
+
+                    return;
                 }
+
+                if (this.debugParse)
+                    ui.AddText("NO MATCH on summon: " + str);
             }
             #endregion
 

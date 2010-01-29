@@ -50,6 +50,7 @@ namespace AionParsePlugin
             List<string> startParts = new List<string> 
             {
                 "You have acquired [item:",
+                "You have acquired 2 [item:",
                 "You have earned",
                 "You are gathering", 
                 "You are no longer",
