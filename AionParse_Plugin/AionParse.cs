@@ -609,10 +609,6 @@
                     {
                         ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, summoner, victim);
                     }
-
-                    if (this.debugParse)
-                        ui.AddText("match summon spirit: s[" + summoner + "], p[" + pet + "], sk[" + skill);
-
                     return;
                 }
 
