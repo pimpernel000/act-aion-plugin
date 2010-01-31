@@ -41,6 +41,10 @@ namespace AionParsePlugin
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
             this.CheckboxLinkPets = new System.Windows.Forms.CheckBox();
+            this.CheckboxParseDmgToTmpPets = new System.Windows.Forms.CheckBox();
+            this.toolTip3 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip4 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip0 = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // TextboxLog
@@ -150,16 +154,30 @@ namespace AionParsePlugin
             this.CheckboxLinkPets.ForeColor = System.Drawing.SystemColors.ControlText;
             this.CheckboxLinkPets.Location = new System.Drawing.Point(623, 133);
             this.CheckboxLinkPets.Name = "CheckboxLinkPets";
-            this.CheckboxLinkPets.Size = new System.Drawing.Size(174, 20);
+            this.CheckboxLinkPets.Size = new System.Drawing.Size(187, 20);
             this.CheckboxLinkPets.TabIndex = 100;
-            this.CheckboxLinkPets.Text = "Link Pets with Summoner";
+            this.CheckboxLinkPets.Text = "Link Spirts with Spiritmaster";
             this.CheckboxLinkPets.UseVisualStyleBackColor = true;
             this.CheckboxLinkPets.CheckedChanged += new System.EventHandler(this.CheckboxLinkPets_CheckedChanged);
+            // 
+            // CheckboxParseDmgToTmpPets
+            // 
+            this.CheckboxParseDmgToTmpPets.AutoSize = true;
+            this.CheckboxParseDmgToTmpPets.Enabled = false;
+            this.CheckboxParseDmgToTmpPets.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxParseDmgToTmpPets.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.CheckboxParseDmgToTmpPets.Location = new System.Drawing.Point(623, 160);
+            this.CheckboxParseDmgToTmpPets.Name = "CheckboxParseDmgToTmpPets";
+            this.CheckboxParseDmgToTmpPets.Size = new System.Drawing.Size(256, 20);
+            this.CheckboxParseDmgToTmpPets.TabIndex = 101;
+            this.CheckboxParseDmgToTmpPets.Text = "Parse damage to temporary summons";
+            this.CheckboxParseDmgToTmpPets.UseVisualStyleBackColor = true;
             // 
             // AionParseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.CheckboxParseDmgToTmpPets);
             this.Controls.Add(this.CheckboxLinkPets);
             this.Controls.Add(this.CheckboxTagBlockedAttacks);
             this.Controls.Add(this.CheckboxDebugParse);
@@ -192,5 +210,9 @@ namespace AionParsePlugin
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolTip toolTip2;
         private System.Windows.Forms.CheckBox CheckboxLinkPets;
+        private System.Windows.Forms.CheckBox CheckboxParseDmgToTmpPets;
+        private System.Windows.Forms.ToolTip toolTip3;
+        private System.Windows.Forms.ToolTip toolTip4;
+        private System.Windows.Forms.ToolTip toolTip0;
     }
 }

@@ -11,6 +11,8 @@ namespace AionParsePlugin
 
         private List<UsingSkillRecord> recordSet = new List<UsingSkillRecord>();
 
+        private List<string> summonedPets = new List<string>();
+
         public UsingSkillRecordSetBase(int lookBackLimit)
         {
             this.lookBackLimit = lookBackLimit;
@@ -34,6 +36,13 @@ namespace AionParsePlugin
         public void Add(string actor, string target, string skill, string pet, DateTime summonTime, int petDuration)
         {
             recordSet.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Pet = pet, Start = summonTime, Duration = petDuration });
+            if (!string.IsNullOrEmpty(pet))
+                summonedPets.Add(pet);
+        }
+
+        public bool IsSummonedPet(string pet)
+        {
+            return summonedPets.Contains(pet);
         }
 
         public string GetActor(string target, string skill, DateTime now)

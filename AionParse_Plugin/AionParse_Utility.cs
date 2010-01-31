@@ -58,7 +58,7 @@ namespace AionParsePlugin
             if (ActGlobals.oFormActMain.SetEncounter(now, attacker, victim))
             {
                 // redirect attacks from pets/servants as coming from summoner
-                if (AionData.Pet.IsPet(attacker))
+                if (summonerRecordSet.IsSummonedPet(attacker))
                 {
                     var summonerRecord = summonerRecordSet.GetSummonerRecord(victim, attacker, now);
                     if (summonerRecord != null)
@@ -79,13 +79,29 @@ namespace AionParsePlugin
                         }
                     }
                 }
-                else if (AionData.Pet.IsPet(victim))
+                else if (summonerRecordSet.IsSummonedPet(victim))
                 {
-                    if (AionData.Pet.PetDurations[victim] <= 60) return; // ignore damage done to short-duration temporary pets
+                    if (AionData.Pet.IsPet(victim))
+                    {
+                        if (AionData.Pet.PetDurations[victim] <= 60) return; // ignore damage done to short-duration temporary pets // TODO: this should be a checkbox as this will decrease the dps of the attacker
 
-                    var summonerRecord = summonerRecordSet.GetSummonerRecord(null, victim, now);
-                    if (linkPets)
-                        return; // TODO: how do we treat damage done to spiritmaster's pets?
+                        var summonerRecord = summonerRecordSet.GetSummonerRecord(null, victim, now);
+                        if (linkPets)
+                        {
+                            ////return; // TODO: how do we treat damage done to spiritmaster's pets?
+                        }
+                    }
+                    else
+                    {
+                        if (linkPets)
+                        {
+                            // TODO: how do we treat damage done to mob's pets?
+                        }
+                        else
+                        {
+                            ////victim += " (inc)"; // TODO: this should be a checkbox if we want damage shown to mob pets
+                        }
+                    }
                 }
 
                 int globalTime = ActGlobals.oFormActMain.GlobalTimeSorter++;

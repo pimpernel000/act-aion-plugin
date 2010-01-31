@@ -22,7 +22,7 @@ namespace AionData
             { "Wind Servant", 12 },
             { "Energy of Cyclone", 30 }, // TODO: spiritmaster 45 stigma skill... this is a placeholder until I can get actual information on the pet name and pet duration
             { "Holy Servant", 21 }, // cleric servants usually shoots 3 times and lasts less than 15 secs; maybe shoots a 4th time if given a heal
-            { "Noble Energy", 30 },
+            { "Noble Energy", 30 }, // TODO: find more information about the duration of this spell
             { "Slowing Trap", 60 }, // ranger traps lasts 60 secs
             { "Poisoning Trap", 60 },
             { "Spike Trap", 60 },
@@ -41,7 +41,8 @@ namespace AionData
             "Water Energy", 
             "Wind Servant",
             "Energy of Cyclone",
-            "Holy Servant"
+            "Holy Servant",
+            "Noble Energy" // TODO: confirm that this is a targetted spell
         };
 
         public static Dictionary<string, int> PetDurations
