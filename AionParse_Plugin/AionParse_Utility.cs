@@ -83,6 +83,7 @@ namespace AionParsePlugin
                 {
                     if (AionData.Pet.IsPet(victim))
                     {
+                        // handle player pets
                         if (AionData.Pet.PetDurations[victim] <= 60) return; // ignore damage done to short-duration temporary pets // TODO: this should be a checkbox as this will decrease the dps of the attacker
 
                         var summonerRecord = summonerRecordSet.GetSummonerRecord(null, victim, now);
@@ -93,6 +94,7 @@ namespace AionParsePlugin
                     }
                     else
                     {
+                        // handle monster/unknown pets
                         if (linkPets)
                         {
                             // TODO: how do we treat damage done to mob's pets?

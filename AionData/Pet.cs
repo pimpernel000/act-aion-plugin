@@ -6,7 +6,7 @@ namespace AionData
 {
     public static class Pet
     {
-        // TODO: add pet elemental damage?
+        /* TODO: add pet elemental damage? */
 
         private static Dictionary<string, int> petDurations = new Dictionary<string, int>()
         {
