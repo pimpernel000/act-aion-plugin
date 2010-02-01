@@ -57,6 +57,14 @@
      *  You began using Celerity Mantra I.
      * Skills not yet implemented:
      *  Draining Blow by Gladiators (this heals)
+     *  
+     * TODO: determine if Wind Cut Down has a secondary Magical Wind Damage effect?! (or is it from some other ability?)
+     * 2010.01.31 19:19:08 : Matteous inflicted 1,393 damage on Brutal Mist Mane Pawsoldier by using Wind Cut Down II. 
+     * 2010.01.31 19:19:08 : Brutal Mist Mane Pawsoldier is bleeding because Matteous used Wind Cut Down II.
+     * 2010.01.31 19:19:13 : Brutal Mist Mane Pawsoldier received 338 bleeding damage after you used Wind Cut Down II. 
+     * 2010.01.31 19:19:16 : Brutal Mist Mane Pawsoldier received 338 bleeding damage after you used Wind Cut Down II. 
+     * 2010.01.31 19:19:16 : Brutal Mist Mane Pawsoldier received 72 damage due to the effect of Magical Wind Damage Effect. 
+     * 
      * 
      * NOTE: currently, resists assume that attacker can have a "'s" in their name, and that is higher priority than "'s" in skill names. A list of possible player skill names are hardcoded
      *   in this parser and the attacker name will be corrected.  However, if there are many more skill names that have "'s" (i.e. mob skills), we might change the regex instead to exclude
@@ -297,7 +305,7 @@
                     }
 
                     // correct the false self damage message that are actually continuous damage from others to you
-                    if (attacker == victim && attacker == CheckYou("you"))
+                    if (victim == "you" && attacker == CheckYou("you"))
                     {
                         string realAttacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
                         if (!String.IsNullOrEmpty(realAttacker))
