@@ -70,7 +70,7 @@
      *   in this parser and the attacker name will be corrected.  However, if there are many more skill names that have "'s" (i.e. mob skills), we might change the regex instead to exclude
      *   "'s" from the attacker's name, and then we hardcode a list of attackers that have "'s" in their name.
      * 
-     * TODO: provide /act commands to set party members
+     * TODO: Implement handling of Selective Parsing tab in ACT so that you can parse your own party members only
      * 
      * TODO: use ActGlobals.oFormActMain.SetEncounters and a timer to handle sleep durations that last 20 seconds without any combat activity.
      *   - EQAditu mentions SetEncounter() combined with LastEstimatedTime
@@ -295,11 +295,11 @@
 
                     var inflictSwingType = SwingTypeEnum.NonMelee;
 
-                    // correct the false damage that are actually group heals
+                    // correct the false damage on you that are actually group heals
                     if (victim == CheckYou("you") &&
                         (skill.StartsWith("Healing Wind") || skill.StartsWith("Light of Recovery") ||
                         skill.StartsWith("Healing Light") || skill.StartsWith("Radiant Cure") ||
-                        skill.StartsWith("Flash of Recovery")))
+                        skill.StartsWith("Flash of Recovery") || skill.StartsWith("Splendor of Recovery")))
                     {
                         inflictSwingType = SwingTypeEnum.Healing;
                     }
