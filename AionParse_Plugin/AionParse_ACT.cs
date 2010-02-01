@@ -22,7 +22,6 @@ namespace AionParsePlugin
             ui = new AionParseForm(this, lastCharName);
             pluginScreenSpace.Controls.Add(ui);
             ui.Dock = DockStyle.Fill;
-            ui.AddText("Plugin Initialized with current character as " + lastCharName + ".");
 
             extraDamageSkills = new System.Collections.Generic.List<string> 
             {

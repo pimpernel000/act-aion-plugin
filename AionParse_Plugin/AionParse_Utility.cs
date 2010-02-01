@@ -141,7 +141,7 @@ namespace AionParsePlugin
                 case "YOU":
                 case "YOUR":
                 case "YOURSELF":
-                    return ActGlobals.charName == "YOU" ? lastCharName : ActGlobals.charName;
+                    return lastCharName;
                 default:
                     return incName;
             }

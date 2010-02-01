@@ -7,11 +7,18 @@ namespace AionParsePlugin
     {
         private AionParse plugin;
 
-        public AionParseForm(AionParse plugin, string lastCharName)
+        public AionParseForm(AionParse plugin, string defaultCharName)
         {
             InitializeComponent();
             this.plugin = plugin;
-            TextboxDefaultCharacter.Text = lastCharName;
+            if (String.IsNullOrEmpty(TextboxDefaultCharacter.Text))
+            {
+                TextboxDefaultCharacter.Text = defaultCharName;
+            }
+
+            plugin.SetCharName(TextboxDefaultCharacter.Text);
+            AddText("Plugin Initialized with current character as " + TextboxDefaultCharacter.Text + ".");
+
             plugin.SetDebugParse(CheckboxDebugParse.Checked);
             plugin.SetGuessDotCasters(CheckboxGuessDoTCasters.Checked);
             plugin.SetLinkPets(CheckboxLinkPets.Checked);

@@ -816,6 +816,7 @@
                 {
                     Match match = rRecoverHP.Match(str);
                     victim = CheckYou(match.Groups["target"].Value);
+                    skill = match.Groups["skill"].Value;
                     if (match.Groups["actor"].Success)
                     {
                         attacker = CheckYou(match.Groups["actor"].Value);
@@ -831,7 +832,6 @@
                     }
 
                     damage = match.Groups["hp"].Value;
-                    skill = match.Groups["skill"].Value;
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.Healing);
                     return;
                 }
