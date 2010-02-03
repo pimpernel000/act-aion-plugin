@@ -130,6 +130,8 @@
         Regex rSummonServant2 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has caused you to summon (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant3 = new Regex(@"^(?<summoner>You) summoned (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?) to let it attack (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);  // NOTE: this regex is a subset of rSummonSpirit, so make sure this is matched first before the other
 
+        Regex rProcBuff = new Regex(@"(?<actor>[a-zA-Z ']*) was affected by its own (?<skill>[a-zA-Z \-']*?)\.", RegexOptions.Compiled);
+
         #endregion
 
         #region private members
@@ -165,6 +167,8 @@
         bool debugParse = false; // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
         bool tagBlockedAttacks = true;
         bool linkPets = false; // TODO: link pets with their summoners for damage totalling; maybe label all pet skills as "Pet Skill (petname)" and name pet melee as "Melee (petname)"
+        bool linkBOFtoSM = true;
+        bool linkDmgProcs = false;
         #endregion
 
         private void OnCombatEnd(bool isImport, CombatToggleEventArgs encounterInfo)
@@ -422,6 +426,7 @@
                 return;
             }
 
+            #region continuous
             if (str.Contains("continuous"))
             {
                 Match contDmgMatch = null;
@@ -495,7 +500,9 @@
                     return;
                 }
             }
+            #endregion
 
+            #region poisoned
             if (str.Contains("poisoned"))
             {
                 Match poisonMatch = null;
@@ -525,7 +532,9 @@
                     return;
                 }
             }
+            #endregion
 
+            #region bleed
             if (str.Contains("bleed"))
             {
                 Match bleedMatch = null;
@@ -555,6 +564,7 @@
                     return;
                 }
             }
+            #endregion
 
             // match "xxx received the xxx effect because xxx used xxx"  occurs when you use Delayed Blast
             if (rReceiveEffect.IsMatch(str))
@@ -570,6 +580,7 @@
                 return;
             }
 
+            #region summon
             if (str.Contains("summon"))
             {
                 Match summonMatch = null;
@@ -624,6 +635,57 @@
             }
             #endregion
 
+            if (rProcBuff.IsMatch(str))
+            {
+                Match match = rProcBuff.Match(str);
+                string actor = match.Groups["actor"].Value;
+                skill = match.Groups["skill"].Value;
+
+                if (linkBOFtoSM && skill.StartsWith("Blessing of Fire I"))
+                {
+                    continuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 10 * 60);
+                    return;
+                }
+
+                if (linkDmgProcs)
+                {
+                    if (skill.StartsWith("Promise of Wind I"))
+                    {
+                        continuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
+                        return;
+                    }
+
+                    if (skill.StartsWith("Apply Poison I") || skill == "Apply Deadly Poison I")
+                    {
+                        continuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 2 * 60);
+                        return;
+                    }
+                }
+
+                if (skill.StartsWith("Promise of Aether I"))
+                {
+                    healerRecordSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
+                    return;
+                }
+
+                // ignore non-damage and non-heal spells
+                /*
+                if (skill.StartsWith("Promise of Earth I") || skill.StartsWith("Arrow Flurry I") || skill == "Blessing of Rock" || skill.StartsWith("Tactical Retreat I") || skill.StartsWith("Robe of Cold I"))
+                {
+                    return;
+                }
+                 */
+
+                // ignore mob and other unhandled spells
+                /*
+                if (debugParse)
+                    ui.AddText("Unhandled self buff: " + str);
+                 */
+                return;
+            }
+
+            #endregion
+
             #region continuous/extra damage from specific skills
             // match "xxx received xxx damage due to the effect of xxx"
             if (rIndirectDmg2.IsMatch(str))
@@ -633,7 +695,11 @@
                 damage = match.Groups["damage"].Value;
                 skill = match.Groups["skill"].Value;
 
-                attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
+                if (linkBOFtoSM || linkDmgProcs)
+                    attacker = continuousDamageSet.GetAnyActor(victim, skill, logInfo.detectedTime);
+                else
+                    attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
+
                 if (String.IsNullOrEmpty(attacker)) // skills like Promise of Wind or Blood Rune
                 {
                     if (skill == "Promise of Wind I")
@@ -647,6 +713,14 @@
                     else if (skill.StartsWith("Blood Rune"))
                     {
                         attacker = "Unknown (Assassin)";
+                    }
+                    else if (skill == "Erosion I")
+                    {
+                        attacker = "Unknown (Mage)";
+                    }
+                    else if (skill.StartsWith("Chain of Earth") || skill.StartsWith("Erosion") || skill.StartsWith("Blessing of Fire"))
+                    {
+                        attacker = "Unknown (Spiritmaster)";
                     }
                     else
                     {
@@ -769,9 +843,9 @@
                         {
                             attacker = "Unknown (Cleric)";
                         }
-                        else if (skill.StartsWith("Blood Rune") || skill.StartsWith("Stamina Recovery I"))
+                        else if (skill.StartsWith("Blood Rune") || skill.StartsWith("Stamina Recovery I") || skill.StartsWith("Absorb Vitality "))
                         {
-                            attacker = victim; // Blood Rune is assassin skill that heals caster; Stamina Recovery is gladiator self HoT skill
+                            attacker = victim; // Blood Rune is assassin skill that heals caster; Stamina Recovery is gladiator self HoT skill; Absorb Vitality is Spiritmaster drain skill
                         }
                         else if (skill.EndsWith(" Potion"))
                         {
@@ -843,8 +917,9 @@
                     victim = CheckYou(match.Groups["target"].Value);
                     damage = match.Groups["mp"].Value;
                     skill = match.Groups["skill"].Value;
-                    if (skill.Contains("Clement Mind Mantra") || skill.Contains("Invincibility Mantra") || skill.StartsWith("Magic Recovery"))  // TODO: how does log line look like when chanter uses Magic Recovery on someone else?
+                    if (skill.Contains("Clement Mind Mantra") || skill.Contains("Invincibility Mantra") || skill.StartsWith("Magic Recovery") || skill.StartsWith("Promise of Aether"))  // NOTE: observing magic recovery being cast on someone else, it is impossible to tell who the caster is. TODO: how does log line look like when you cast Magic Recovery on someone else? or on you? or another chanter on you?
                     {
+
                         attacker = "Unknown (Chanter)"; // TODO: try to guess the chanter based on who casted the mantra
                     }
                     else

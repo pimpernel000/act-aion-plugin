@@ -56,6 +56,18 @@ namespace AionParsePlugin
             return null;
         }
 
+        public string GetPartyCaster(string skill, DateTime now) {
+            return GetActor(null, skill, now);
+        }
+
+        public string GetAnyActor(string target, string skill, DateTime now)
+        {
+            string actor = GetActor(target, skill, now);
+            if (String.IsNullOrEmpty(actor))
+                actor = GetPartyCaster(skill, now);
+            return actor;
+        }
+
         public UsingSkillRecord GetSummonerRecord(string target, string pet, DateTime now)
         {
             foreach (var record in recordSet)

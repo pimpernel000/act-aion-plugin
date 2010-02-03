@@ -31,10 +31,8 @@ namespace AionParsePlugin
         {
             this.components = new System.ComponentModel.Container();
             this.TextboxLog = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.TextboxDefaultCharacter = new System.Windows.Forms.TextBox();
             this.ApplyDefaultCharacter = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
             this.CheckboxGuessDoTCasters = new System.Windows.Forms.CheckBox();
             this.CheckboxDebugParse = new System.Windows.Forms.CheckBox();
             this.CheckboxTagBlockedAttacks = new System.Windows.Forms.CheckBox();
@@ -45,35 +43,37 @@ namespace AionParsePlugin
             this.toolTip3 = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip4 = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip0 = new System.Windows.Forms.ToolTip(this.components);
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.CheckboxLinkBOFtoSM = new System.Windows.Forms.CheckBox();
+            this.CheckboxLinkDamageProcs = new System.Windows.Forms.CheckBox();
+            this.toolTip5 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip6 = new System.Windows.Forms.ToolTip(this.components);
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tabControl1.SuspendLayout();
+            this.tabGeneral.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // TextboxLog
             // 
             this.TextboxLog.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextboxLog.Location = new System.Drawing.Point(34, 37);
+            this.TextboxLog.Location = new System.Drawing.Point(7, 19);
             this.TextboxLog.Margin = new System.Windows.Forms.Padding(4);
             this.TextboxLog.Multiline = true;
             this.TextboxLog.Name = "TextboxLog";
             this.TextboxLog.ReadOnly = true;
             this.TextboxLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextboxLog.Size = new System.Drawing.Size(560, 437);
+            this.TextboxLog.Size = new System.Drawing.Size(553, 414);
             this.TextboxLog.TabIndex = 0;
             this.TextboxLog.TabStop = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(34, 14);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(34, 16);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Log";
             // 
             // TextboxDefaultCharacter
             // 
             this.TextboxDefaultCharacter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TextboxDefaultCharacter.Location = new System.Drawing.Point(623, 37);
+            this.TextboxDefaultCharacter.Location = new System.Drawing.Point(10, 21);
             this.TextboxDefaultCharacter.Name = "TextboxDefaultCharacter";
             this.TextboxDefaultCharacter.Size = new System.Drawing.Size(122, 22);
             this.TextboxDefaultCharacter.TabIndex = 2;
@@ -82,7 +82,7 @@ namespace AionParsePlugin
             // ApplyDefaultCharacter
             // 
             this.ApplyDefaultCharacter.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ApplyDefaultCharacter.Location = new System.Drawing.Point(762, 36);
+            this.ApplyDefaultCharacter.Location = new System.Drawing.Point(138, 20);
             this.ApplyDefaultCharacter.Name = "ApplyDefaultCharacter";
             this.ApplyDefaultCharacter.Size = new System.Drawing.Size(75, 23);
             this.ApplyDefaultCharacter.TabIndex = 3;
@@ -90,22 +90,13 @@ namespace AionParsePlugin
             this.ApplyDefaultCharacter.UseVisualStyleBackColor = true;
             this.ApplyDefaultCharacter.Click += new System.EventHandler(this.ApplyDefaultCharacter_Click);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(620, 14);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(128, 16);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Default Character";
-            // 
             // CheckboxGuessDoTCasters
             // 
             this.CheckboxGuessDoTCasters.AutoSize = true;
             this.CheckboxGuessDoTCasters.Checked = true;
             this.CheckboxGuessDoTCasters.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CheckboxGuessDoTCasters.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckboxGuessDoTCasters.Location = new System.Drawing.Point(623, 79);
+            this.CheckboxGuessDoTCasters.Location = new System.Drawing.Point(596, 68);
             this.CheckboxGuessDoTCasters.Name = "CheckboxGuessDoTCasters";
             this.CheckboxGuessDoTCasters.Size = new System.Drawing.Size(161, 20);
             this.CheckboxGuessDoTCasters.TabIndex = 5;
@@ -117,7 +108,7 @@ namespace AionParsePlugin
             // 
             this.CheckboxDebugParse.AutoSize = true;
             this.CheckboxDebugParse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckboxDebugParse.Location = new System.Drawing.Point(623, 457);
+            this.CheckboxDebugParse.Location = new System.Drawing.Point(596, 429);
             this.CheckboxDebugParse.Name = "CheckboxDebugParse";
             this.CheckboxDebugParse.Size = new System.Drawing.Size(109, 17);
             this.CheckboxDebugParse.TabIndex = 99;
@@ -131,7 +122,7 @@ namespace AionParsePlugin
             this.CheckboxTagBlockedAttacks.Checked = true;
             this.CheckboxTagBlockedAttacks.CheckState = System.Windows.Forms.CheckState.Checked;
             this.CheckboxTagBlockedAttacks.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckboxTagBlockedAttacks.Location = new System.Drawing.Point(623, 106);
+            this.CheckboxTagBlockedAttacks.Location = new System.Drawing.Point(596, 95);
             this.CheckboxTagBlockedAttacks.Name = "CheckboxTagBlockedAttacks";
             this.CheckboxTagBlockedAttacks.Size = new System.Drawing.Size(152, 20);
             this.CheckboxTagBlockedAttacks.TabIndex = 7;
@@ -152,7 +143,7 @@ namespace AionParsePlugin
             this.CheckboxLinkPets.AutoSize = true;
             this.CheckboxLinkPets.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CheckboxLinkPets.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.CheckboxLinkPets.Location = new System.Drawing.Point(623, 133);
+            this.CheckboxLinkPets.Location = new System.Drawing.Point(596, 122);
             this.CheckboxLinkPets.Name = "CheckboxLinkPets";
             this.CheckboxLinkPets.Size = new System.Drawing.Size(187, 20);
             this.CheckboxLinkPets.TabIndex = 100;
@@ -166,44 +157,116 @@ namespace AionParsePlugin
             this.CheckboxParseDmgToTmpPets.Enabled = false;
             this.CheckboxParseDmgToTmpPets.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CheckboxParseDmgToTmpPets.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.CheckboxParseDmgToTmpPets.Location = new System.Drawing.Point(623, 160);
+            this.CheckboxParseDmgToTmpPets.Location = new System.Drawing.Point(596, 149);
             this.CheckboxParseDmgToTmpPets.Name = "CheckboxParseDmgToTmpPets";
             this.CheckboxParseDmgToTmpPets.Size = new System.Drawing.Size(256, 20);
             this.CheckboxParseDmgToTmpPets.TabIndex = 101;
             this.CheckboxParseDmgToTmpPets.Text = "Parse damage to temporary summons";
             this.CheckboxParseDmgToTmpPets.UseVisualStyleBackColor = true;
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabGeneral);
+            this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tabControl1.Location = new System.Drawing.Point(3, 3);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(883, 484);
+            this.tabControl1.TabIndex = 102;
+            // 
+            // tabGeneral
+            // 
+            this.tabGeneral.Controls.Add(this.groupBox2);
+            this.tabGeneral.Controls.Add(this.groupBox1);
+            this.tabGeneral.Controls.Add(this.CheckboxLinkDamageProcs);
+            this.tabGeneral.Controls.Add(this.CheckboxLinkBOFtoSM);
+            this.tabGeneral.Controls.Add(this.CheckboxParseDmgToTmpPets);
+            this.tabGeneral.Controls.Add(this.CheckboxLinkPets);
+            this.tabGeneral.Controls.Add(this.CheckboxTagBlockedAttacks);
+            this.tabGeneral.Controls.Add(this.CheckboxDebugParse);
+            this.tabGeneral.Controls.Add(this.CheckboxGuessDoTCasters);
+            this.tabGeneral.Location = new System.Drawing.Point(4, 25);
+            this.tabGeneral.Name = "tabGeneral";
+            this.tabGeneral.Padding = new System.Windows.Forms.Padding(3);
+            this.tabGeneral.Size = new System.Drawing.Size(875, 455);
+            this.tabGeneral.TabIndex = 0;
+            this.tabGeneral.Text = "General";
+            this.tabGeneral.UseVisualStyleBackColor = true;
+            // 
+            // CheckboxLinkBOFtoSM
+            // 
+            this.CheckboxLinkBOFtoSM.AutoSize = true;
+            this.CheckboxLinkBOFtoSM.Checked = true;
+            this.CheckboxLinkBOFtoSM.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckboxLinkBOFtoSM.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxLinkBOFtoSM.Location = new System.Drawing.Point(596, 176);
+            this.CheckboxLinkBOFtoSM.Name = "CheckboxLinkBOFtoSM";
+            this.CheckboxLinkBOFtoSM.Size = new System.Drawing.Size(234, 20);
+            this.CheckboxLinkBOFtoSM.TabIndex = 102;
+            this.CheckboxLinkBOFtoSM.Text = "Link Blessing of Fire to Spiritmaster";
+            this.CheckboxLinkBOFtoSM.UseVisualStyleBackColor = true;
+            this.CheckboxLinkBOFtoSM.CheckedChanged += new System.EventHandler(this.CheckboxLinkBOFtoSM_CheckedChanged);
+            // 
+            // CheckboxLinkDamageProcs
+            // 
+            this.CheckboxLinkDamageProcs.AutoSize = true;
+            this.CheckboxLinkDamageProcs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxLinkDamageProcs.Location = new System.Drawing.Point(596, 203);
+            this.CheckboxLinkDamageProcs.Name = "CheckboxLinkDamageProcs";
+            this.CheckboxLinkDamageProcs.Size = new System.Drawing.Size(196, 20);
+            this.CheckboxLinkDamageProcs.TabIndex = 103;
+            this.CheckboxLinkDamageProcs.Text = "Guess damage proc owners";
+            this.CheckboxLinkDamageProcs.UseVisualStyleBackColor = true;
+            this.CheckboxLinkDamageProcs.CheckedChanged += new System.EventHandler(this.CheckboxLinkDamageProcs_CheckedChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.TextboxLog);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(567, 440);
+            this.groupBox1.TabIndex = 104;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Log";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.TextboxDefaultCharacter);
+            this.groupBox2.Controls.Add(this.ApplyDefaultCharacter);
+            this.groupBox2.Location = new System.Drawing.Point(596, 6);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(224, 56);
+            this.groupBox2.TabIndex = 105;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Default Character";
+            // 
             // AionParseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.CheckboxParseDmgToTmpPets);
-            this.Controls.Add(this.CheckboxLinkPets);
-            this.Controls.Add(this.CheckboxTagBlockedAttacks);
-            this.Controls.Add(this.CheckboxDebugParse);
-            this.Controls.Add(this.CheckboxGuessDoTCasters);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.ApplyDefaultCharacter);
-            this.Controls.Add(this.TextboxDefaultCharacter);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.TextboxLog);
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.Controls.Add(this.tabControl1);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AionParseForm";
-            this.Size = new System.Drawing.Size(1334, 507);
+            this.Size = new System.Drawing.Size(922, 539);
             this.Load += new System.EventHandler(this.AionParseForm_Load);
+            this.tabControl1.ResumeLayout(false);
+            this.tabGeneral.ResumeLayout(false);
+            this.tabGeneral.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.TextBox TextboxLog;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox TextboxDefaultCharacter;
         private System.Windows.Forms.Button ApplyDefaultCharacter;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox CheckboxGuessDoTCasters;
         private System.Windows.Forms.CheckBox CheckboxDebugParse;
         private System.Windows.Forms.CheckBox CheckboxTagBlockedAttacks;
@@ -214,5 +277,13 @@ namespace AionParsePlugin
         private System.Windows.Forms.ToolTip toolTip3;
         private System.Windows.Forms.ToolTip toolTip4;
         private System.Windows.Forms.ToolTip toolTip0;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabGeneral;
+        private System.Windows.Forms.CheckBox CheckboxLinkBOFtoSM;
+        private System.Windows.Forms.CheckBox CheckboxLinkDamageProcs;
+        private System.Windows.Forms.ToolTip toolTip5;
+        private System.Windows.Forms.ToolTip toolTip6;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

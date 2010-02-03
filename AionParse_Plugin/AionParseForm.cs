@@ -46,12 +46,20 @@ namespace AionParsePlugin
 
             string toolTip4Msg =
                 "When checked, damage done to known temporary pets (i.e. Holy Servants) and unknown pets (i.e. monster's trap summons) will be recorded. (Default: unchecked)";
+
+            string toolTip5Msg = 
+                "When checked, damage done by Blessing of Fire will be listed under the most recent Spiritmaster who casted it.";
+
+            string toolTip6Msg = 
+                "When checked, damage done by Promise of Wind, Apply Poison, and Apply Deadly Poison will be listed under the most recent person who casted it.";
          
             toolTip0.SetToolTip(CheckboxDebugParse, "Show developer debug messages in log.");
             toolTip1.SetToolTip(CheckboxTagBlockedAttacks, toolTip1Msg);
             toolTip2.SetToolTip(CheckboxGuessDoTCasters, toolTip2Msg);
             toolTip3.SetToolTip(CheckboxLinkPets, toolTip3Msg);
             toolTip4.SetToolTip(CheckboxParseDmgToTmpPets, toolTip4Msg);
+            toolTip5.SetToolTip(CheckboxLinkBOFtoSM, toolTip5Msg);
+            toolTip6.SetToolTip(CheckboxLinkDamageProcs, toolTip6Msg);
         }
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)
@@ -86,6 +94,16 @@ namespace AionParsePlugin
         private void CheckboxLinkPets_CheckedChanged(object sender, EventArgs e)
         {
             plugin.SetLinkPets(CheckboxLinkPets.Checked);
+        }
+
+        private void CheckboxLinkBOFtoSM_CheckedChanged(object sender, EventArgs e)
+        {
+            plugin.SetLinkBOFtoSM(((System.Windows.Forms.CheckBox)sender).Checked);
+        }
+
+        private void CheckboxLinkDamageProcs_CheckedChanged(object sender, EventArgs e)
+        {
+            plugin.SetLinkDmgProcs(((System.Windows.Forms.CheckBox)sender).Checked);
         }
     }
 }

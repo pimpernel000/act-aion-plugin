@@ -34,6 +34,16 @@ namespace AionParsePlugin
             this.linkPets = linkPets;
         }
 
+        internal void SetLinkBOFtoSM(bool linkBOFtoSM)
+        {
+            this.linkBOFtoSM = linkBOFtoSM;
+        }
+
+        internal void SetLinkDmgProcs(bool linkDmgProcs)
+        {
+            this.linkDmgProcs = linkDmgProcs;
+        }
+
         #endregion
 
         #region AddCombatAction overloads
