@@ -1,4 +1,4 @@
-﻿// Assembly AionParse, Version 0.2.5.9  (<major>.<minor>.<revision>.<build>)
+﻿// Assembly AionParse, Version 0.2.6.10  (<major>.<minor>.<revision>.<build>)
 
 [assembly: System.CLSCompliant(true)]
 [assembly: System.Reflection.AssemblyVersion("0.2.5.9")]

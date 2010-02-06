@@ -16,29 +16,9 @@
      *  The spirit used a skill on Iceghost Priest because Coszet used Spirit Thunderbolt Claw I.
      *  The spirit used a skill on Brutal Mist Mane Pawsoldier because Hexis used Spirit Erosion I.
      *  
-     * Servants from Summoners (TODO: pet damage should be summoner's damage)
-     *  Konata has summoned Water Energy to attack Brutal Mist Mane Grappler by using Summon Water Energy I. 
-     *  Wind Servant inflicted 301 damage on Brutal Mist Mane Pawsoldier. (wind servant attacks 6 times over 10 secs)
-     *  (NOTE: in pvp, you get a weird message that sounds like you who summoned the servant; likely this is bad translation)
-     *  Malemodel has caused you to summon Water Energy by using Summon Water Energy I.
-     *  You received 97 damage from Water Energy. 
-
-     * Holy Spirit from Clerics (clerics are pet summoners too) (TODO: pet damage should be summoner's damage)
-     *  You summoned Holy Servant by using Summon Holy Servant II to let it attack Pale Worg.
-     *  Azshadela has summoned Holy Servant to attack Infiltrator by using Summon Holy Servant II. 
-     *  Holy Servant inflicted 300 damage on Sergeant by using Summon Holy Servant II Effect. 
-     *  (NOTE: in pvp, you get a weird message that sounds like you who summoned the servant; likely this is bad translation)
-     *  Bondmetoo has caused you to summon Holy Servant by using Summon Holy Servant III.  
-     *  You resisted Holy Servant's Summon Holy Servant III Effect. 
-     * 
      * Resists to you (and maybe others?)   TODO: put resists in their class specific Unknown (class)... and perhaps in the future, give option to specify name... i.e. all Unknown (Sorcerer) will be defaulted to MyDefaultName
      *  Alpine Gorgon resisted Chastisement I.
      *  
-     * Poison Traps by Rangers (rangers are pet summoners too) (TODO: pet damage should be summoner's damage)
-     *   Fluid summoned Poisoning Trap by using Poisoning Trap III.
-     *   Brutal Mist Mane Pawsoldier became poisoned because Poisoning Trap used Poisoning Trap III Effect. 
-     *   Brutal Mist Mane Pawsoldier received 361 poisoning damage after you used Poisoning Trap III Effect. 
-     *   
      * Poisoning by unknown assassins (NOTE: ACT already has a feature for Combatant Rename... so users can just rename Unknown (Assassin) to your party's assassin.)
      *   (NOTE: it seems that Apply Poison doesn't have a "became poisoned" message when it procs, so logs alone cannot determine caster)
      *   You received 51 poisoning damage due to the effect of Apply Poison II Effect. 
@@ -80,13 +60,14 @@
     public partial class AionParse : IActPluginV1, IDisposable
     {
         #region regex
-        Regex rInflictDamageRuneCarve = new Regex(@"^(?<attacker>[a-zA-Z ']*) inflicted (?<damage>(\d+\D{0,2})?\d+) (?<critical>critical )?damage and the (rune carve|pattern engraving) effect on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ']*?)( has)? inflicted (?<damage>(\d+\D{0,2})?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        static string ngs = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberGroupSeparator;
+        Regex rInflictDamageRuneCarve = new Regex(@"^(?<attacker>[a-zA-Z ']*) inflicted (?<damage>(\d+" + ngs + @")?\d+) (?<critical>critical )?damage and the (rune carve|pattern engraving) effect on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ']*?)( has)? inflicted (?<damage>(\d+" + ngs + @")?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
         Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ']*) and caused the (?<statuseffect>[a-zA-Z ']*) effect$", RegexOptions.Compiled);
         Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ']*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // only for Ignite Aether spell
         Regex rReflect = new Regex(@"^(?<victim>[a-zA-Z ']*) by reflecting the attack$", RegexOptions.Compiled);
-        Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+\D{0,2})?\d+) damage from (?<attacker>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
+        Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) damage from (?<attacker>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
         Regex rReceiveEffect = new Regex(@"^(?<victim>[a-zA-Z ']*) received the (?<statuseffect>[a-zA-Z ']*) effect (as (?<attacker>you)|because (?<attacker>[a-zA-Z ']*)) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Delayed Blast spell
         Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ']*) became poisoned because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: there are other status effects (see comments below), but we're only interested in damage
         Regex rStatusEffect2 = new Regex(@"^(?<victim>[a-zA-Z ']*) is bleeding because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: there are other status effects (see comments below), but we're only interested in damage
@@ -108,11 +89,11 @@
         Regex rContDmg1 = new Regex(@"^You inflicted continuous damage on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
         Regex rContDmg3 = new Regex(@"^You received continuous damage because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: this usually causes log lines to say that you start damaging yourself... i.e. my name is Vyn, but if I am hit by Chastisement in PvP, log lines will say: Vyn inflicted 70 damage on you by using Chastisement I.
-        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+\D{0,2})?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+\D{0,2})?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*?)(( Additional)? Effect)?\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*?)(( Additional)? Effect)?\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ']*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
-        Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<mp>(\d+\D{0,2})?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
-        Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<hp>(\d+\D{0,2})?\d+) HP (because (?<actor>[a-zA-Z ']*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
+        Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<mp>(\d+" + ngs + @")?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
+        Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<hp>(\d+" + ngs + @")?\d+) HP (because (?<actor>[a-zA-Z ']*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rResist = new Regex(@"^(?<victim>[a-zA-Z ']*) resisted ((?<attacker>[a-zA-Z ]*('s[a-zA-Z ]*)?)'s )?(?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);  // TODO: should we remove the word "Effect" from the end for traps and holy servant attacks?  need to be consistent.   NOTE: attacker match is a bit more complex to handle a string like "Guy resisted Hirmilden's Tipolid's Animal's Rights"
         /* TODO: use timer based on skill to keep encounter going if these skills are used in case no other combat action is taking place
         Regex rSleep1 = new Regex(@"^(?<victim>[a-zA-Z ']*) fell asleep because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*).", RegexOptions.Compiled);
@@ -811,7 +792,7 @@
                 // match "You restored xx of xxx's HP by using xxx."  the actor in this case is ambigious and not really you.
                 if (str.StartsWith("You restored"))
                 {
-                    Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+\D{0,2})?\d+) of (?<target>[a-zA-Z ']*)'s HP by using (?<skill>[a-zA-Z \-']*?)\.");
+                    Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+" + ngs + @")?\d+) of (?<target>[a-zA-Z ']*)'s HP by using (?<skill>[a-zA-Z \-']*?)\.");
                     Match match = rYouRestoreHP.Match(str);
                     if (!match.Success)
                     {
@@ -864,7 +845,7 @@
                 // match "xx restored xx HP."  most likely due to potion
                 if (str.EndsWith(" HP.") && str.Contains("restored"))
                 {
-                    Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ']*) restored (?<hp>(\d+\D{0,2})?\d+) HP\.");
+                    Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ']*) restored (?<hp>(\d+" + ngs + @")?\d+) HP\.");
                     Match match = rYouRestoreHP.Match(str);
                     if (!match.Success)
                     {

@@ -54,7 +54,7 @@ namespace AionParsePlugin
 
         private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
         {
-            int cleanedDmg = int.Parse(System.Text.RegularExpressions.Regex.Replace(damage, @"\D",""));
+            int cleanedDmg = int.Parse(damage, NumberStyles.AllowThousands, CultureInfo.CurrentCulture.NumberFormat);
             AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, cleanedDmg, swingType, damageType);
         }
 
