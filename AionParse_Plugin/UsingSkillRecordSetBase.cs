@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace AionParsePlugin
 {
-    public class UsingSkillRecordSetBase
+    public class UsingSkillRecordSetBase : System.ComponentModel.BindingList<UsingSkillRecord>
     {
         public const int DefaultLookBackLimit = 30;
 
         private int lookBackLimit;
 
-        private List<UsingSkillRecord> recordSet = new List<UsingSkillRecord>();
-
-        private List<string> summonedPets = new List<string>();
-
         public UsingSkillRecordSetBase(int lookBackLimit)
         {
             this.lookBackLimit = lookBackLimit;
+            this.SummonedPets = new List<string>();
         }
 
         public UsingSkillRecordSetBase()
             : this(DefaultLookBackLimit)
         {
         }
+
+        private List<string> SummonedPets { get; set; }
 
         public void Add(string actor, string target, string skill, DateTime start)
         {
@@ -30,24 +30,24 @@ namespace AionParsePlugin
 
         public void Add(string actor, string target, string skill, DateTime start, int duration)
         {
-            recordSet.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Start = start, Duration = duration });
+            this.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Start = start, Duration = duration });
         }
 
         public void Add(string actor, string target, string skill, string pet, DateTime summonTime, int petDuration)
         {
-            recordSet.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Pet = pet, Start = summonTime, Duration = petDuration });
+            this.Insert(0, new UsingSkillRecord { Actor = actor, Target = target, Skill = skill, Pet = pet, Start = summonTime, Duration = petDuration });
             if (!string.IsNullOrEmpty(pet))
-                summonedPets.Add(pet);
+                SummonedPets.Add(pet);
         }
 
         public bool IsSummonedPet(string pet)
         {
-            return summonedPets.Contains(pet);
+            return SummonedPets.Contains(pet);
         }
 
         public string GetActor(string target, string skill, DateTime now)
         {
-            foreach (var record in recordSet)
+            foreach (var record in this.Items)
             {
                 if (record.Match(target, skill, now))
                     return record.Actor;
@@ -56,7 +56,8 @@ namespace AionParsePlugin
             return null;
         }
 
-        public string GetPartyCaster(string skill, DateTime now) {
+        public string GetPartyCaster(string skill, DateTime now)
+        {
             return GetActor(null, skill, now);
         }
 
@@ -70,7 +71,7 @@ namespace AionParsePlugin
 
         public UsingSkillRecord GetSummonerRecord(string target, string pet, DateTime now)
         {
-            foreach (var record in recordSet)
+            foreach (var record in this.Items)
             {
                 if (record.MatchPet(target, pet, now))
                     return record;
@@ -79,62 +80,77 @@ namespace AionParsePlugin
             return null;
         }
 
-        public virtual void Clear()
+        public new void Clear()
         {
-            if (recordSet.Count == 0) return;
-            DateTime lastTime = recordSet[0].Start;
+            if (this.Items.Count == 0) return;
+            DateTime lastTime = this.Items[0].Start;
             Clear(lastTime);
         }
 
-        public virtual void Clear(DateTime focusTime)
+        public void Clear(DateTime focusTime)
         {
-            if (recordSet.Count == 0) return;
+            if (this.Items.Count == 0) return;
 
-            for (int i = recordSet.Count - 1; i >= 0; i--)
+            for (int i = this.Items.Count - 1; i >= 0; i--)
             {
-                double elapsedTime = (focusTime - recordSet[i].Start).TotalSeconds;
-                if (elapsedTime > recordSet[i].Duration)
-                    recordSet.RemoveAt(i);
+                if (this.Items[i].Duration == 0) continue; // Duration 0 = does not expire
+                double elapsedTime = (focusTime - this.Items[i].Start).TotalSeconds;
+                if (elapsedTime > this.Items[i].Duration)
+                    this.Items.RemoveAt(i);
+            }
+        }
+    }
+
+    public class UsingSkillRecord
+    {
+        public UsingSkillRecord() 
+        { 
+        }
+
+        public UsingSkillRecord(string actor, string skill) : this()
+        {
+            Actor = actor;
+            Skill = skill;
+            Target = null;
+            Duration = 0;
+        }
+
+        public string Actor { get; set; }
+
+        public string Target { get; set; }
+
+        public string Skill { get; set; }
+
+        public string Pet { get; set; }
+
+        public int Duration { get; set; }
+
+        public DateTime Start { get; set; }
+
+        public DateTime End
+        {
+            get
+            {
+                return Start.AddSeconds(Duration);
             }
         }
 
-        public class UsingSkillRecord
+        public bool Match(string target, string skill, DateTime time)
         {
-            public string Actor { get; set; }
+            return
+                ((target == Target &&
+                    skill == Skill) ||
+                 (target == null &&
+                    (skill == Skill || Regex.IsMatch(skill, Skill + " (I(X|V)?|(X|V)?I{0,3})")))) &&
+                (time <= End || Duration == 0);
+        }
 
-            public string Target { get; set; }
-
-            public string Skill { get; set; }
-
-            public string Pet { get; set; }
-
-            public int Duration { get; set; }
-
-            public DateTime Start { get; set; }
-
-            public DateTime End
-            {
-                get
-                {
-                    return Start.AddSeconds(Duration);
-                }
-            }
-
-            public bool Match(string target, string skill, DateTime time)
-            {
-                return
-                    target == Target &&
-                    skill == Skill &&
-                    time <= End;
-            }
-
-            public bool MatchPet(string target, string pet, DateTime time)
-            {
-                return
-                    (target == Target || !AionData.Pet.IsTargettedPet(pet)) &&
-                    pet == Pet &&
-                    time <= End;
-            }
+        public bool MatchPet(string target, string pet, DateTime time)
+        {
+            return
+                pet == Pet &&
+                (target == Target || !AionData.Pet.IsTargettedPet(pet)) &&
+                (time <= End || Duration == 0);
         }
     }
 }

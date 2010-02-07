@@ -11,18 +11,21 @@ namespace AionParsePlugin
         {
             InitializeComponent();
             this.plugin = plugin;
-            if (String.IsNullOrEmpty(TextboxDefaultCharacter.Text))
+            if (String.IsNullOrEmpty(TextboxDefaultCharacter.Text) || TextboxDefaultCharacter.Text == "YOU")
             {
                 TextboxDefaultCharacter.Text = defaultCharName;
             }
 
-            plugin.SetCharName(TextboxDefaultCharacter.Text);
+            plugin.LastCharName = TextboxDefaultCharacter.Text;
             AddText("Plugin Initialized with current character as " + TextboxDefaultCharacter.Text + ".");
 
-            plugin.SetDebugParse(CheckboxDebugParse.Checked);
-            plugin.SetGuessDotCasters(CheckboxGuessDoTCasters.Checked);
-            plugin.SetLinkPets(CheckboxLinkPets.Checked);
-            plugin.SetTagBlockedAttacks(CheckboxTagBlockedAttacks.Checked);
+            plugin.DebugParse = CheckboxDebugParse.Checked;
+            plugin.GuessDotCasters = CheckboxGuessDoTCasters.Checked;
+            plugin.LinkPets = CheckboxLinkPets.Checked;
+            plugin.TagBlockedAttacks = CheckboxTagBlockedAttacks.Checked;
+
+            this.dgGainSpells.DataSource = plugin.HealerRecordSet;
+            this.dgDamageSpells.DataSource = plugin.ContinuousDamageSet;
         }
 
         public void AddText(string text)
@@ -64,7 +67,7 @@ namespace AionParsePlugin
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)
         {
-            plugin.SetCharName(TextboxDefaultCharacter.Text);
+            plugin.LastCharName = TextboxDefaultCharacter.Text;
             AddText("Default character changed to " + TextboxDefaultCharacter.Text);
         }
 
@@ -78,32 +81,32 @@ namespace AionParsePlugin
 
         private void CheckboxGuessDoTCasters_CheckedChanged(object sender, EventArgs e)
         {
-            plugin.SetGuessDotCasters(CheckboxGuessDoTCasters.Checked);
+            plugin.GuessDotCasters = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
 
         private void CheckboxDebugParse_CheckedChanged(object sender, EventArgs e)
         {
-            plugin.SetDebugParse(CheckboxDebugParse.Checked);
+            plugin.DebugParse = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
 
         private void CheckboxTagBlockedAttacks_CheckedChanged(object sender, EventArgs e)
         {
-            plugin.SetTagBlockedAttacks(CheckboxTagBlockedAttacks.Checked);
+            plugin.TagBlockedAttacks = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
 
         private void CheckboxLinkPets_CheckedChanged(object sender, EventArgs e)
         {
-            plugin.SetLinkPets(CheckboxLinkPets.Checked);
+            plugin.LinkPets = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
 
         private void CheckboxLinkBOFtoSM_CheckedChanged(object sender, EventArgs e)
         {
-            plugin.SetLinkBOFtoSM(((System.Windows.Forms.CheckBox)sender).Checked);
+            plugin.LinkBOFtoSM = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
 
         private void CheckboxLinkDamageProcs_CheckedChanged(object sender, EventArgs e)
         {
-            plugin.SetLinkDmgProcs(((System.Windows.Forms.CheckBox)sender).Checked);
+            plugin.LinkDmgProcs = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
     }
 }

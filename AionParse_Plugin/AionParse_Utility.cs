@@ -6,46 +6,6 @@ namespace AionParsePlugin
 {
     public partial class AionParse : IActPluginV1
     {
-        #region ui setters
-
-        internal void SetCharName(string charName)
-        {
-            lastCharName = charName;
-            ActGlobals.charName = charName;
-        }
-
-        internal void SetGuessDotCasters(bool guessDotCasters)
-        {
-            this.guessDotCasters = guessDotCasters;
-        }
-
-        internal void SetDebugParse(bool debugParse)
-        {
-            this.debugParse = debugParse;
-        }
-
-        internal void SetTagBlockedAttacks(bool tagBlockedAttacks)
-        {
-            this.tagBlockedAttacks = tagBlockedAttacks;
-        }
-
-        internal void SetLinkPets(bool linkPets)
-        {
-            this.linkPets = linkPets;
-        }
-
-        internal void SetLinkBOFtoSM(bool linkBOFtoSM)
-        {
-            this.linkBOFtoSM = linkBOFtoSM;
-        }
-
-        internal void SetLinkDmgProcs(bool linkDmgProcs)
-        {
-            this.linkDmgProcs = linkDmgProcs;
-        }
-
-        #endregion
-
         #region AddCombatAction overloads
         private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType)
         {
@@ -54,8 +14,8 @@ namespace AionParsePlugin
 
         private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, string damage, SwingTypeEnum swingType, string damageType)
         {
-            int cleanedDmg = int.Parse(damage, NumberStyles.AllowThousands, CultureInfo.CurrentCulture.NumberFormat);
-            AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, cleanedDmg, swingType, damageType);
+            Dnum dnumDamage = NewDnum(damage, null);
+            AddCombatAction(logInfo, attacker, victim, theAttackType, critical, special, dnumDamage, swingType, damageType);
         }
 
         private void AddCombatAction(LogLineEventArgs logInfo, string attacker, string victim, string theAttackType, bool critical, string special, Dnum damage, SwingTypeEnum swingType)
@@ -69,9 +29,9 @@ namespace AionParsePlugin
             if (ActGlobals.oFormActMain.SetEncounter(now, attacker, victim))
             {
                 // redirect attacks from pets/servants as coming from summoner
-                if (summonerRecordSet.IsSummonedPet(attacker))
+                if (SummonerRecordSet.IsSummonedPet(attacker))
                 {
-                    var summonerRecord = summonerRecordSet.GetSummonerRecord(victim, attacker, now);
+                    var summonerRecord = SummonerRecordSet.GetSummonerRecord(victim, attacker, now);
                     if (summonerRecord != null)
                     {
                         string pet = attacker;
@@ -80,7 +40,7 @@ namespace AionParsePlugin
                             attacker = summonerRecord.Actor;
                             theAttackType = summonerRecord.Skill;
                         }
-                        else if (linkPets)
+                        else if (LinkPets)
                         {
                             attacker = summonerRecord.Actor;
                             if (summonerRecord.Duration <= 60)
@@ -90,15 +50,15 @@ namespace AionParsePlugin
                         }
                     }
                 }
-                else if (summonerRecordSet.IsSummonedPet(victim))
+                else if (SummonerRecordSet.IsSummonedPet(victim))
                 {
                     if (AionData.Pet.IsPet(victim))
                     {
                         // handle player pets
                         if (AionData.Pet.PetDurations[victim] <= 60) return; // ignore damage done to short-duration temporary pets // TODO: this should be a checkbox as this will decrease the dps of the attacker
 
-                        var summonerRecord = summonerRecordSet.GetSummonerRecord(null, victim, now);
-                        if (linkPets)
+                        var summonerRecord = SummonerRecordSet.GetSummonerRecord(null, victim, now);
+                        if (LinkPets)
                         {
                             ////return; // TODO: how do we treat damage done to spiritmaster's pets?
                         }
@@ -106,7 +66,7 @@ namespace AionParsePlugin
                     else
                     {
                         // handle monster/unknown pets
-                        if (linkPets)
+                        if (LinkPets)
                         {
                             // TODO: how do we treat damage done to mob's pets?
                         }
@@ -134,7 +94,7 @@ namespace AionParsePlugin
 
         private static Dnum NewDnum(string damage, string damageString)
         {
-            int d = int.Parse(damage.Replace(",", string.Empty).Trim());
+            int d = int.Parse(damage, NumberStyles.AllowThousands, CultureInfo.CurrentCulture.NumberFormat);
             if (String.IsNullOrEmpty(damageString))
             {
                 return new Dnum(d);
@@ -147,12 +107,12 @@ namespace AionParsePlugin
 
         private string CheckYou(string incName)
         {
-            switch (incName.ToUpper().Trim())
+            switch (incName.ToUpper(CultureInfo.InvariantCulture).Trim())
             {
                 case "YOU":
                 case "YOUR":
                 case "YOURSELF":
-                    return lastCharName;
+                    return LastCharName;
                 default:
                     return incName;
             }

@@ -115,43 +115,6 @@
 
         #endregion
 
-        #region private members
-        // for Robe of Ice damage reflect
-        string lastActivatedSkill = string.Empty;
-        int lastActivatedSkillGlobalTime = -1;
-        DateTime lastActivedSkillTime = DateTime.MinValue;
-
-        // for using potions by you
-        string lastPotion;
-        int lastPotionGlobalTime = -1;
-        DateTime lastPotionTime = DateTime.MinValue;
-
-        // remembering who cast DoTs
-        UsingSkillRecordSetBase continuousDamageSet = new UsingSkillRecordSetBase();
-
-        // remembering who cast HoTs
-        UsingSkillRecordSetBase healerRecordSet = new UsingSkillRecordSetBase();
-
-        // remembering who who got blocked
-        BlockedSet blockedHistory = new BlockedSet();
-
-        // remembering summoners
-        UsingSkillRecordSetBase summonerRecordSet = new UsingSkillRecordSetBase();
-
-        // list of skills that also contain DoT component or secondary payload damage later but cannot be found outside of rUsingAttack regex
-        System.Collections.Generic.List<string> extraDamageSkills;
-
-        // ui variables (initial values reset by UI on init)
-        AionParseForm ui;
-        string lastCharName = ActGlobals.charName;
-        bool guessDotCasters = true;
-        bool debugParse = false; // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
-        bool tagBlockedAttacks = true;
-        bool linkPets = false; // TODO: link pets with their summoners for damage totalling; maybe label all pet skills as "Pet Skill (petname)" and name pet melee as "Melee (petname)"
-        bool linkBOFtoSM = true;
-        bool linkDmgProcs = false;
-        #endregion
-
         private void OnCombatEnd(bool isImport, CombatToggleEventArgs encounterInfo)
         {
             lastActivatedSkill = string.Empty;
@@ -162,9 +125,9 @@
             lastPotionGlobalTime = -1;
             lastPotionTime = DateTime.MinValue;
 
-            continuousDamageSet.Clear();
-            blockedHistory.Clear();
-            healerRecordSet.Clear();
+            ContinuousDamageSet.Clear();
+            BlockedHistory.Clear();
+            ////HealerRecordSet.Clear(); // DEBUG: turned off for testing
         }
 
         private void BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
@@ -211,9 +174,9 @@
                 victim = CheckYou("you");
                 attacker = match.Groups["attacker"].Value;
                 damage = match.Groups["damage"].Value;
-                if (tagBlockedAttacks)
+                if (TagBlockedAttacks)
                 {
-                    string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
+                    string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
@@ -255,9 +218,9 @@
                         victim = CheckYou(mUsingAttack.Groups["victimclause"].Value);
                     }
 
-                    if (tagBlockedAttacks)
+                    if (TagBlockedAttacks)
                     {
-                        string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
+                        string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
                         if (!String.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
@@ -265,16 +228,12 @@
                     skill = mUsingAttack.Groups["skill"].Value;
 
                     // check if skill has an extra payload damage that can't be found other than in here
-                    if (guessDotCasters)
+                    if (GuessDotCasters)
                     {
-                        foreach (string extradmgskill in extraDamageSkills)
+                        if (skill.StartsWith("Blood Rune"))
                         {
-                            if (skill.StartsWith(extradmgskill))
-                            {
-                                continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor for when it deals payload damage later or when Wind Cut Down does bleeding damage later
-                                healerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor when he heals later as single HoT tick
-                                break;
-                            }
+                            ContinuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor for when it deals payload damage later
+                            HealerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor when he heals later as single HoT tick
                         }
                     }
 
@@ -292,7 +251,7 @@
                     // correct the false self damage message that are actually continuous damage from others to you
                     if (victim == "you" && attacker == CheckYou("you"))
                     {
-                        string realAttacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
+                        string realAttacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
                         if (!String.IsNullOrEmpty(realAttacker))
                             attacker = realAttacker;
                     }
@@ -306,9 +265,9 @@
                 if (mIgniteAether.Success)
                 {
                     victim = CheckYou(mIgniteAether.Groups["victim"].Value);
-                    if (tagBlockedAttacks)
+                    if (TagBlockedAttacks)
                     {
-                        string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
+                        string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
                         if (!String.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
@@ -325,9 +284,9 @@
                 {
                     special = "reflected";
                     victim = CheckYou(mReflect.Groups["victim"].Value);
-                    if (tagBlockedAttacks)
+                    if (TagBlockedAttacks)
                     {
-                        string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
+                        string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
                         if (!String.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
@@ -347,9 +306,9 @@
 
                 // no ability submatch
                 victim = CheckYou(targetClause);
-                if (tagBlockedAttacks)
+                if (TagBlockedAttacks)
                 {
-                    string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
+                    string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                     {
                         special = blockType;
@@ -371,9 +330,9 @@
                 damage = mInflictDamageRuneCarve.Groups["damage"].Value;
                 skill = mInflictDamageRuneCarve.Groups["skill"].Value;
                 critical = mInflictDamageRuneCarve.Groups["critical"].Success;
-                if (tagBlockedAttacks)
+                if (TagBlockedAttacks)
                 {
-                    string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
+                    string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType;
                 }
@@ -398,7 +357,7 @@
             // match "xxx has been activated." for use in damage shields like Robe of Cold
             if (rActivated.IsMatch(str))
             {
-                if (!guessDotCasters) return;
+                if (!GuessDotCasters) return;
 
                 Match match = rActivated.Match(str);
                 lastActivatedSkill = match.Groups["skill"].Value;
@@ -439,8 +398,8 @@
                 if (contDmgMatch != null)
                 {
                     skill = contDmgMatch.Groups["skill"].Value;
-                    if (guessDotCasters)
-                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    if (GuessDotCasters)
+                        ContinuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     return;
                 }
 
@@ -477,7 +436,7 @@
                 if (contHPMatch != null)
                 {
                     skill = contHPMatch.Groups["skill"].Value;
-                    healerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                    HealerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     return;
                 }
             }
@@ -502,12 +461,12 @@
 
                 if (poisonMatch != null && poisonMatch.Success)
                 {
-                    if (guessDotCasters)
+                    if (GuessDotCasters)
                     {
                         attacker = CheckYou(poisonMatch.Groups["attacker"].Value);
                         victim = CheckYou(poisonMatch.Groups["victim"].Value);
                         skill = poisonMatch.Groups["skill"].Value;
-                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                        ContinuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     }
 
                     return;
@@ -534,12 +493,12 @@
 
                 if (bleedMatch != null && bleedMatch.Success)
                 {
-                    if (guessDotCasters)
+                    if (GuessDotCasters)
                     {
                         attacker = CheckYou(bleedMatch.Groups["attacker"].Value);
                         victim = CheckYou(bleedMatch.Groups["victim"].Value);
                         skill = bleedMatch.Groups["skill"].Value;
-                        continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                        ContinuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                     }
 
                     return;
@@ -554,8 +513,8 @@
                 attacker = CheckYou(match.Groups["attacker"].Value);
                 victim = match.Groups["victim"].Value;
                 skill = match.Groups["skill"].Value;
-                if (guessDotCasters)
-                    continuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
+                if (GuessDotCasters)
+                    ContinuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime);
                 ActGlobals.oFormActMain.SetEncounter(logInfo.detectedTime, attacker, victim);
                 ////AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Unknown, "effect"), SwingTypeEnum.NonMelee);
                 return;
@@ -584,7 +543,7 @@
                 }
                 else if (rSummonSpirit.IsMatch(str))
                 {
-                    if (linkPets)
+                    if (LinkPets)
                     {
                         summonMatch = rSummonSpirit.Match(str); // xxx summoned pet by using skill
                         victim = null;
@@ -601,7 +560,7 @@
                     if (AionData.Pet.PetDurations.ContainsKey(pet))
                         petDuration = AionData.Pet.PetDurations[pet];
 
-                    summonerRecordSet.Add(summoner, victim, skill, pet, logInfo.detectedTime, petDuration);
+                    SummonerRecordSet.Add(summoner, victim, skill, pet, logInfo.detectedTime, petDuration);
 
                     if (!string.IsNullOrEmpty(victim))
                     {
@@ -611,7 +570,7 @@
                     return;
                 }
 
-                if (this.debugParse)
+                if (this.DebugParse)
                     ui.AddText("NO MATCH on summon: " + str);
             }
             #endregion
@@ -622,30 +581,30 @@
                 string actor = match.Groups["actor"].Value;
                 skill = match.Groups["skill"].Value;
 
-                if (linkBOFtoSM && skill.StartsWith("Blessing of Fire I"))
+                if (LinkBOFtoSM && skill.StartsWith("Blessing of Fire I"))
                 {
-                    continuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 10 * 60);
+                    ContinuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 10 * 60);
                     return;
                 }
 
-                if (linkDmgProcs)
+                if (LinkDmgProcs)
                 {
                     if (skill.StartsWith("Promise of Wind I"))
                     {
-                        continuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
+                        ContinuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
                         return;
                     }
 
                     if (skill.StartsWith("Apply Poison I") || skill == "Apply Deadly Poison I")
                     {
-                        continuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 2 * 60);
+                        ContinuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 2 * 60);
                         return;
                     }
                 }
 
                 if (skill.StartsWith("Promise of Aether I"))
                 {
-                    healerRecordSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
+                    HealerRecordSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
                     return;
                 }
 
@@ -676,13 +635,15 @@
                 damage = match.Groups["damage"].Value;
                 skill = match.Groups["skill"].Value;
 
-                if (linkBOFtoSM || linkDmgProcs)
-                    attacker = continuousDamageSet.GetAnyActor(victim, skill, logInfo.detectedTime);
+                if (LinkBOFtoSM || LinkDmgProcs)
+                    attacker = ContinuousDamageSet.GetAnyActor(victim, skill, logInfo.detectedTime);
                 else
-                    attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
+                    attacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
 
                 if (String.IsNullOrEmpty(attacker)) // skills like Promise of Wind or Blood Rune
                 {
+                    attacker = "Unknown";
+                    /*
                     if (skill == "Promise of Wind I")
                     {
                         attacker = "Unknown (Priest)";
@@ -707,11 +668,12 @@
                     {
                         attacker = "Unknown";
                     }
+                     */
                 }
 
-                if (tagBlockedAttacks)
+                if (TagBlockedAttacks)
                 {
-                    string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
+                    string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
@@ -728,9 +690,10 @@
                 damage = match.Groups["damage"].Value;
                 string damageType = match.Groups["damagetype"].Value;
                 skill = match.Groups["skill"].Value; // only DoT skills: Poison, Poison Arrow, or Wind Cut Down skills match this... often mob skills
-                attacker = continuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
+                attacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
                 if (String.IsNullOrEmpty(attacker))
                 {
+                    /*
                     if (skill.StartsWith("Wind Cut Down"))
                     {
                         attacker = "Unknown (Sorcerer)";
@@ -751,11 +714,13 @@
                     {
                         attacker = "Unknown"; // unknown class abilities are: Poison, Poison Slash (assassin?), Bleeding (spiritmaster?)
                     }
+                     */
+                    attacker = "Unknown";
                 }
 
-                if (tagBlockedAttacks)
+                if (TagBlockedAttacks)
                 {
-                    string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
+                    string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
@@ -774,9 +739,9 @@
                 attacker = match.Groups["attacker"].Value;
                 victim = CheckYou(match.Groups["victim"].Value);
                 damage = match.Groups["damage"].Value;
-                if (tagBlockedAttacks)
+                if (TagBlockedAttacks)
                 {
-                    string blockType = blockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
+                    string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
                     if (!String.IsNullOrEmpty(blockType))
                         special = blockType;
                 }
@@ -804,9 +769,9 @@
                     damage = match.Groups["hp"].Value;
                     skill = match.Groups["skill"].Value;
 
-                    if (guessDotCasters)
+                    if (GuessDotCasters)
                     {
-                        attacker = healerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past record, specifically Word of Life
+                        attacker = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past record, specifically Word of Life
                     }
 
                     if (string.IsNullOrEmpty(attacker))
@@ -816,6 +781,7 @@
                             attacker = victim;
                             skill = "Unknown (Potion?)";
                         }
+                            /*
                         else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life") || skill.StartsWith("Word of Revival") || skill.StartsWith("Recovery Spell"))
                         {
                             attacker = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
@@ -824,6 +790,7 @@
                         {
                             attacker = "Unknown (Cleric)";
                         }
+                            */
                         else if (skill.StartsWith("Blood Rune") || skill.StartsWith("Stamina Recovery I") || skill.StartsWith("Absorb Vitality "))
                         {
                             attacker = victim; // Blood Rune is assassin skill that heals caster; Stamina Recovery is gladiator self HoT skill; Absorb Vitality is Spiritmaster drain skill
@@ -879,9 +846,9 @@
                     else
                     {
                         attacker = victim; // no healer is specified if you healed yourself, unless it was from a HoT (see check below)
-                        if (guessDotCasters)
+                        if (GuessDotCasters)
                         {
-                            string healerHoT = healerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
+                            string healerHoT = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
                             if (!String.IsNullOrEmpty(healerHoT)) attacker = healerHoT;
                         }
                     }
@@ -898,12 +865,17 @@
                     victim = CheckYou(match.Groups["target"].Value);
                     damage = match.Groups["mp"].Value;
                     skill = match.Groups["skill"].Value;
+                    
+                    /*
                     if (skill.Contains("Clement Mind Mantra") || skill.Contains("Invincibility Mantra") || skill.StartsWith("Magic Recovery") || skill.StartsWith("Promise of Aether"))  // NOTE: observing magic recovery being cast on someone else, it is impossible to tell who the caster is. TODO: how does log line look like when you cast Magic Recovery on someone else? or on you? or another chanter on you?
                     {
 
                         attacker = "Unknown (Chanter)"; // TODO: try to guess the chanter based on who casted the mantra
                     }
-                    else
+                    else */
+
+                    attacker = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime);
+                    if (String.IsNullOrEmpty(attacker))
                     {
                         attacker = victim; // almost any MP recovery spell/potion is self cast
                     }
@@ -944,7 +916,7 @@
             #region blocked
             if (str.Contains("blocked"))
             {
-                if (!tagBlockedAttacks) return;
+                if (!TagBlockedAttacks) return;
 
                 if (str.StartsWith("The attack was blocked by the "))
                 {
@@ -960,7 +932,7 @@
                     victim = CheckYou(match.Groups["target"].Value);
                     ////theAttackType = match.Groups["skill"].Value;
                     ////AddCombatAction(logInfo, "Unknown", incName, theAttackType, critical, special, Dnum.NoDamage, SwingTypeEnum.Melee); // don't add action; this event occurs even on spells if they have armor up
-                    blockedHistory.Add(CheckYou("you"), victim, logInfo.detectedTime, "blocked");
+                    BlockedHistory.Add(CheckYou("you"), victim, logInfo.detectedTime, "blocked");
                     return;
                 }
                 else
@@ -977,7 +949,7 @@
                     victim = match.Groups["victim"].Value;
                     attacker = match.Groups["attacker"].Value;
                     ////theAttackType = match.Groups["skill"].Value;
-                    blockedHistory.Add(attacker, victim, logInfo.detectedTime, "blocked");
+                    BlockedHistory.Add(attacker, victim, logInfo.detectedTime, "blocked");
                     return;
                 }
             }
@@ -990,8 +962,8 @@
                 victim = this.CheckYou(victim);
                 attacker = str.Substring(str.IndexOf("parried") + 8, str.IndexOf("'s attack") - (str.IndexOf("parried") + 8));
                 attacker = this.CheckYou(attacker);
-                if (tagBlockedAttacks)
-                    blockedHistory.Add(attacker, victim, logInfo.detectedTime, "parried");
+                if (TagBlockedAttacks)
+                    BlockedHistory.Add(attacker, victim, logInfo.detectedTime, "parried");
                 return;
             }
             #endregion
@@ -1184,7 +1156,7 @@
             #region debug output
             else
             {
-                if (debugParse && !IsIgnore(str))
+                if (DebugParse && !IsIgnore(str))
                     ui.AddText("unparsed: " + str);
             }
             #endregion
