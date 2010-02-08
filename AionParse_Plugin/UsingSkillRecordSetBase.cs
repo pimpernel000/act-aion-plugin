@@ -96,7 +96,7 @@ namespace AionParsePlugin
                 if (this.Items[i].Duration == 0) continue; // Duration 0 = does not expire
                 double elapsedTime = (focusTime - this.Items[i].Start).TotalSeconds;
                 if (elapsedTime > this.Items[i].Duration)
-                    this.Items.RemoveAt(i);
+                    this.RemoveAt(i);
             }
         }
     }

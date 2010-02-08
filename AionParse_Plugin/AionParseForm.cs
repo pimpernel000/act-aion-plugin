@@ -10,6 +10,9 @@ namespace AionParsePlugin
         public AionParseForm(AionParse plugin, string defaultCharName)
         {
             InitializeComponent();
+
+            ToggleAdvancedTabs(CheckboxAdvancedToggle.Checked);
+
             this.plugin = plugin;
             if (String.IsNullOrEmpty(TextboxDefaultCharacter.Text) || TextboxDefaultCharacter.Text == "YOU")
             {
@@ -56,7 +59,7 @@ namespace AionParsePlugin
             string toolTip6Msg = 
                 "When checked, damage done by Promise of Wind, Apply Poison, and Apply Deadly Poison will be listed under the most recent person who casted it.";
          
-            toolTip0.SetToolTip(CheckboxDebugParse, "Show developer debug messages in log.");
+            toolTip0.SetToolTip(CheckboxDebugParse, "Show developer debug messages in log. This will slow down the parser.");
             toolTip1.SetToolTip(CheckboxTagBlockedAttacks, toolTip1Msg);
             toolTip2.SetToolTip(CheckboxGuessDoTCasters, toolTip2Msg);
             toolTip3.SetToolTip(CheckboxLinkPets, toolTip3Msg);
@@ -107,6 +110,25 @@ namespace AionParsePlugin
         private void CheckboxLinkDamageProcs_CheckedChanged(object sender, EventArgs e)
         {
             plugin.LinkDmgProcs = ((System.Windows.Forms.CheckBox)sender).Checked;
+        }
+
+        private void CheckboxAdvancedToggle_CheckedChanged(object sender, EventArgs e)
+        {
+            ToggleAdvancedTabs(CheckboxAdvancedToggle.Checked);
+        }
+
+        private void ToggleAdvancedTabs(bool showTabs)
+        {
+            if (showTabs)
+            {
+                tabControl1.TabPages.Add(tabGain);
+                tabControl1.TabPages.Add(tabDamage);
+            }
+            else
+            {
+                tabControl1.TabPages.Remove(tabGain);
+                tabControl1.TabPages.Remove(tabDamage);
+            }
         }
     }
 }

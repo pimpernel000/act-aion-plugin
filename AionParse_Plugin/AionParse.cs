@@ -127,7 +127,7 @@
 
             ContinuousDamageSet.Clear();
             BlockedHistory.Clear();
-            ////HealerRecordSet.Clear(); // DEBUG: turned off for testing
+            HealerRecordSet.Clear(); // DEBUG: turned off for testing
         }
 
         private void BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
@@ -917,6 +917,8 @@
             if (str.Contains("blocked"))
             {
                 if (!TagBlockedAttacks) return;
+
+                if (str.StartsWith("You have blocked ")) return; // ignore chat logs that indicate adding a player to the block list
 
                 if (str.StartsWith("The attack was blocked by the "))
                 {
