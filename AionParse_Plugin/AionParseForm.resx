@@ -135,11 +135,11 @@
   <metadata name="toolTip0.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>405, 17</value>
   </metadata>
-  <data name="label2.Text" xml:space="preserve">
-    <value>This table contains the plugin's list of damage 
+  <data name="label1.Text" xml:space="preserve">
+    <value>This table contains the plugin's list of healing 
 spells.
 
-As DoT spells or DoT abilites are captured, the 
+As HoT spells or Mantras are captured, the 
 spells will show up in this list. At the end of 
 combat, this list is truncated to only the most 
 recently cast spells.
@@ -151,11 +151,11 @@ untested! Proceed at your own risk!</value>
   <metadata name="usingSkillRecordSetBaseBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>288, 56</value>
   </metadata>
-  <data name="label1.Text" xml:space="preserve">
-    <value>This table contains the plugin's list of healing 
+  <data name="label2.Text" xml:space="preserve">
+    <value>This table contains the plugin's list of damage 
 spells.
 
-As HoT spells or Mantras are captured, the 
+As DoT spells or DoT abilites are captured, the 
 spells will show up in this list. At the end of 
 combat, this list is truncated to only the most 
 recently cast spells.

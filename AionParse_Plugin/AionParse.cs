@@ -4,7 +4,11 @@
     using System.Text.RegularExpressions;
     using Advanced_Combat_Tracker;
 
-    /* TODO: rename continuousdamageset to indirectdamageset
+    /* Currently working on Mantras: How do you know who's in your party? How do you assign a mantra to the chanter?
+     * 
+     * TODO: make it work with ACT Selective Parsing (Combat Limiting toggle and listed combatants)
+     * 
+     * TODO: rename continuousdamageset to indirectdamageset
      * TODO: have continuousdamageset also contain skill specific durations.. some spells like Delayed Blast only lasts 2 seconds, others like Word of Life lasts 10 seconds, Spirit Erosion lasts 30 seconds.
      *        -when looking back on the list, do so with skill specific durations in mind
      * 
@@ -127,7 +131,7 @@
 
             ContinuousDamageSet.Clear();
             BlockedHistory.Clear();
-            HealerRecordSet.Clear(); // DEBUG: turned off for testing
+            HealerRecordSet.Clear();
         }
 
         private void BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
@@ -575,6 +579,8 @@
             }
             #endregion
 
+            #region buffSelf
+            // match "xxx was affected by its own xxx."
             if (rProcBuff.IsMatch(str))
             {
                 Match match = rProcBuff.Match(str);
@@ -623,6 +629,7 @@
                  */
                 return;
             }
+            #endregion
 
             #endregion
 
