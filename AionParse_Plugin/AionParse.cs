@@ -136,6 +136,8 @@
 
         private void BeforeLogLineRead(bool isImport, LogLineEventArgs logInfo)
         {
+            if (this.LastCharName == "YOU" && ActGlobals.charName != "YOU") ui.UpdateDefaultCharacter(ActGlobals.charName);
+
             string str = logInfo.logLine.Substring(0x16, logInfo.logLine.Length - 0x16).Trim();
             string victim = string.Empty;
             string attacker = string.Empty;

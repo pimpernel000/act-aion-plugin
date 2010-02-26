@@ -36,6 +36,15 @@ namespace AionParsePlugin
             TextboxLog.Text += text + Environment.NewLine;
         }
 
+        internal void UpdateDefaultCharacter(string newGuy)
+        {
+            string oldGuy = plugin.LastCharName;
+            plugin.PartyMembers.Replace(oldGuy, newGuy);
+            plugin.LastCharName = newGuy;
+            TextboxDefaultCharacter.Text = newGuy;
+            AddText("Default character changed from " + oldGuy + " to " + newGuy);
+        }
+
         private void AionParseForm_Load(object sender, EventArgs e)
         {
             string toolTip1Msg = 
@@ -70,8 +79,7 @@ namespace AionParsePlugin
 
         private void ApplyDefaultCharacter_Click(object sender, EventArgs e)
         {
-            plugin.LastCharName = TextboxDefaultCharacter.Text;
-            AddText("Default character changed to " + TextboxDefaultCharacter.Text);
+            UpdateDefaultCharacter(TextboxDefaultCharacter.Text);
         }
 
         private void TextboxDefaultCharacter_KeyDown(object sender, KeyEventArgs e)
