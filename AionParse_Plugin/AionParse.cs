@@ -766,7 +766,7 @@
                 // match "You restored xx of xxx's HP by using xxx."  the actor in this case is ambigious and not really you.
                 if (str.StartsWith("You restored"))
                 {
-                    Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+" + ngs + @")?\d+) of (?<target>[a-zA-Z ']*)'s HP by using (?<skill>[a-zA-Z \-']*?)\.");
+                    Regex rYouRestoreHP = new Regex(@"You restored (?<hp>(\d+" + ngs + @")?\d+) of (?<target>[a-zA-Z ']*)'s HP by using (?<skill>[a-zA-Z \-']*?)( Effect)?\.", RegexOptions.Compiled);
                     Match match = rYouRestoreHP.Match(str);
                     if (!match.Success)
                     {
@@ -780,7 +780,7 @@
 
                     if (GuessDotCasters)
                     {
-                        attacker = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past record, specifically Word of Life
+                        attacker = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // attempt to get the healer from a past indicator log line; or default to an Unknown (Class) for HoTs
                     }
 
                     if (string.IsNullOrEmpty(attacker))
@@ -818,7 +818,7 @@
                     return;
                 }
 
-                // match "xx restored xx HP."  most likely due to potion
+                // match "xx restored xx HP."  caused by initial heal of using a potion
                 if (str.EndsWith(" HP.") && str.Contains("restored"))
                 {
                     Regex rYouRestoreHP = new Regex(@"(?<actor>[a-zA-Z ']*) restored (?<hp>(\d+" + ngs + @")?\d+) HP\.");
@@ -842,7 +842,7 @@
                     return;
                 }
 
-                // match "xxx recovered xx HP ..."
+                // match "xxx recovered xx HP (because xxx used|by using) xxx."
                 if (rRecoverHP.IsMatch(str))
                 {
                     Match match = rRecoverHP.Match(str);
@@ -867,7 +867,7 @@
                     return;
                 }
 
-                // match "xxx recovered x MP ..."
+                // match "xxx recovered x MP (due to|by using|after using) xxx."
                 if (rRecoverMP.IsMatch(str))
                 {
                     Match match = rRecoverMP.Match(str);
@@ -893,10 +893,10 @@
                     return;
                 }
 
-                // match "xxx restored x MP."  (most likely due to potion)
-                if (str.EndsWith(" MP.") && str.Contains("restored"))
+                // match "xxx restored x MP." or "You recovered x MP."  caused by initial mana heal of using a potion
+                if (str.EndsWith(" MP.") && (str.Contains("restored") || str.Contains("recovered")))
                 {
-                    Match match = (new Regex(@"^(?<actor>[a-zA-Z ']*) restored (?<mp>.*) MP\.$", RegexOptions.Compiled)).Match(str);
+                    Match match = (new Regex(@"^(?<actor>[a-zA-Z ']*) (restored|recovered) (?<mp>.*) MP\.$", RegexOptions.Compiled)).Match(str);
                     if (!match.Success)
                     {
                         ui.AddText("Exception-Unable to parse[e5]: " + str);
@@ -1050,11 +1050,20 @@
             #region evaded
             else if (str.Contains("evaded"))
             {
-                Regex rEvaded = new Regex(@"^(?<victim>[a-zA-Z ']*) evaded (?<attacker>[a-zA-Z ']*?)'s (attack|(?<skill>[a-zA-Z \-']*?))\.$", RegexOptions.Compiled);
+                Regex rEvaded = new Regex(@"^(?<victim>[a-zA-Z ']*) evaded (the|(?<attacker>[a-zA-Z ']*?)'s) (attack|(?<skill>[a-zA-Z \-']*?))\.$", RegexOptions.Compiled);
                 Match match = rEvaded.Match(str);
 
                 victim = CheckYou(match.Groups["victim"].Value);
-                attacker = CheckYou(match.Groups["attacker"].Value);
+                
+                if (match.Groups["attacker"].Success)
+                {
+                    attacker = CheckYou(match.Groups["attacker"].Value);
+                }
+                else
+                {
+                    attacker = "Unknown";
+                }
+
                 SwingTypeEnum swingType;
                 if (match.Groups["skill"].Success)
                 {
