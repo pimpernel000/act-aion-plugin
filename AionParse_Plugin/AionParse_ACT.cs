@@ -9,6 +9,9 @@ namespace AionParsePlugin
     public partial class AionParse : IActPluginV1
     {
         #region private members
+        // ui page for plugin
+        AionParseForm ui;
+
         // for Robe of Ice damage reflect
         string lastActivatedSkill = string.Empty;
         int lastActivatedSkillGlobalTime = -1;
@@ -29,24 +32,64 @@ namespace AionParsePlugin
         // remembering summoners
         internal UsingSkillRecordSet SummonerRecordSet { get; set; }
 
-        // ui variables (initial values reset by UI on init)
-        AionParseForm ui;
-
+        // ui properties (initial values reset by UI on init)
         internal string LastCharName { get; set; }
 
-        internal bool GuessDotCasters { get; set; }
+        internal bool GuessDotCasters
+        {
+            get
+            {
+                return ui.CheckboxGuessDoTCasters.Checked;
+            }
+        }
 
-        internal bool DebugParse { get; set; } // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
+        internal bool DebugParse
+        {
+            get
+            {
+                return ui.CheckboxDebugParse.Checked;
+            }
+        } // for debugging purposes, causes all messages to be shown in log that aren't caught by parser
 
-        internal bool TagBlockedAttacks { get; set; }
+        internal bool TagBlockedAttacks
+        {
+            get
+            {
+                return ui.CheckboxTagBlockedAttacks.Checked;
+            }
+        }
 
-        internal bool LinkPets { get; set; } // TODO: link pets with their summoners for damage totalling; maybe label all pet skills as "Pet Skill (petname)" and name pet melee as "Melee (petname)"
-        
-        internal bool LinkBOFtoSM { get; set; }
+        internal bool LinkPets
+        {
+            get
+            {
+                return ui.CheckboxLinkPets.Checked;
+            }
+        } // TODO: link pets with their summoners for damage totalling; maybe label all pet skills as "Pet Skill (petname)" and name pet melee as "Melee (petname)"
 
-        internal bool LinkDmgProcs { get; set; }
+        internal bool LinkBOFtoSM
+        {
+            get
+            {
+                return ui.CheckboxLinkBOFtoSM.Checked;
+            }
+        }
 
-        internal bool GuessChanter { get { return ui.CheckboxGuessChanter.Checked; } }
+        internal bool LinkDmgProcs
+        {
+            get
+            {
+                return ui.CheckboxLinkDamageProcs.Checked;
+            }
+        }
+
+        internal bool GuessChanter
+        {
+            get
+            {
+                return ui.CheckboxGuessChanter.Checked;
+            }
+        }
 
         internal PartyRecordSet PartyMembers { get; set; }
 

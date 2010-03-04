@@ -53,6 +53,7 @@ namespace AionParsePlugin
             this.toolTip0 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.CheckboxGuessChanter = new System.Windows.Forms.CheckBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.label3 = new System.Windows.Forms.Label();
             this.CheckboxAdvancedToggle = new System.Windows.Forms.CheckBox();
@@ -90,7 +91,6 @@ namespace AionParsePlugin
             this.endDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.toolTip5 = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip6 = new System.Windows.Forms.ToolTip(this.components);
-            this.CheckboxGuessChanter = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -153,7 +153,6 @@ namespace AionParsePlugin
             this.CheckboxGuessDoTCasters.TabIndex = 5;
             this.CheckboxGuessDoTCasters.Text = "Guess Indirect Casters";
             this.CheckboxGuessDoTCasters.UseVisualStyleBackColor = true;
-            this.CheckboxGuessDoTCasters.CheckedChanged += new System.EventHandler(this.CheckboxGuessDoTCasters_CheckedChanged);
             // 
             // CheckboxDebugParse
             // 
@@ -165,7 +164,6 @@ namespace AionParsePlugin
             this.CheckboxDebugParse.TabIndex = 99;
             this.CheckboxDebugParse.Text = "Debug Messages";
             this.CheckboxDebugParse.UseVisualStyleBackColor = true;
-            this.CheckboxDebugParse.CheckedChanged += new System.EventHandler(this.CheckboxDebugParse_CheckedChanged);
             // 
             // CheckboxTagBlockedAttacks
             // 
@@ -181,7 +179,6 @@ namespace AionParsePlugin
             this.toolTip1.SetToolTip(this.CheckboxTagBlockedAttacks, "When checked, the parser will parse blocked attacks and attempt to label the foll" +
                     "owing attack as (special) blocked.");
             this.CheckboxTagBlockedAttacks.UseVisualStyleBackColor = true;
-            this.CheckboxTagBlockedAttacks.CheckedChanged += new System.EventHandler(this.CheckboxTagBlockedAttacks_CheckedChanged);
             // 
             // toolTip2
             // 
@@ -200,7 +197,6 @@ namespace AionParsePlugin
             this.CheckboxLinkPets.TabIndex = 100;
             this.CheckboxLinkPets.Text = "Link Spirts with Spiritmaster";
             this.CheckboxLinkPets.UseVisualStyleBackColor = true;
-            this.CheckboxLinkPets.CheckedChanged += new System.EventHandler(this.CheckboxLinkPets_CheckedChanged);
             // 
             // CheckboxParseDmgToTmpPets
             // 
@@ -250,6 +246,16 @@ namespace AionParsePlugin
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
+            // 
+            // CheckboxGuessChanter
+            // 
+            this.CheckboxGuessChanter.AutoSize = true;
+            this.CheckboxGuessChanter.Location = new System.Drawing.Point(596, 230);
+            this.CheckboxGuessChanter.Name = "CheckboxGuessChanter";
+            this.CheckboxGuessChanter.Size = new System.Drawing.Size(190, 20);
+            this.CheckboxGuessChanter.TabIndex = 109;
+            this.CheckboxGuessChanter.Text = "Guess Chanter in your party";
+            this.CheckboxGuessChanter.UseVisualStyleBackColor = true;
             // 
             // linkLabel1
             // 
@@ -317,7 +323,6 @@ namespace AionParsePlugin
             this.CheckboxLinkDamageProcs.TabIndex = 103;
             this.CheckboxLinkDamageProcs.Text = "Guess damage proc owners";
             this.CheckboxLinkDamageProcs.UseVisualStyleBackColor = true;
-            this.CheckboxLinkDamageProcs.CheckedChanged += new System.EventHandler(this.CheckboxLinkDamageProcs_CheckedChanged);
             // 
             // CheckboxLinkBOFtoSM
             // 
@@ -331,7 +336,6 @@ namespace AionParsePlugin
             this.CheckboxLinkBOFtoSM.TabIndex = 102;
             this.CheckboxLinkBOFtoSM.Text = "Link Blessing of Fire to Spiritmaster";
             this.CheckboxLinkBOFtoSM.UseVisualStyleBackColor = true;
-            this.CheckboxLinkBOFtoSM.CheckedChanged += new System.EventHandler(this.CheckboxLinkBOFtoSM_CheckedChanged);
             // 
             // tabPartyInfo
             // 
@@ -603,16 +607,6 @@ namespace AionParsePlugin
             this.endDataGridViewTextBoxColumn1.Name = "endDataGridViewTextBoxColumn1";
             this.endDataGridViewTextBoxColumn1.ReadOnly = true;
             // 
-            // CheckboxGuessChanter
-            // 
-            this.CheckboxGuessChanter.AutoSize = true;
-            this.CheckboxGuessChanter.Location = new System.Drawing.Point(596, 230);
-            this.CheckboxGuessChanter.Name = "CheckboxGuessChanter";
-            this.CheckboxGuessChanter.Size = new System.Drawing.Size(190, 20);
-            this.CheckboxGuessChanter.TabIndex = 109;
-            this.CheckboxGuessChanter.Text = "Guess Chanter in your party";
-            this.CheckboxGuessChanter.UseVisualStyleBackColor = true;
-            // 
             // AionParseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
@@ -654,20 +648,13 @@ namespace AionParsePlugin
         private System.Windows.Forms.TextBox TextboxLog;
         private System.Windows.Forms.TextBox TextboxDefaultCharacter;
         private System.Windows.Forms.Button ApplyDefaultCharacter;
-        private System.Windows.Forms.CheckBox CheckboxGuessDoTCasters;
-        private System.Windows.Forms.CheckBox CheckboxDebugParse;
-        private System.Windows.Forms.CheckBox CheckboxTagBlockedAttacks;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolTip toolTip2;
-        private System.Windows.Forms.CheckBox CheckboxLinkPets;
-        private System.Windows.Forms.CheckBox CheckboxParseDmgToTmpPets;
         private System.Windows.Forms.ToolTip toolTip3;
         private System.Windows.Forms.ToolTip toolTip4;
         private System.Windows.Forms.ToolTip toolTip0;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabGeneral;
-        private System.Windows.Forms.CheckBox CheckboxLinkBOFtoSM;
-        private System.Windows.Forms.CheckBox CheckboxLinkDamageProcs;
         private System.Windows.Forms.ToolTip toolTip5;
         private System.Windows.Forms.ToolTip toolTip6;
         private System.Windows.Forms.GroupBox groupBox2;
@@ -704,5 +691,12 @@ namespace AionParsePlugin
         private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn Class;
         internal System.Windows.Forms.CheckBox CheckboxGuessChanter;
+        internal System.Windows.Forms.CheckBox CheckboxGuessDoTCasters;
+        internal System.Windows.Forms.CheckBox CheckboxTagBlockedAttacks;
+        internal System.Windows.Forms.CheckBox CheckboxLinkPets;
+        internal System.Windows.Forms.CheckBox CheckboxParseDmgToTmpPets;
+        internal System.Windows.Forms.CheckBox CheckboxLinkBOFtoSM;
+        internal System.Windows.Forms.CheckBox CheckboxLinkDamageProcs;
+        internal System.Windows.Forms.CheckBox CheckboxDebugParse;
     }
 }

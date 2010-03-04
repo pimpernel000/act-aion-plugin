@@ -22,11 +22,6 @@ namespace AionParsePlugin
             plugin.LastCharName = TextboxDefaultCharacter.Text;
             AddText("Plugin Initialized with current character as " + TextboxDefaultCharacter.Text + ".");
 
-            plugin.DebugParse = CheckboxDebugParse.Checked;
-            plugin.GuessDotCasters = CheckboxGuessDoTCasters.Checked;
-            plugin.LinkPets = CheckboxLinkPets.Checked;
-            plugin.TagBlockedAttacks = CheckboxTagBlockedAttacks.Checked;
-
             this.dgGainSpells.DataSource = plugin.HealerRecordSet;
             this.dgDamageSpells.DataSource = plugin.ContinuousDamageSet;
             this.dgParty.DataSource = plugin.PartyMembers;
@@ -89,36 +84,6 @@ namespace AionParsePlugin
             {
                 ApplyDefaultCharacter_Click(sender, e);
             }
-        }
-
-        private void CheckboxGuessDoTCasters_CheckedChanged(object sender, EventArgs e)
-        {
-            plugin.GuessDotCasters = ((System.Windows.Forms.CheckBox)sender).Checked;
-        }
-
-        private void CheckboxDebugParse_CheckedChanged(object sender, EventArgs e)
-        {
-            plugin.DebugParse = ((System.Windows.Forms.CheckBox)sender).Checked;
-        }
-
-        private void CheckboxTagBlockedAttacks_CheckedChanged(object sender, EventArgs e)
-        {
-            plugin.TagBlockedAttacks = ((System.Windows.Forms.CheckBox)sender).Checked;
-        }
-
-        private void CheckboxLinkPets_CheckedChanged(object sender, EventArgs e)
-        {
-            plugin.LinkPets = ((System.Windows.Forms.CheckBox)sender).Checked;
-        }
-
-        private void CheckboxLinkBOFtoSM_CheckedChanged(object sender, EventArgs e)
-        {
-            plugin.LinkBOFtoSM = ((System.Windows.Forms.CheckBox)sender).Checked;
-        }
-
-        private void CheckboxLinkDamageProcs_CheckedChanged(object sender, EventArgs e)
-        {
-            plugin.LinkDmgProcs = ((System.Windows.Forms.CheckBox)sender).Checked;
         }
 
         private void CheckboxAdvancedToggle_CheckedChanged(object sender, EventArgs e)
