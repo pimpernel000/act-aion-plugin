@@ -29,6 +29,7 @@ namespace AionParsePlugin
 
             this.dgGainSpells.DataSource = plugin.HealerRecordSet;
             this.dgDamageSpells.DataSource = plugin.ContinuousDamageSet;
+            this.dgParty.DataSource = plugin.PartyMembers;
         }
 
         public void AddText(string text)
@@ -129,14 +130,25 @@ namespace AionParsePlugin
         {
             if (showTabs)
             {
+                tabControl1.TabPages.Add(tabPartyInfo);
                 tabControl1.TabPages.Add(tabGain);
                 tabControl1.TabPages.Add(tabDamage);
             }
             else
             {
+                tabControl1.TabPages.Remove(tabPartyInfo);
                 tabControl1.TabPages.Remove(tabGain);
                 tabControl1.TabPages.Remove(tabDamage);
             }
+        }
+
+        private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            // Specify that the link was visited.
+            this.linkLabel1.LinkVisited = true;
+
+            // Navigate to a URL.
+            System.Diagnostics.Process.Start("http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-a.html");
         }
     }
 }

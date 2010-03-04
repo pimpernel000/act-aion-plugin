@@ -135,6 +135,30 @@
   <metadata name="toolTip0.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>405, 17</value>
   </metadata>
+  <data name="label4.Text" xml:space="preserve">
+    <value>This table contains a list of party members.
+
+If there is one chanter in the party, that 
+chanter will be associated with all chanter 
+mantra healing abilities.
+
+If there is more than one chanter, only the 
+chanter that has been last seen casting 
+healing mantras will be associated with 
+party-wide healing abilities.</value>
+  </data>
+  <metadata name="Class.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="partyRecordSetBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>696, 17</value>
+  </metadata>
+  <metadata name="Class.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="partyRecordSetBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>696, 17</value>
+  </metadata>
   <data name="label1.Text" xml:space="preserve">
     <value>This table contains the plugin's list of healing 
 spells.
@@ -148,8 +172,8 @@ This table is reset as the plugin loads.
 Modifying this table is possible, but is largely
 untested! Proceed at your own risk!</value>
   </data>
-  <metadata name="usingSkillRecordSetBaseBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>288, 56</value>
+  <metadata name="usingSkillRecordSetBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 56</value>
   </metadata>
   <data name="label2.Text" xml:space="preserve">
     <value>This table contains the plugin's list of damage 

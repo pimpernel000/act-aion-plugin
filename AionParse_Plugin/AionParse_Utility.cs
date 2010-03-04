@@ -28,6 +28,12 @@ namespace AionParsePlugin
             DateTime now = logInfo.detectedTime;
             if (ActGlobals.oFormActMain.SetEncounter(now, attacker, victim))
             {
+                // attempt to guess the party member's class
+                if (GuessChanter)
+                {
+                    PartyMembers.SetClass(attacker, theAttackType);
+                }
+
                 // redirect attacks from pets/servants as coming from summoner
                 if (SummonerRecordSet.IsSummonedPet(attacker))
                 {

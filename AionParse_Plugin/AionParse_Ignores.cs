@@ -10,7 +10,7 @@ namespace AionParsePlugin
             if (str.Contains("[charname:")) return true; // ignore chats ([charname:...] is a link to a name
             if (str.StartsWith(CheckYou("you") + ":")) return true; // ignore your own chats
 
-            if (str.StartsWith("You have gained") && str.Contains("EXP")) return true;
+            if (str.StartsWith("You have gained") && (str.Contains("EXP") || str.Contains("Abyss Points"))) return true;
 
             if (str.StartsWith("You boosted your")) return true; // ignore You boosted your evasion by using Focused Evasion I. 
             if (str.Contains("movement speed decreased as you used")) return true;
@@ -44,7 +44,10 @@ namespace AionParsePlugin
                 "Greetings Daevas!",
                 "There have been frequent scam attempts on our players using web sites that imitate ours.",
                 "Our official sites are aiononline.com and ncsoft.com only.",
-                "Don't enter your Aion account info on any other site, or it will be stolen and your characters will be looted."
+                "Don't enter your Aion account info on any other site, or it will be stolen and your characters will be looted.",
+                "You are too far from the target to use that skill.",
+                "You cannot issue commands in resting.",
+                "You do not have much flight time left. Please land on a secure place."
             };
 
             List<string> startParts = new List<string> 
@@ -63,11 +66,13 @@ namespace AionParsePlugin
                 "You changed the connection status",
                 "Legion Message:",
                 "You learned",
-                "You were killed"
+                "You were killed",
+                "Your spirit uses its skills on"
             };
 
             List<string> endParts = new List<string> 
             {
+                "is running away.",
                 "restored its movement speed.", "restored its attack speed.",
                 "is no longer stunned.",
                 "is no longer immobilized.", 
@@ -81,7 +86,14 @@ namespace AionParsePlugin
                 "is no longer staggering.",
                 "woke up.",
                 "is no longer silenced.",
-                "has died."
+                "has died.",
+                "gave up rolling the dice.",
+                "Spirit starts to attack the enemy.",
+                "Spirit is in Guard mode.",
+                "Spirit is in Resting mode.",
+                "Spirit has been dismissed.",
+                "gives up the pursuit.",
+                "MP consumption has changed because he used Lumiel's Wisdom I."
             };
 
             List<string> containParts = new List<string> 

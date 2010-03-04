@@ -4,7 +4,15 @@
     using System.Text.RegularExpressions;
     using Advanced_Combat_Tracker;
 
-    /* Currently working on Mantras: How do you know who's in your party? How do you assign a mantra to the chanter?
+    /* 
+     * TODO: test results:
+     *  - proc for Promise of Wind only works for Unknown (Chanter/Priest) if you check Guess damage proc owners
+     *    - this should be moved out of damage list as it should work regardless
+     *  - proc for heals don't work for Unknown (Chanter/Cleric) as it doesn't check GetAnyActor, 
+     *    - should this be moved out? or should GetAnyActor be the default behaviour?
+     *      -i.e. if Target == null, it means you've reached the end of the list anyways, you might as well match.
+     * 
+     * TODO: test to make sure it works with a chanter in the party
      * 
      * TODO: make it work with ACT Selective Parsing (Combat Limiting toggle and listed combatants)
      * 
@@ -93,8 +101,8 @@
         Regex rContDmg1 = new Regex(@"^You inflicted continuous damage on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
         Regex rContDmg3 = new Regex(@"^You received continuous damage because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: this usually causes log lines to say that you start damaging yourself... i.e. my name is Vyn, but if I am hit by Chastisement in PvP, log lines will say: Vyn inflicted 70 damage on you by using Chastisement I.
-        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
-        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*?)(( Additional)? Effect)?\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg1 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) (?<damagetype>[a-zA-Z]*) damage after you used (?<skill>[a-zA-Z \-']*)( Effect)?\.$", RegexOptions.Compiled);
+        Regex rIndirectDmg2 = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) (?<damagetype>[a-zA-Z]* )?damage due to the effect of (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rReflectDamageOnYou = new Regex(@"^Your attack on (?<attacker>[a-zA-Z ']*) was reflected and inflicted (?<damagetype>[a-zA-Z ]*) damage on you\.$", RegexOptions.Compiled);
         Regex rRecoverMP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<mp>(\d+" + ngs + @")?\d+) MP (due to the effect of|by using|after using) (?<skill>[a-zA-Z \-']*?)( Effect)?\.$", RegexOptions.Compiled);
         Regex rRecoverHP = new Regex(@"^(?<target>[a-zA-Z ']*) recovered (?<hp>(\d+" + ngs + @")?\d+) HP (because (?<actor>[a-zA-Z ']*) used|by using) (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
@@ -126,8 +134,6 @@
             lastActivedSkillTime = DateTime.MinValue;
 
             lastPotion = string.Empty;
-            lastPotionGlobalTime = -1;
-            lastPotionTime = DateTime.MinValue;
 
             ContinuousDamageSet.Clear();
             BlockedHistory.Clear();
@@ -236,20 +242,18 @@
                     // check if skill has an extra payload damage that can't be found other than in here
                     if (GuessDotCasters)
                     {
-                        if (skill.StartsWith("Blood Rune"))
+                        if (AionData.Skill.HasAdditionalEffect(skill))
                         {
-                            ContinuousDamageSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor for when it deals payload damage later
-                            HealerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime); // record Blood Rune actor when he heals later as single HoT tick
+                            string additionalEffect = skill + " Additional";
+                            ContinuousDamageSet.Add(attacker, victim, additionalEffect, logInfo.detectedTime); // record Blood Rune actor for when it deals payload damage later as Blood Rune X Additional Effect (regex will parse out Effect)
+                            HealerRecordSet.Add(attacker, victim, additionalEffect, logInfo.detectedTime); // record Blood Rune actor when he heals later as single HoT tick
                         }
                     }
 
                     var inflictSwingType = SwingTypeEnum.NonMelee;
 
-                    // correct the false damage on you that are actually group heals
-                    if (victim == CheckYou("you") &&
-                        (skill.StartsWith("Healing Wind") || skill.StartsWith("Light of Recovery") ||
-                        skill.StartsWith("Healing Light") || skill.StartsWith("Radiant Cure") ||
-                        skill.StartsWith("Flash of Recovery") || skill.StartsWith("Splendor of Recovery")))
+                    // correct the false damage on you that are actually heals
+                    if (victim == CheckYou("you") && AionData.Skill.IsHealThatInflictsDamage(skill))
                     {
                         inflictSwingType = SwingTypeEnum.Healing;
                     }
@@ -355,8 +359,6 @@
             {
                 Match match = (new Regex("You have used (?<potion>[a-zA-Z ']*).", RegexOptions.Compiled)).Match(str);
                 lastPotion = match.Groups["potion"].Value;
-                lastPotionGlobalTime = ActGlobals.oFormActMain.GlobalTimeSorter;
-                lastPotionTime = logInfo.detectedTime;
                 return;
             }
 
@@ -555,6 +557,10 @@
                         victim = null;
                         petDuration = 600;
                     }
+                    else
+                    {
+                        return; // ignore SM's summons
+                    }
                 }
 
                 if (summonMatch != null && summonMatch.Success)
@@ -588,8 +594,9 @@
                 Match match = rProcBuff.Match(str);
                 string actor = match.Groups["actor"].Value;
                 skill = match.Groups["skill"].Value;
+                string playerSkill = AionData.Skill.PlayerSkill(skill);
 
-                if (LinkBOFtoSM && skill.StartsWith("Blessing of Fire I"))
+                if (LinkBOFtoSM && playerSkill == "Blessing of Fire")
                 {
                     ContinuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 10 * 60);
                     return;
@@ -597,38 +604,55 @@
 
                 if (LinkDmgProcs)
                 {
-                    if (skill.StartsWith("Promise of Wind I"))
+                    if (playerSkill == "Promise of Wind")
                     {
                         ContinuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
                         return;
                     }
 
-                    if (skill.StartsWith("Apply Poison I") || skill == "Apply Deadly Poison I")
+                    if (playerSkill == "Apply Poison" || skill == "Apply Deadly Poison")
                     {
                         ContinuousDamageSet.Add(actor, null, skill, logInfo.detectedTime, 2 * 60);
                         return;
                     }
                 }
 
-                if (skill.StartsWith("Promise of Aether I"))
+                if (playerSkill == "Promise of Aether")
                 {
+                    PartyMembers.SetClass(actor, AionData.Player.Classes.Chanter);
                     HealerRecordSet.Add(actor, null, skill, logInfo.detectedTime, 30 * 60);
                     return;
                 }
 
-                // ignore non-damage and non-heal spells
-                /*
-                if (skill.StartsWith("Promise of Earth I") || skill.StartsWith("Arrow Flurry I") || skill == "Blessing of Rock" || skill.StartsWith("Tactical Retreat I") || skill.StartsWith("Robe of Cold I"))
+                if (AionData.Skill.IsGainMantra(skill))
                 {
-                    return;
+                    if (PartyMembers.Find(actor) != null)
+                    {
+                        PartyMembers.SetClass(actor, AionData.Player.Classes.Chanter);
+                        foreach (AionData.Player player in PartyMembers)
+                        {
+                            HealerRecordSet.Add(actor, player.Name, skill, logInfo.detectedTime, 0); // add every party member as receiving mantra
+                        }
+                    }
+                    else
+                    {
+                        HealerRecordSet.Add(actor, actor, skill, logInfo.detectedTime, 0); // if not in party, assume chanter is soling
+                    }
                 }
-                 */
+
+                // ignore non-damage and non-heal spells
+                foreach (string otherSkill in new string[] { "Promise of Earth", "Arrow Flurry", "Blessing of Rock", "Tactical Retreat", "Robe of Cold" })
+                {
+                    if (playerSkill == otherSkill)
+                        return;
+                }
 
                 // ignore mob and other unhandled spells
-                /*
-                if (debugParse)
+                if (DebugParse)
+                {
                     ui.AddText("Unhandled self buff: " + str);
-                 */
+                }
+
                 return;
             }
             #endregion
@@ -649,35 +673,9 @@
                 else
                     attacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
 
-                if (String.IsNullOrEmpty(attacker)) // skills like Promise of Wind or Blood Rune
+                if (String.IsNullOrEmpty(attacker))
                 {
                     attacker = "Unknown";
-                    /*
-                    if (skill == "Promise of Wind I")
-                    {
-                        attacker = "Unknown (Priest)";
-                    }
-                    else if (skill.StartsWith("Promise of Wind I"))
-                    {
-                        attacker = "Unknown (Chanter)"; // only chanters get Promise of Wind above rank I
-                    }
-                    else if (skill.StartsWith("Blood Rune"))
-                    {
-                        attacker = "Unknown (Assassin)";
-                    }
-                    else if (skill == "Erosion I")
-                    {
-                        attacker = "Unknown (Mage)";
-                    }
-                    else if (skill.StartsWith("Chain of Earth") || skill.StartsWith("Erosion") || skill.StartsWith("Blessing of Fire"))
-                    {
-                        attacker = "Unknown (Spiritmaster)";
-                    }
-                    else
-                    {
-                        attacker = "Unknown";
-                    }
-                     */
                 }
 
                 if (TagBlockedAttacks)
@@ -788,29 +786,27 @@
                         if (skill == "Healing")
                         {
                             attacker = victim;
-                            skill = "Unknown (Potion?)";
+                            skill = "Healing Potion HoT"; // HoTs from healing potions are oddly named Healing
+                            if (attacker == CheckYou("you"))
+                                skill = lastPotion;
                         }
-                            /*
-                        else if (skill.StartsWith("Revival Mantra") || skill.StartsWith("Word of Life") || skill.StartsWith("Word of Revival") || skill.StartsWith("Recovery Spell"))
+                        else if (skill == "Recovery Potion")
                         {
-                            attacker = "Unknown (Chanter)"; // Revival Mantra is group heal; this does indeed show up if the chanter heals itself. TODO: confirm if chanter healing party with this spells shows up in logs the same way
+                            attacker = victim; // HoTs from potions
+
+                            skill = "Recovery Potion HoT";
+                            if (attacker == CheckYou("you"))
+                                skill = lastPotion;
                         }
-                        else if (skill.StartsWith("Light of Rejuvenation"))
+                        else if (AionData.Skill.IsSelfHeal(skill))
                         {
-                            attacker = "Unknown (Cleric)";
-                        }
-                            */
-                        else if (skill.StartsWith("Blood Rune") || skill.StartsWith("Stamina Recovery I") || skill.StartsWith("Absorb Vitality "))
-                        {
-                            attacker = victim; // Blood Rune is assassin skill that heals caster; Stamina Recovery is gladiator self HoT skill; Absorb Vitality is Spiritmaster drain skill
-                        }
-                        else if (skill.EndsWith(" Potion"))
-                        {
-                            attacker = victim; // potions heals caster
+                            attacker = victim; // known HoT skills: Blood Rune Additional Effect (only 1 tick), Stamina Recovery, Absorb Vitality (only 1 tick)
                         }
                         else
                         {
-                            attacker = "Unknown"; // TODO: add list of spells: Chastisement, Delayed Blast, Flame Cage.  sometimes encounter breaks will cause normally detectable casters of delayed damage spells to be unknown
+                            attacker = "Unknown";
+                            if (DebugParse)
+                                ui.AddText("Unknown HoT: " + str);
                         }
                     }
 
@@ -832,11 +828,10 @@
                     attacker = match.Groups["actor"].Value;
                     victim = attacker;
                     damage = match.Groups["hp"].Value;
-                    skill = "Unknown (Potion?)";
-                    if (victim == CheckYou("you") && (ActGlobals.oFormActMain.GlobalTimeSorter == lastPotionGlobalTime || (logInfo.detectedTime - lastPotionTime).TotalSeconds < 2))
-                    {
+
+                    skill = "Healing/Recovery Potion";
+                    if (victim == CheckYou("you"))
                         skill = lastPotion;
-                    }
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.Healing);
                     return;
@@ -855,7 +850,15 @@
                     else
                     {
                         attacker = victim; // no healer is specified if you healed yourself, unless it was from a HoT (see check below)
-                        if (GuessDotCasters)
+
+                        if (skill == "Recovery Potion")
+                        {
+                        }
+                        else if (skill == "Healing")
+                        {
+                            skill = "Healing Potion";
+                        }
+                        else if (GuessDotCasters)
                         {
                             string healerHoT = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
                             if (!String.IsNullOrEmpty(healerHoT)) attacker = healerHoT;
@@ -874,19 +877,42 @@
                     victim = CheckYou(match.Groups["target"].Value);
                     damage = match.Groups["mp"].Value;
                     skill = match.Groups["skill"].Value;
-                    
-                    /*
-                    if (skill.Contains("Clement Mind Mantra") || skill.Contains("Invincibility Mantra") || skill.StartsWith("Magic Recovery") || skill.StartsWith("Promise of Aether"))  // NOTE: observing magic recovery being cast on someone else, it is impossible to tell who the caster is. TODO: how does log line look like when you cast Magic Recovery on someone else? or on you? or another chanter on you?
-                    {
-
-                        attacker = "Unknown (Chanter)"; // TODO: try to guess the chanter based on who casted the mantra
-                    }
-                    else */
 
                     attacker = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime);
-                    if (String.IsNullOrEmpty(attacker))
+                    if (attacker.StartsWith("Unknown"))
+                    {
+                        if (AionData.Skill.IsGainMantra(skill) && PartyMembers.Contains(victim))
+                        {
+                            var chanters = PartyMembers.FindByClass(AionData.Player.Classes.Chanter);
+                            if (chanters.Count == 1)
+                            {
+                                attacker = chanters[0].Name;
+                            }
+                        }
+                    }
+
+                    if (string.IsNullOrEmpty(attacker) && AionData.Skill.PlayerSkill(skill) == "Magic Recovery")
+                    {
+                        attacker = "Unknown (Chanter)"; // NOTE: the only example I have of this spell is "Becca recovered 1,500 MP by using Magic Recovery I." which I assume is self-cast.  I need more examples on this spell: i.e. you cast Magic Recovery on yourself, you cast on another player, another player cast on a different player.
+                        ////attacker = victim; // we could guess that most of the time chanter is self-casting this spell
+                    }
+
+                    if (string.IsNullOrEmpty(attacker))
                     {
                         attacker = victim; // almost any MP recovery spell/potion is self cast
+
+                        if (skill == "Recovery Potion")
+                        {
+                            if (attacker == CheckYou("you"))
+                                skill = lastPotion;
+                        }
+
+                        if (skill == "Mana Treatment")
+                        {
+                            skill = "Mana Potion";
+                            if (attacker == CheckYou("you"))
+                                skill = lastPotion; // oddly enough, healing potions are Healing and mana potions are Mana Treatment.  NOTE: Mana Treatment skills have roman numerals after them, potions are just Mana Treatment.
+                        }
                     }
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.PowerHealing);
@@ -906,11 +932,10 @@
                     victim = CheckYou(match.Groups["actor"].Value);
                     attacker = victim; // assume: this log comes from a self action
                     damage = match.Groups["mp"].Value;
-                    skill = "Unknown (Potion?)";
-                    if (victim == CheckYou("you") && (ActGlobals.oFormActMain.GlobalTimeSorter == lastPotionGlobalTime || (logInfo.detectedTime - lastPotionTime).TotalSeconds < 2))
-                    {
+
+                    skill = "Mana/Recovery Potion";
+                    if (victim == CheckYou("you"))
                         skill = lastPotion;
-                    }
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.PowerHealing);
                     return;
@@ -1004,42 +1029,47 @@
                         swingType = SwingTypeEnum.Melee;
                     }
 
-                    string blob = attacker + "'s " + skill;
-                    string[] skillsThatContainQuote = new string[] 
+                    #region resolve skills with quotes
+                    /* Initially, we let the regex let the actor name be greedy with the 's.  i.e. Hirmilden's Tipolid is a possible actor.
+                     * However, given the set of skills that contain 's is finite, we double check here if a skill would make more sense.
+                     */
+                    string blob = attacker + "'s " + skill; // example blob: "Heaven" + "Judgement II" = "Heaven's Judgement II" or "Vyn's Aether" + "Hold" = "Vyn's Aether's Hold I"
+                    foreach (string skillThatContainsQuote in AionData.Skill.SkillsThatContainQuote)
                     {
-                        "Aether's Hold I", "Heaven's Judgment I", "Earth's Wrath I", "Vaizel's Dirk I", "Triniel's Dirk I", "Vaizel's Arrow I", "Triniel's Arrow I", "Lumiel's Wrath I", "Kaisinel's Wrath I"
-                    }; // the rank I is just there to end the skill name
-                    foreach (string skillThatContainsQuote in skillsThatContainQuote)
-                    {
-                        if (blob.Contains(skillThatContainsQuote))
+                        string possiblePlayerSkill = skillThatContainsQuote + " I"; // the rank I is just there to end the skill name
+                        if (blob.Contains(possiblePlayerSkill))
                         {
-                            int indexForSkill = blob.IndexOf(skillThatContainsQuote);
-                            string newattacker = blob.Substring(0, indexForSkill).Trim();
-                            string newskill = blob.Substring(indexForSkill).Trim();
+                            int indexForSkill = blob.IndexOf(possiblePlayerSkill);
+                            string newattacker = blob.Substring(0, indexForSkill).Trim(); // example newattacker: "" or "Vyn's"
+                            string newskill = blob.Substring(indexForSkill); // example newskill = "Heaven's Judgement" or "Aether's Hold"
 
                             if (String.IsNullOrEmpty(newattacker)) // attacker not specified? is this a self cast?
                             {
                                 if (attacker == CheckYou("you")) // in the unlikely event that your character's name is Heaven, then we know your name does not appear in your own spell's resist log, so you must be a cleric and you casted Heaven's Judgment
                                 {
+                                    // leave attacker as "you"
+                                    skill = newskill;
                                     break;
                                 }
                                 else
                                 {
                                     // ambiguous case! either there is a templar nearby named Heaven who casted Judgment (unlikely but there is one on Siel), or you're a cleric who casted Heaven's Judgment
                                     // TODO: perhaps knowing more information will help (i.e. surrounding players during encounter, your class versus the class requirement of the spell, etc.)
-                                    attacker = CheckYou("you"); // just assume it was your spell that got resisted and ignore the other possibility for now
+                                    // just assume it was your spell that got resisted and ignore the other possibility for now
+                                    attacker = CheckYou("you");
                                     skill = newskill;
                                     break;
                                 }
                             }
                             else
                             {
-                                attacker = newattacker.Remove(newattacker.Length - 2);
+                                attacker = newattacker.Remove(newattacker.Length - 2); // remove the 's at the end
                                 skill = newskill;
                                 break;
                             }
                         }
                     }
+                    #endregion
 
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.Miss, "resisted"), swingType);
                     return;

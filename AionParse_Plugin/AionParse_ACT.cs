@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Advanced_Combat_Tracker;
@@ -15,20 +16,18 @@ namespace AionParsePlugin
 
         // for using potions by you
         string lastPotion;
-        int lastPotionGlobalTime = -1;
-        DateTime lastPotionTime = DateTime.MinValue;
 
         // remembering who cast DoTs
-        internal UsingSkillRecordSetBase ContinuousDamageSet { get; set; }
+        internal UsingSkillRecordSet ContinuousDamageSet { get; set; }
 
         // remembering who cast HoTs
-        internal UsingSkillRecordSetBase HealerRecordSet { get; set; }
+        internal UsingSkillRecordSet HealerRecordSet { get; set; }
 
         // remembering who who got blocked
         internal BlockedSet BlockedHistory { get; set; }
 
         // remembering summoners
-        internal UsingSkillRecordSetBase SummonerRecordSet { get; set; }
+        internal UsingSkillRecordSet SummonerRecordSet { get; set; }
 
         // ui variables (initial values reset by UI on init)
         AionParseForm ui;
@@ -47,6 +46,10 @@ namespace AionParsePlugin
 
         internal bool LinkDmgProcs { get; set; }
 
+        internal bool GuessChanter { get { return ui.CheckboxGuessChanter.Checked; } }
+
+        internal PartyRecordSet PartyMembers { get; set; }
+
         #endregion
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
@@ -62,7 +65,7 @@ namespace AionParsePlugin
             ActGlobals.oFormActMain.OnCombatEnd += new CombatToggleEventDelegate(this.OnCombatEnd);
 
             // private variables that must be set before UI
-            ContinuousDamageSet = new UsingSkillRecordSetBase()
+            ContinuousDamageSet = new UsingSkillRecordSet()
             {
                 new UsingSkillRecord("Unknown (Templar)", "Slash Artery"),
                 new UsingSkillRecord("Unknown (Assassin)", "Apply Poison"),
@@ -79,10 +82,13 @@ namespace AionParsePlugin
                 new UsingSkillRecord("Unknown (Spiritmaster)", "Erosion"),
                 new UsingSkillRecord("Unknown (Spiritmaster)", "Chain of Earth"),
                 new UsingSkillRecord("Unknown (Spiritmaster)", "Blessing of Fire"),
-                new UsingSkillRecord("Unknown (Spiritmaster)", "Sandblaster")
+                new UsingSkillRecord("Unknown (Spiritmaster)", "Sandblaster"),
+                new UsingSkillRecord("Unknown (Spiritmaster)", "Spirit Erosion"),
+                new UsingSkillRecord("Unknown (Cleric)", "Earth's Wrath"),
+                new UsingSkillRecord("Unknown (Cleric)", "Chastisement")
             };
 
-            HealerRecordSet = new UsingSkillRecordSetBase() 
+            HealerRecordSet = new UsingSkillRecordSet() 
             {
                 new UsingSkillRecord("Unknown (Priest)", "Healing Light"),
                 new UsingSkillRecord("Unknown (Cleric)", "Radiant Cure"),
@@ -99,12 +105,16 @@ namespace AionParsePlugin
                 new UsingSkillRecord("Unknown (Chanter)", "Recovery Spell"),
                 new UsingSkillRecord("Unknown (Chanter)", "Clement Mind Mantra"),
                 new UsingSkillRecord("Unknown (Chanter)", "Invincibility Mantra"),
-                new UsingSkillRecord("Unknown (Chanter)", "Magic Recovery")
-
+                new UsingSkillRecord("Unknown (Chanter)", "Magic Recovery"),
+                new UsingSkillRecord("Unknown (Spiritmaster)", "Spirit Armor of Darkness")
             };
 
             BlockedHistory = new BlockedSet();
-            SummonerRecordSet = new UsingSkillRecordSetBase();
+            SummonerRecordSet = new UsingSkillRecordSet();
+
+            PartyMembers = new PartyRecordSet();
+
+            PartyMembers.Add(new AionData.Player() { Name = ActGlobals.charName });
 
             // UI initialization
             ui = new AionParseForm(this, ActGlobals.charName);

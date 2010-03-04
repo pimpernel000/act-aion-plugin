@@ -31,14 +31,13 @@ namespace AionParsePlugin
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AionParseForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TextboxLog = new System.Windows.Forms.TextBox();
             this.TextboxDefaultCharacter = new System.Windows.Forms.TextBox();
             this.ApplyDefaultCharacter = new System.Windows.Forms.Button();
@@ -54,47 +53,59 @@ namespace AionParsePlugin
             this.toolTip0 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.label3 = new System.Windows.Forms.Label();
             this.CheckboxAdvancedToggle = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.CheckboxLinkDamageProcs = new System.Windows.Forms.CheckBox();
             this.CheckboxLinkBOFtoSM = new System.Windows.Forms.CheckBox();
+            this.tabPartyInfo = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.dgParty = new System.Windows.Forms.DataGridView();
+            this.nameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Class = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.partyRecordSetBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.tabGain = new System.Windows.Forms.TabPage();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.dgGainSpells = new System.Windows.Forms.DataGridView();
-            this.tabDamage = new System.Windows.Forms.TabPage();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.dgDamageSpells = new System.Windows.Forms.DataGridView();
-            this.toolTip5 = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTip6 = new System.Windows.Forms.ToolTip(this.components);
             this.actorDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.skillDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.targetDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.startDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.durationDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.endDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.usingSkillRecordSetBaseBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.label3 = new System.Windows.Forms.Label();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
+            this.usingSkillRecordSetBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.tabDamage = new System.Windows.Forms.TabPage();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.dgDamageSpells = new System.Windows.Forms.DataGridView();
+            this.actorDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.skillDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.targetDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.startDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.durationDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.endDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.toolTip5 = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTip6 = new System.Windows.Forms.ToolTip(this.components);
+            this.CheckboxGuessChanter = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabPartyInfo.SuspendLayout();
+            this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgParty)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.partyRecordSetBindingSource)).BeginInit();
             this.tabGain.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgGainSpells)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.usingSkillRecordSetBindingSource)).BeginInit();
             this.tabDamage.SuspendLayout();
             this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgDamageSpells)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.usingSkillRecordSetBaseBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // TextboxLog
@@ -207,6 +218,7 @@ namespace AionParsePlugin
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabGeneral);
+            this.tabControl1.Controls.Add(this.tabPartyInfo);
             this.tabControl1.Controls.Add(this.tabGain);
             this.tabControl1.Controls.Add(this.tabDamage);
             this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -218,6 +230,7 @@ namespace AionParsePlugin
             // 
             // tabGeneral
             // 
+            this.tabGeneral.Controls.Add(this.CheckboxGuessChanter);
             this.tabGeneral.Controls.Add(this.linkLabel1);
             this.tabGeneral.Controls.Add(this.label3);
             this.tabGeneral.Controls.Add(this.CheckboxAdvancedToggle);
@@ -237,6 +250,30 @@ namespace AionParsePlugin
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoEllipsis = true;
+            this.linkLabel1.LinkArea = new System.Windows.Forms.LinkArea(0, 87);
+            this.linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+            this.linkLabel1.Location = new System.Drawing.Point(591, 306);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(273, 20);
+            this.linkLabel1.TabIndex = 108;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-" +
+                "a.html";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(591, 270);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(277, 32);
+            this.label3.TabIndex = 107;
+            this.label3.Text = "Official forum thread for questions and feature \r\nrequests the Aion Plugin can be" +
+                " found at :";
             // 
             // CheckboxAdvancedToggle
             // 
@@ -296,6 +333,70 @@ namespace AionParsePlugin
             this.CheckboxLinkBOFtoSM.UseVisualStyleBackColor = true;
             this.CheckboxLinkBOFtoSM.CheckedChanged += new System.EventHandler(this.CheckboxLinkBOFtoSM_CheckedChanged);
             // 
+            // tabPartyInfo
+            // 
+            this.tabPartyInfo.Controls.Add(this.groupBox5);
+            this.tabPartyInfo.Controls.Add(this.dgParty);
+            this.tabPartyInfo.Location = new System.Drawing.Point(4, 25);
+            this.tabPartyInfo.Name = "tabPartyInfo";
+            this.tabPartyInfo.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPartyInfo.Size = new System.Drawing.Size(875, 455);
+            this.tabPartyInfo.TabIndex = 3;
+            this.tabPartyInfo.Text = "PartyInfo";
+            this.tabPartyInfo.UseVisualStyleBackColor = true;
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.label4);
+            this.groupBox5.Location = new System.Drawing.Point(636, 6);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(233, 173);
+            this.groupBox5.TabIndex = 3;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Help";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(6, 18);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(206, 130);
+            this.label4.TabIndex = 0;
+            this.label4.Text = resources.GetString("label4.Text");
+            // 
+            // dgParty
+            // 
+            this.dgParty.AutoGenerateColumns = false;
+            this.dgParty.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgParty.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.nameDataGridViewTextBoxColumn,
+            this.Class});
+            this.dgParty.DataSource = this.partyRecordSetBindingSource;
+            this.dgParty.Location = new System.Drawing.Point(12, 15);
+            this.dgParty.Name = "dgParty";
+            this.dgParty.Size = new System.Drawing.Size(399, 427);
+            this.dgParty.TabIndex = 0;
+            // 
+            // nameDataGridViewTextBoxColumn
+            // 
+            this.nameDataGridViewTextBoxColumn.DataPropertyName = "Name";
+            this.nameDataGridViewTextBoxColumn.HeaderText = "Name";
+            this.nameDataGridViewTextBoxColumn.Name = "nameDataGridViewTextBoxColumn";
+            this.nameDataGridViewTextBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.nameDataGridViewTextBoxColumn.Width = 150;
+            // 
+            // Class
+            // 
+            this.Class.DataPropertyName = "Class";
+            this.Class.HeaderText = "Class";
+            this.Class.Name = "Class";
+            this.Class.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // partyRecordSetBindingSource
+            // 
+            this.partyRecordSetBindingSource.DataSource = typeof(AionParsePlugin.PartyRecordSet);
+            // 
             // tabGain
             // 
             this.tabGain.Controls.Add(this.groupBox3);
@@ -311,7 +412,7 @@ namespace AionParsePlugin
             // groupBox3
             // 
             this.groupBox3.Controls.Add(this.label1);
-            this.groupBox3.Location = new System.Drawing.Point(636, 7);
+            this.groupBox3.Location = new System.Drawing.Point(635, 6);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(233, 173);
             this.groupBox3.TabIndex = 1;
@@ -340,14 +441,68 @@ namespace AionParsePlugin
             this.startDataGridViewTextBoxColumn,
             this.durationDataGridViewTextBoxColumn,
             this.endDataGridViewTextBoxColumn});
-            this.dgGainSpells.DataSource = this.usingSkillRecordSetBaseBindingSource;
+            this.dgGainSpells.DataSource = this.usingSkillRecordSetBindingSource;
             this.dgGainSpells.Dock = System.Windows.Forms.DockStyle.Left;
             this.dgGainSpells.Location = new System.Drawing.Point(3, 3);
             this.dgGainSpells.Name = "dgGainSpells";
-            dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dgGainSpells.RowsDefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgGainSpells.RowsDefaultCellStyle = dataGridViewCellStyle11;
             this.dgGainSpells.Size = new System.Drawing.Size(626, 449);
             this.dgGainSpells.TabIndex = 0;
+            // 
+            // actorDataGridViewTextBoxColumn
+            // 
+            this.actorDataGridViewTextBoxColumn.DataPropertyName = "Actor";
+            this.actorDataGridViewTextBoxColumn.HeaderText = "Actor";
+            this.actorDataGridViewTextBoxColumn.Name = "actorDataGridViewTextBoxColumn";
+            // 
+            // skillDataGridViewTextBoxColumn
+            // 
+            this.skillDataGridViewTextBoxColumn.DataPropertyName = "Skill";
+            this.skillDataGridViewTextBoxColumn.HeaderText = "Skill";
+            this.skillDataGridViewTextBoxColumn.Name = "skillDataGridViewTextBoxColumn";
+            this.skillDataGridViewTextBoxColumn.Width = 140;
+            // 
+            // targetDataGridViewTextBoxColumn
+            // 
+            this.targetDataGridViewTextBoxColumn.DataPropertyName = "Target";
+            this.targetDataGridViewTextBoxColumn.HeaderText = "Target";
+            this.targetDataGridViewTextBoxColumn.Name = "targetDataGridViewTextBoxColumn";
+            this.targetDataGridViewTextBoxColumn.Width = 125;
+            // 
+            // startDataGridViewTextBoxColumn
+            // 
+            this.startDataGridViewTextBoxColumn.DataPropertyName = "Start";
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle8.Format = "T";
+            this.startDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle8;
+            this.startDataGridViewTextBoxColumn.HeaderText = "Start";
+            this.startDataGridViewTextBoxColumn.Name = "startDataGridViewTextBoxColumn";
+            this.startDataGridViewTextBoxColumn.Width = 65;
+            // 
+            // durationDataGridViewTextBoxColumn
+            // 
+            this.durationDataGridViewTextBoxColumn.DataPropertyName = "Duration";
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.durationDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle9;
+            this.durationDataGridViewTextBoxColumn.HeaderText = "Duration";
+            this.durationDataGridViewTextBoxColumn.Name = "durationDataGridViewTextBoxColumn";
+            this.durationDataGridViewTextBoxColumn.Width = 65;
+            // 
+            // endDataGridViewTextBoxColumn
+            // 
+            this.endDataGridViewTextBoxColumn.DataPropertyName = "End";
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
+            dataGridViewCellStyle10.Format = "T";
+            this.endDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle10;
+            this.endDataGridViewTextBoxColumn.HeaderText = "End";
+            this.endDataGridViewTextBoxColumn.Name = "endDataGridViewTextBoxColumn";
+            this.endDataGridViewTextBoxColumn.ReadOnly = true;
+            this.endDataGridViewTextBoxColumn.Width = 65;
+            // 
+            // usingSkillRecordSetBindingSource
+            // 
+            this.usingSkillRecordSetBindingSource.DataSource = typeof(AionParsePlugin.UsingSkillRecordSet);
             // 
             // tabDamage
             // 
@@ -387,154 +542,76 @@ namespace AionParsePlugin
             this.dgDamageSpells.AutoGenerateColumns = false;
             this.dgDamageSpells.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgDamageSpells.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2,
-            this.dataGridViewTextBoxColumn3,
-            this.dataGridViewTextBoxColumn4,
-            this.dataGridViewTextBoxColumn5,
-            this.dataGridViewTextBoxColumn6});
-            this.dgDamageSpells.DataSource = this.usingSkillRecordSetBaseBindingSource;
+            this.actorDataGridViewTextBoxColumn1,
+            this.skillDataGridViewTextBoxColumn1,
+            this.targetDataGridViewTextBoxColumn1,
+            this.startDataGridViewTextBoxColumn1,
+            this.durationDataGridViewTextBoxColumn1,
+            this.endDataGridViewTextBoxColumn1});
+            this.dgDamageSpells.DataSource = this.usingSkillRecordSetBindingSource;
             this.dgDamageSpells.Dock = System.Windows.Forms.DockStyle.Left;
             this.dgDamageSpells.Location = new System.Drawing.Point(3, 3);
             this.dgDamageSpells.Name = "dgDamageSpells";
-            dataGridViewCellStyle16.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dgDamageSpells.RowsDefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgDamageSpells.RowsDefaultCellStyle = dataGridViewCellStyle14;
             this.dgDamageSpells.Size = new System.Drawing.Size(626, 449);
             this.dgDamageSpells.TabIndex = 1;
             // 
-            // actorDataGridViewTextBoxColumn
+            // actorDataGridViewTextBoxColumn1
             // 
-            this.actorDataGridViewTextBoxColumn.DataPropertyName = "Actor";
-            this.actorDataGridViewTextBoxColumn.HeaderText = "Actor";
-            this.actorDataGridViewTextBoxColumn.Name = "actorDataGridViewTextBoxColumn";
+            this.actorDataGridViewTextBoxColumn1.DataPropertyName = "Actor";
+            this.actorDataGridViewTextBoxColumn1.HeaderText = "Actor";
+            this.actorDataGridViewTextBoxColumn1.Name = "actorDataGridViewTextBoxColumn1";
             // 
-            // skillDataGridViewTextBoxColumn
+            // skillDataGridViewTextBoxColumn1
             // 
-            this.skillDataGridViewTextBoxColumn.DataPropertyName = "Skill";
-            this.skillDataGridViewTextBoxColumn.HeaderText = "Skill";
-            this.skillDataGridViewTextBoxColumn.Name = "skillDataGridViewTextBoxColumn";
-            this.skillDataGridViewTextBoxColumn.Width = 140;
+            this.skillDataGridViewTextBoxColumn1.DataPropertyName = "Skill";
+            this.skillDataGridViewTextBoxColumn1.HeaderText = "Skill";
+            this.skillDataGridViewTextBoxColumn1.Name = "skillDataGridViewTextBoxColumn1";
+            this.skillDataGridViewTextBoxColumn1.Width = 140;
             // 
-            // targetDataGridViewTextBoxColumn
+            // targetDataGridViewTextBoxColumn1
             // 
-            this.targetDataGridViewTextBoxColumn.DataPropertyName = "Target";
-            this.targetDataGridViewTextBoxColumn.HeaderText = "Target";
-            this.targetDataGridViewTextBoxColumn.Name = "targetDataGridViewTextBoxColumn";
-            this.targetDataGridViewTextBoxColumn.Width = 125;
+            this.targetDataGridViewTextBoxColumn1.DataPropertyName = "Target";
+            this.targetDataGridViewTextBoxColumn1.HeaderText = "Target";
+            this.targetDataGridViewTextBoxColumn1.Name = "targetDataGridViewTextBoxColumn1";
+            this.targetDataGridViewTextBoxColumn1.Width = 125;
             // 
-            // startDataGridViewTextBoxColumn
+            // startDataGridViewTextBoxColumn1
             // 
-            this.startDataGridViewTextBoxColumn.DataPropertyName = "Start";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle9.Format = "T";
-            dataGridViewCellStyle9.NullValue = null;
-            this.startDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle9;
-            this.startDataGridViewTextBoxColumn.HeaderText = "Start";
-            this.startDataGridViewTextBoxColumn.Name = "startDataGridViewTextBoxColumn";
-            this.startDataGridViewTextBoxColumn.Width = 65;
+            this.startDataGridViewTextBoxColumn1.DataPropertyName = "Start";
+            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle12.Format = "T";
+            this.startDataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle12;
+            this.startDataGridViewTextBoxColumn1.HeaderText = "Start";
+            this.startDataGridViewTextBoxColumn1.Name = "startDataGridViewTextBoxColumn1";
+            this.startDataGridViewTextBoxColumn1.Width = 65;
             // 
-            // durationDataGridViewTextBoxColumn
+            // durationDataGridViewTextBoxColumn1
             // 
-            this.durationDataGridViewTextBoxColumn.DataPropertyName = "Duration";
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.durationDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle10;
-            this.durationDataGridViewTextBoxColumn.HeaderText = "Duration";
-            this.durationDataGridViewTextBoxColumn.Name = "durationDataGridViewTextBoxColumn";
-            this.durationDataGridViewTextBoxColumn.ToolTipText = "Duration of the spell/ability.";
-            this.durationDataGridViewTextBoxColumn.Width = 65;
-            // 
-            // endDataGridViewTextBoxColumn
-            // 
-            this.endDataGridViewTextBoxColumn.DataPropertyName = "End";
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle11.Format = "T";
-            dataGridViewCellStyle11.NullValue = null;
-            this.endDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle11;
-            this.endDataGridViewTextBoxColumn.HeaderText = "End";
-            this.endDataGridViewTextBoxColumn.Name = "endDataGridViewTextBoxColumn";
-            this.endDataGridViewTextBoxColumn.ReadOnly = true;
-            this.endDataGridViewTextBoxColumn.ToolTipText = "Time when the spell/ability expires.";
-            this.endDataGridViewTextBoxColumn.Width = 65;
-            // 
-            // usingSkillRecordSetBaseBindingSource
-            // 
-            this.usingSkillRecordSetBaseBindingSource.DataSource = typeof(AionParsePlugin.UsingSkillRecordSetBase);
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "Actor";
-            this.dataGridViewTextBoxColumn1.HeaderText = "Actor";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.DataPropertyName = "Skill";
-            this.dataGridViewTextBoxColumn2.HeaderText = "Skill";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            this.dataGridViewTextBoxColumn2.Width = 140;
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "Target";
-            this.dataGridViewTextBoxColumn3.HeaderText = "Target";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            this.dataGridViewTextBoxColumn3.Width = 125;
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            this.dataGridViewTextBoxColumn4.DataPropertyName = "Start";
+            this.durationDataGridViewTextBoxColumn1.DataPropertyName = "Duration";
             dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle13.Format = "T";
-            dataGridViewCellStyle13.NullValue = null;
-            this.dataGridViewTextBoxColumn4.DefaultCellStyle = dataGridViewCellStyle13;
-            this.dataGridViewTextBoxColumn4.HeaderText = "Start";
-            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            this.dataGridViewTextBoxColumn4.Width = 65;
+            this.durationDataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle13;
+            this.durationDataGridViewTextBoxColumn1.HeaderText = "Duration";
+            this.durationDataGridViewTextBoxColumn1.Name = "durationDataGridViewTextBoxColumn1";
+            this.durationDataGridViewTextBoxColumn1.Width = 65;
             // 
-            // dataGridViewTextBoxColumn5
+            // endDataGridViewTextBoxColumn1
             // 
-            this.dataGridViewTextBoxColumn5.DataPropertyName = "Duration";
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dataGridViewTextBoxColumn5.DefaultCellStyle = dataGridViewCellStyle14;
-            this.dataGridViewTextBoxColumn5.HeaderText = "Duration";
-            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
-            this.dataGridViewTextBoxColumn5.ToolTipText = "Duration of the spell/ability.";
-            this.dataGridViewTextBoxColumn5.Width = 65;
+            this.endDataGridViewTextBoxColumn1.DataPropertyName = "End";
+            this.endDataGridViewTextBoxColumn1.HeaderText = "End";
+            this.endDataGridViewTextBoxColumn1.Name = "endDataGridViewTextBoxColumn1";
+            this.endDataGridViewTextBoxColumn1.ReadOnly = true;
             // 
-            // dataGridViewTextBoxColumn6
+            // CheckboxGuessChanter
             // 
-            this.dataGridViewTextBoxColumn6.DataPropertyName = "End";
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle15.Format = "T";
-            dataGridViewCellStyle15.NullValue = null;
-            this.dataGridViewTextBoxColumn6.DefaultCellStyle = dataGridViewCellStyle15;
-            this.dataGridViewTextBoxColumn6.HeaderText = "End";
-            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-            this.dataGridViewTextBoxColumn6.ReadOnly = true;
-            this.dataGridViewTextBoxColumn6.ToolTipText = "Time when the spell/ability expires.";
-            this.dataGridViewTextBoxColumn6.Width = 65;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(591, 270);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(277, 32);
-            this.label3.TabIndex = 107;
-            this.label3.Text = "Official forum thread for questions and feature \r\nrequests the Aion Plugin can be" +
-                " found at :";
-            // 
-            // linkLabel1
-            // 
-            this.linkLabel1.AutoEllipsis = true;
-            this.linkLabel1.LinkArea = new System.Windows.Forms.LinkArea(0, 87);
-            this.linkLabel1.Location = new System.Drawing.Point(591, 306);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(273, 20);
-            this.linkLabel1.TabIndex = 108;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-" +
-                "a.html";
+            this.CheckboxGuessChanter.AutoSize = true;
+            this.CheckboxGuessChanter.Location = new System.Drawing.Point(596, 230);
+            this.CheckboxGuessChanter.Name = "CheckboxGuessChanter";
+            this.CheckboxGuessChanter.Size = new System.Drawing.Size(190, 20);
+            this.CheckboxGuessChanter.TabIndex = 109;
+            this.CheckboxGuessChanter.Text = "Guess Chanter in your party";
+            this.CheckboxGuessChanter.UseVisualStyleBackColor = true;
             // 
             // AionParseForm
             // 
@@ -545,7 +622,7 @@ namespace AionParsePlugin
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "AionParseForm";
-            this.Size = new System.Drawing.Size(922, 539);
+            this.Size = new System.Drawing.Size(922, 493);
             this.Load += new System.EventHandler(this.AionParseForm_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabGeneral.ResumeLayout(false);
@@ -554,15 +631,20 @@ namespace AionParsePlugin
             this.groupBox2.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.tabPartyInfo.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgParty)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.partyRecordSetBindingSource)).EndInit();
             this.tabGain.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgGainSpells)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.usingSkillRecordSetBindingSource)).EndInit();
             this.tabDamage.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgDamageSpells)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.usingSkillRecordSetBaseBindingSource)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -591,20 +673,7 @@ namespace AionParsePlugin
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridView dgGainSpells;
-        private System.Windows.Forms.BindingSource usingSkillRecordSetBaseBindingSource;
         private System.Windows.Forms.DataGridView dgDamageSpells;
-        private System.Windows.Forms.DataGridViewTextBoxColumn actorDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn skillDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn targetDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn startDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn durationDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn endDataGridViewTextBoxColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
-        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
         private System.Windows.Forms.CheckBox CheckboxAdvancedToggle;
         private System.Windows.Forms.TabPage tabGain;
         private System.Windows.Forms.TabPage tabDamage;
@@ -614,5 +683,26 @@ namespace AionParsePlugin
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TabPage tabPartyInfo;
+        private System.Windows.Forms.DataGridView dgParty;
+        private System.Windows.Forms.BindingSource partyRecordSetBindingSource;
+        private System.Windows.Forms.BindingSource usingSkillRecordSetBindingSource;
+        private System.Windows.Forms.DataGridViewTextBoxColumn actorDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn skillDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn targetDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn startDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn durationDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn endDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn actorDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn skillDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn targetDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn startDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn durationDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn endDataGridViewTextBoxColumn1;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.DataGridViewTextBoxColumn nameDataGridViewTextBoxColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Class;
+        internal System.Windows.Forms.CheckBox CheckboxGuessChanter;
     }
 }

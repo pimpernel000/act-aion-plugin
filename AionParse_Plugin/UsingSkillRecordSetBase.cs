@@ -4,19 +4,19 @@ using System.Text.RegularExpressions;
 
 namespace AionParsePlugin
 {
-    public class UsingSkillRecordSetBase : System.ComponentModel.BindingList<UsingSkillRecord>
+    public class UsingSkillRecordSet : System.ComponentModel.BindingList<UsingSkillRecord>
     {
         public const int DefaultLookBackLimit = 30;
 
         private int lookBackLimit;
 
-        public UsingSkillRecordSetBase(int lookBackLimit)
+        public UsingSkillRecordSet(int lookBackLimit)
         {
             this.lookBackLimit = lookBackLimit;
             this.SummonedPets = new List<string>();
         }
 
-        public UsingSkillRecordSetBase()
+        public UsingSkillRecordSet()
             : this(DefaultLookBackLimit)
         {
         }
@@ -140,8 +140,8 @@ namespace AionParsePlugin
             return
                 ((target == Target &&
                     skill == Skill) ||
-                 (target == null &&
-                    (skill == Skill || Regex.IsMatch(skill, Skill + " (I(X|V)?|(X|V)?I{0,3})")))) &&
+                 (Target == null &&
+                    Skill == AionData.Skill.PlayerSkill(skill))) &&
                 (time <= End || Duration == 0);
         }
 

@@ -75,6 +75,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AionData\Pet.cs" />
+    <Compile Include="AionData\Player.cs" />
+    <Compile Include="AionData\Skill.cs" />
     <Compile Include="AionParse_Plugin\AionParse.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -88,6 +90,7 @@
     <Compile Include="AionParse_Plugin\AionParse_Ignores.cs" />
     <Compile Include="AionParse_Plugin\AionParse_Utility.cs" />
     <Compile Include="AionParse_Plugin\BlockedRecord.cs" />
+    <Compile Include="AionParse_Plugin\PartyRecordSet.cs" />
     <Compile Include="AionParse_Plugin\UsingSkillRecordSetBase.cs" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -133,7 +136,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\DataSources\AionParsePlugin.UsingSkillRecordSetBase.datasource" />
+    <None Include="Properties\DataSources\AionParsePlugin.PartyRecordSet.datasource" />
+    <None Include="Properties\DataSources\AionParsePlugin.UsingSkillRecordSet.datasource" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProgramFiles)\MSBuild\Microsoft\StyleCop\v4.3\Microsoft.StyleCop.targets" />
