@@ -31,13 +31,13 @@ namespace AionParsePlugin
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AionParseForm));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle21 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle19 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle20 = new System.Windows.Forms.DataGridViewCellStyle();
             this.TextboxLog = new System.Windows.Forms.TextBox();
             this.TextboxDefaultCharacter = new System.Windows.Forms.TextBox();
             this.ApplyDefaultCharacter = new System.Windows.Forms.Button();
@@ -45,22 +45,19 @@ namespace AionParsePlugin
             this.CheckboxDebugParse = new System.Windows.Forms.CheckBox();
             this.CheckboxTagBlockedAttacks = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
             this.CheckboxLinkPets = new System.Windows.Forms.CheckBox();
             this.CheckboxParseDmgToTmpPets = new System.Windows.Forms.CheckBox();
-            this.toolTip3 = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTip4 = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTip0 = new System.Windows.Forms.ToolTip(this.components);
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabGeneral = new System.Windows.Forms.TabPage();
             this.CheckboxGuessChanter = new System.Windows.Forms.CheckBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.label3 = new System.Windows.Forms.Label();
             this.CheckboxAdvancedToggle = new System.Windows.Forms.CheckBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.CheckboxLinkDamageProcs = new System.Windows.Forms.CheckBox();
             this.CheckboxLinkBOFtoSM = new System.Windows.Forms.CheckBox();
+            this.toolTip2 = new System.Windows.Forms.ToolTip(this.components);
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabGeneral = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tabPartyInfo = new System.Windows.Forms.TabPage();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -89,8 +86,7 @@ namespace AionParsePlugin
             this.startDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.durationDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.endDataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.toolTip5 = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTip6 = new System.Windows.Forms.ToolTip(this.components);
+            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -128,6 +124,8 @@ namespace AionParsePlugin
             this.TextboxDefaultCharacter.Name = "TextboxDefaultCharacter";
             this.TextboxDefaultCharacter.Size = new System.Drawing.Size(122, 22);
             this.TextboxDefaultCharacter.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.TextboxDefaultCharacter, "Your character\'s name. Ensure that this name is also in ACT\'s General->Miscenaneo" +
+                    "us field.");
             this.TextboxDefaultCharacter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextboxDefaultCharacter_KeyDown);
             // 
             // ApplyDefaultCharacter
@@ -152,6 +150,7 @@ namespace AionParsePlugin
             this.CheckboxGuessDoTCasters.Size = new System.Drawing.Size(161, 20);
             this.CheckboxGuessDoTCasters.TabIndex = 5;
             this.CheckboxGuessDoTCasters.Text = "Guess Indirect Casters";
+            this.toolTip2.SetToolTip(this.CheckboxGuessDoTCasters, resources.GetString("CheckboxGuessDoTCasters.ToolTip"));
             this.CheckboxGuessDoTCasters.UseVisualStyleBackColor = true;
             // 
             // CheckboxDebugParse
@@ -163,6 +162,7 @@ namespace AionParsePlugin
             this.CheckboxDebugParse.Size = new System.Drawing.Size(109, 17);
             this.CheckboxDebugParse.TabIndex = 99;
             this.CheckboxDebugParse.Text = "Debug Messages";
+            this.toolTip1.SetToolTip(this.CheckboxDebugParse, "Show developer debug messages in log. This will slow down the parser.");
             this.CheckboxDebugParse.UseVisualStyleBackColor = true;
             // 
             // CheckboxTagBlockedAttacks
@@ -180,12 +180,6 @@ namespace AionParsePlugin
                     "owing attack as (special) blocked.");
             this.CheckboxTagBlockedAttacks.UseVisualStyleBackColor = true;
             // 
-            // toolTip2
-            // 
-            this.toolTip2.AutoPopDelay = 10000;
-            this.toolTip2.InitialDelay = 500;
-            this.toolTip2.ReshowDelay = 100;
-            // 
             // CheckboxLinkPets
             // 
             this.CheckboxLinkPets.AutoSize = true;
@@ -196,6 +190,8 @@ namespace AionParsePlugin
             this.CheckboxLinkPets.Size = new System.Drawing.Size(187, 20);
             this.CheckboxLinkPets.TabIndex = 100;
             this.CheckboxLinkPets.Text = "Link Spirts with Spiritmaster";
+            this.toolTip1.SetToolTip(this.CheckboxLinkPets, "When checked, skills and melee attacks from Spirits (ex-Fire Spirit) will be list" +
+                    "ed under the Spiritmaster instead. (Default: unchecked)");
             this.CheckboxLinkPets.UseVisualStyleBackColor = true;
             // 
             // CheckboxParseDmgToTmpPets
@@ -209,7 +205,83 @@ namespace AionParsePlugin
             this.CheckboxParseDmgToTmpPets.Size = new System.Drawing.Size(256, 20);
             this.CheckboxParseDmgToTmpPets.TabIndex = 101;
             this.CheckboxParseDmgToTmpPets.Text = "Parse damage to temporary summons";
+            this.toolTip1.SetToolTip(this.CheckboxParseDmgToTmpPets, "When checked, damage done to known temporary pets (i.e. Holy Servants) and unknow" +
+                    "n pets (i.e. monster\'s trap summons) will be recorded. (Default: unchecked)");
             this.CheckboxParseDmgToTmpPets.UseVisualStyleBackColor = true;
+            // 
+            // CheckboxGuessChanter
+            // 
+            this.CheckboxGuessChanter.AutoSize = true;
+            this.CheckboxGuessChanter.Location = new System.Drawing.Point(596, 230);
+            this.CheckboxGuessChanter.Name = "CheckboxGuessChanter";
+            this.CheckboxGuessChanter.Size = new System.Drawing.Size(190, 20);
+            this.CheckboxGuessChanter.TabIndex = 109;
+            this.CheckboxGuessChanter.Text = "Guess Chanter in your party";
+            this.toolTip1.SetToolTip(this.CheckboxGuessChanter, "When checked, attempt to guess the Chanter in your party,\r\nand assign ownership o" +
+                    "f all mantras to that Chanter.");
+            this.CheckboxGuessChanter.UseVisualStyleBackColor = true;
+            // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoEllipsis = true;
+            this.linkLabel1.LinkArea = new System.Windows.Forms.LinkArea(0, 87);
+            this.linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+            this.linkLabel1.Location = new System.Drawing.Point(591, 306);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(273, 20);
+            this.linkLabel1.TabIndex = 108;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-" +
+                "a.html";
+            this.toolTip1.SetToolTip(this.linkLabel1, "http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-" +
+                    "a.html");
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
+            // 
+            // CheckboxAdvancedToggle
+            // 
+            this.CheckboxAdvancedToggle.AutoSize = true;
+            this.CheckboxAdvancedToggle.Location = new System.Drawing.Point(596, 394);
+            this.CheckboxAdvancedToggle.Name = "CheckboxAdvancedToggle";
+            this.CheckboxAdvancedToggle.Size = new System.Drawing.Size(124, 20);
+            this.CheckboxAdvancedToggle.TabIndex = 106;
+            this.CheckboxAdvancedToggle.Text = "Advanced Tabs";
+            this.toolTip1.SetToolTip(this.CheckboxAdvancedToggle, "Show developer tabs.");
+            this.CheckboxAdvancedToggle.UseVisualStyleBackColor = true;
+            this.CheckboxAdvancedToggle.CheckedChanged += new System.EventHandler(this.CheckboxAdvancedToggle_CheckedChanged);
+            // 
+            // CheckboxLinkDamageProcs
+            // 
+            this.CheckboxLinkDamageProcs.AutoSize = true;
+            this.CheckboxLinkDamageProcs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxLinkDamageProcs.Location = new System.Drawing.Point(596, 203);
+            this.CheckboxLinkDamageProcs.Name = "CheckboxLinkDamageProcs";
+            this.CheckboxLinkDamageProcs.Size = new System.Drawing.Size(196, 20);
+            this.CheckboxLinkDamageProcs.TabIndex = 103;
+            this.CheckboxLinkDamageProcs.Text = "Guess damage proc owners";
+            this.toolTip1.SetToolTip(this.CheckboxLinkDamageProcs, "When checked, damage done by Blessing of Fire will be listed under the most recen" +
+                    "t Spiritmaster who casted it.");
+            this.CheckboxLinkDamageProcs.UseVisualStyleBackColor = true;
+            // 
+            // CheckboxLinkBOFtoSM
+            // 
+            this.CheckboxLinkBOFtoSM.AutoSize = true;
+            this.CheckboxLinkBOFtoSM.Checked = true;
+            this.CheckboxLinkBOFtoSM.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckboxLinkBOFtoSM.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CheckboxLinkBOFtoSM.Location = new System.Drawing.Point(596, 176);
+            this.CheckboxLinkBOFtoSM.Name = "CheckboxLinkBOFtoSM";
+            this.CheckboxLinkBOFtoSM.Size = new System.Drawing.Size(234, 20);
+            this.CheckboxLinkBOFtoSM.TabIndex = 102;
+            this.CheckboxLinkBOFtoSM.Text = "Link Blessing of Fire to Spiritmaster";
+            this.toolTip1.SetToolTip(this.CheckboxLinkBOFtoSM, "When checked, damage done by Blessing of Fire will be listed under the most recen" +
+                    "t Spiritmaster who casted it.");
+            this.CheckboxLinkBOFtoSM.UseVisualStyleBackColor = true;
+            // 
+            // toolTip2
+            // 
+            this.toolTip2.AutoPopDelay = 10000;
+            this.toolTip2.InitialDelay = 500;
+            this.toolTip2.ReshowDelay = 100;
             // 
             // tabControl1
             // 
@@ -226,6 +298,7 @@ namespace AionParsePlugin
             // 
             // tabGeneral
             // 
+            this.tabGeneral.Controls.Add(this.linkLabel2);
             this.tabGeneral.Controls.Add(this.CheckboxGuessChanter);
             this.tabGeneral.Controls.Add(this.linkLabel1);
             this.tabGeneral.Controls.Add(this.label3);
@@ -247,30 +320,6 @@ namespace AionParsePlugin
             this.tabGeneral.Text = "General";
             this.tabGeneral.UseVisualStyleBackColor = true;
             // 
-            // CheckboxGuessChanter
-            // 
-            this.CheckboxGuessChanter.AutoSize = true;
-            this.CheckboxGuessChanter.Location = new System.Drawing.Point(596, 230);
-            this.CheckboxGuessChanter.Name = "CheckboxGuessChanter";
-            this.CheckboxGuessChanter.Size = new System.Drawing.Size(190, 20);
-            this.CheckboxGuessChanter.TabIndex = 109;
-            this.CheckboxGuessChanter.Text = "Guess Chanter in your party";
-            this.CheckboxGuessChanter.UseVisualStyleBackColor = true;
-            // 
-            // linkLabel1
-            // 
-            this.linkLabel1.AutoEllipsis = true;
-            this.linkLabel1.LinkArea = new System.Windows.Forms.LinkArea(0, 87);
-            this.linkLabel1.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
-            this.linkLabel1.Location = new System.Drawing.Point(591, 306);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(273, 20);
-            this.linkLabel1.TabIndex = 108;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-" +
-                "a.html";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel1_LinkClicked);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -280,17 +329,6 @@ namespace AionParsePlugin
             this.label3.TabIndex = 107;
             this.label3.Text = "Official forum thread for questions and feature \r\nrequests the Aion Plugin can be" +
                 " found at :";
-            // 
-            // CheckboxAdvancedToggle
-            // 
-            this.CheckboxAdvancedToggle.AutoSize = true;
-            this.CheckboxAdvancedToggle.Location = new System.Drawing.Point(596, 394);
-            this.CheckboxAdvancedToggle.Name = "CheckboxAdvancedToggle";
-            this.CheckboxAdvancedToggle.Size = new System.Drawing.Size(124, 20);
-            this.CheckboxAdvancedToggle.TabIndex = 106;
-            this.CheckboxAdvancedToggle.Text = "Advanced Tabs";
-            this.CheckboxAdvancedToggle.UseVisualStyleBackColor = true;
-            this.CheckboxAdvancedToggle.CheckedChanged += new System.EventHandler(this.CheckboxAdvancedToggle_CheckedChanged);
             // 
             // groupBox2
             // 
@@ -312,30 +350,6 @@ namespace AionParsePlugin
             this.groupBox1.TabIndex = 104;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Log";
-            // 
-            // CheckboxLinkDamageProcs
-            // 
-            this.CheckboxLinkDamageProcs.AutoSize = true;
-            this.CheckboxLinkDamageProcs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckboxLinkDamageProcs.Location = new System.Drawing.Point(596, 203);
-            this.CheckboxLinkDamageProcs.Name = "CheckboxLinkDamageProcs";
-            this.CheckboxLinkDamageProcs.Size = new System.Drawing.Size(196, 20);
-            this.CheckboxLinkDamageProcs.TabIndex = 103;
-            this.CheckboxLinkDamageProcs.Text = "Guess damage proc owners";
-            this.CheckboxLinkDamageProcs.UseVisualStyleBackColor = true;
-            // 
-            // CheckboxLinkBOFtoSM
-            // 
-            this.CheckboxLinkBOFtoSM.AutoSize = true;
-            this.CheckboxLinkBOFtoSM.Checked = true;
-            this.CheckboxLinkBOFtoSM.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CheckboxLinkBOFtoSM.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.CheckboxLinkBOFtoSM.Location = new System.Drawing.Point(596, 176);
-            this.CheckboxLinkBOFtoSM.Name = "CheckboxLinkBOFtoSM";
-            this.CheckboxLinkBOFtoSM.Size = new System.Drawing.Size(234, 20);
-            this.CheckboxLinkBOFtoSM.TabIndex = 102;
-            this.CheckboxLinkBOFtoSM.Text = "Link Blessing of Fire to Spiritmaster";
-            this.CheckboxLinkBOFtoSM.UseVisualStyleBackColor = true;
             // 
             // tabPartyInfo
             // 
@@ -449,8 +463,8 @@ namespace AionParsePlugin
             this.dgGainSpells.Dock = System.Windows.Forms.DockStyle.Left;
             this.dgGainSpells.Location = new System.Drawing.Point(3, 3);
             this.dgGainSpells.Name = "dgGainSpells";
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dgGainSpells.RowsDefaultCellStyle = dataGridViewCellStyle11;
+            dataGridViewCellStyle18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgGainSpells.RowsDefaultCellStyle = dataGridViewCellStyle18;
             this.dgGainSpells.Size = new System.Drawing.Size(626, 449);
             this.dgGainSpells.TabIndex = 0;
             // 
@@ -477,9 +491,9 @@ namespace AionParsePlugin
             // startDataGridViewTextBoxColumn
             // 
             this.startDataGridViewTextBoxColumn.DataPropertyName = "Start";
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle8.Format = "T";
-            this.startDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle15.Format = "T";
+            this.startDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle15;
             this.startDataGridViewTextBoxColumn.HeaderText = "Start";
             this.startDataGridViewTextBoxColumn.Name = "startDataGridViewTextBoxColumn";
             this.startDataGridViewTextBoxColumn.Width = 65;
@@ -487,8 +501,8 @@ namespace AionParsePlugin
             // durationDataGridViewTextBoxColumn
             // 
             this.durationDataGridViewTextBoxColumn.DataPropertyName = "Duration";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.durationDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.durationDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle16;
             this.durationDataGridViewTextBoxColumn.HeaderText = "Duration";
             this.durationDataGridViewTextBoxColumn.Name = "durationDataGridViewTextBoxColumn";
             this.durationDataGridViewTextBoxColumn.Width = 65;
@@ -496,9 +510,9 @@ namespace AionParsePlugin
             // endDataGridViewTextBoxColumn
             // 
             this.endDataGridViewTextBoxColumn.DataPropertyName = "End";
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
-            dataGridViewCellStyle10.Format = "T";
-            this.endDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
+            dataGridViewCellStyle17.Format = "T";
+            this.endDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle17;
             this.endDataGridViewTextBoxColumn.HeaderText = "End";
             this.endDataGridViewTextBoxColumn.Name = "endDataGridViewTextBoxColumn";
             this.endDataGridViewTextBoxColumn.ReadOnly = true;
@@ -556,8 +570,8 @@ namespace AionParsePlugin
             this.dgDamageSpells.Dock = System.Windows.Forms.DockStyle.Left;
             this.dgDamageSpells.Location = new System.Drawing.Point(3, 3);
             this.dgDamageSpells.Name = "dgDamageSpells";
-            dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dgDamageSpells.RowsDefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle21.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dgDamageSpells.RowsDefaultCellStyle = dataGridViewCellStyle21;
             this.dgDamageSpells.Size = new System.Drawing.Size(626, 449);
             this.dgDamageSpells.TabIndex = 1;
             // 
@@ -584,9 +598,9 @@ namespace AionParsePlugin
             // startDataGridViewTextBoxColumn1
             // 
             this.startDataGridViewTextBoxColumn1.DataPropertyName = "Start";
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle12.Format = "T";
-            this.startDataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle12;
+            dataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle19.Format = "T";
+            this.startDataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle19;
             this.startDataGridViewTextBoxColumn1.HeaderText = "Start";
             this.startDataGridViewTextBoxColumn1.Name = "startDataGridViewTextBoxColumn1";
             this.startDataGridViewTextBoxColumn1.Width = 65;
@@ -594,8 +608,8 @@ namespace AionParsePlugin
             // durationDataGridViewTextBoxColumn1
             // 
             this.durationDataGridViewTextBoxColumn1.DataPropertyName = "Duration";
-            dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.durationDataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.durationDataGridViewTextBoxColumn1.DefaultCellStyle = dataGridViewCellStyle20;
             this.durationDataGridViewTextBoxColumn1.HeaderText = "Duration";
             this.durationDataGridViewTextBoxColumn1.Name = "durationDataGridViewTextBoxColumn1";
             this.durationDataGridViewTextBoxColumn1.Width = 65;
@@ -606,6 +620,22 @@ namespace AionParsePlugin
             this.endDataGridViewTextBoxColumn1.HeaderText = "End";
             this.endDataGridViewTextBoxColumn1.Name = "endDataGridViewTextBoxColumn1";
             this.endDataGridViewTextBoxColumn1.ReadOnly = true;
+            // 
+            // linkLabel2
+            // 
+            this.linkLabel2.AutoEllipsis = true;
+            this.linkLabel2.LinkArea = new System.Windows.Forms.LinkArea(36, 63);
+            this.linkLabel2.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
+            this.linkLabel2.Location = new System.Drawing.Point(591, 341);
+            this.linkLabel2.Name = "linkLabel2";
+            this.linkLabel2.Size = new System.Drawing.Size(273, 32);
+            this.linkLabel2.TabIndex = 111;
+            this.linkLabel2.TabStop = true;
+            this.linkLabel2.Text = "Installation wiki can be found at:\r\nhttp://code.google.com/p/act-aion-plugin/wiki" +
+                "/InstallationNotes";
+            this.toolTip1.SetToolTip(this.linkLabel2, "http://code.google.com/p/act-aion-plugin/wiki/InstallationNotes");
+            this.linkLabel2.UseCompatibleTextRendering = true;
+            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
             // 
             // AionParseForm
             // 
@@ -650,13 +680,8 @@ namespace AionParsePlugin
         private System.Windows.Forms.Button ApplyDefaultCharacter;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolTip toolTip2;
-        private System.Windows.Forms.ToolTip toolTip3;
-        private System.Windows.Forms.ToolTip toolTip4;
-        private System.Windows.Forms.ToolTip toolTip0;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabGeneral;
-        private System.Windows.Forms.ToolTip toolTip5;
-        private System.Windows.Forms.ToolTip toolTip6;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.DataGridView dgGainSpells;
@@ -698,5 +723,6 @@ namespace AionParsePlugin
         internal System.Windows.Forms.CheckBox CheckboxLinkBOFtoSM;
         internal System.Windows.Forms.CheckBox CheckboxLinkDamageProcs;
         internal System.Windows.Forms.CheckBox CheckboxDebugParse;
+        private System.Windows.Forms.LinkLabel linkLabel2;
     }
 }
