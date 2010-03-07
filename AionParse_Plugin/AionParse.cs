@@ -50,6 +50,10 @@
      * Skills not yet implemented:
      *  Draining Blow by Gladiators (this heals)
      *  
+     * Poison Slash... is this a godstone effect?
+     *  Hungry Karnif's attack speed has decreased because Bip used Booming Smash II.
+     *  Hungry Karnif received 10 poisoning damage after you used Poison Slash. 
+     *  
      * TODO: determine if Wind Cut Down has a secondary Magical Wind Damage effect?! (Most likely, it is the effect of a godstone.)
      * 2010.01.31 19:19:08 : Matteous inflicted 1,393 damage on Brutal Mist Mane Pawsoldier by using Wind Cut Down II. 
      * 2010.01.31 19:19:08 : Brutal Mist Mane Pawsoldier is bleeding because Matteous used Wind Cut Down II.
@@ -156,7 +160,8 @@
 
             #region misc parse
             // ignore chats (channels i.e. [3.LFG] or whispers [charname:Drakkon] all start with "[")
-            if (str.StartsWith("[") || str.StartsWith("You Whisper to ") || str.StartsWith(CheckYou("you") + ": "))
+            if (str.StartsWith("[") || str.StartsWith("You Whisper to ") || 
+                str.StartsWith(CheckYou("you") + ": ") || str.StartsWith(CheckYou("you") + " Whispers: "))
             {
                 return;
             }
@@ -880,10 +885,10 @@
                         {
                             skill = "Healing Potion";
                         }
-                        else if (GuessDotCasters)
+                        else if (GuessDotCasters && skill != "Prayer of Resilience I" /* temp self heal stigma */ && skill != "Improved Stamina I" /* glad self hot */)
                         {
                             string healerHoT = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
-                            if (!String.IsNullOrEmpty(healerHoT) && (!healerHoT.StartsWith("Unknown") ||  AionData.Skill.IsHoT(skill))) attacker = healerHoT; // only assign from HeaderRecordSet if the skill is actually a HoT; otherwise, direct healing spells without a target is actually a self-heal.
+                            if (!String.IsNullOrEmpty(healerHoT) && (!healerHoT.StartsWith("Unknown") || AionData.Skill.IsHoT(skill))) attacker = healerHoT; // only assign from HeaderRecordSet if the skill is actually a HoT; otherwise, direct healing spells without a target is actually a self-heal.
                         }
                     }
 
@@ -892,8 +897,14 @@
                         HealerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime, 40); // Word of Revival doesn't trigger the "is in the continuous recovery state" log line, so we have to catch it here when it does the first heal. (It heals like a potion, first payload, then HoT).
                     }
 
+                    if (AionData.Skill.PlayerSkill(skill) == "Splendor of Rebirth")
+                    {
+                        HealerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime, 23);
+                    }
+
                     damage = match.Groups["hp"].Value;
                     AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.Healing);
+
                     return;
                 }
 

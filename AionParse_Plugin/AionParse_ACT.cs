@@ -112,10 +112,10 @@ namespace AionParsePlugin
             {
                 new UsingSkillRecord("Unknown (Templar)", "Slash Artery"),
                 new UsingSkillRecord("Unknown (Assassin)", "Apply Poison"),
-                new UsingSkillRecord("Unknown (Assassin)", "Poison Slash"),
                 new UsingSkillRecord("Unknown (Ranger)", "Poison Arrow"),
                 new UsingSkillRecord("Unknown (Ranger)", "Poisoning Trap"),
                 new UsingSkillRecord("Unknown (Priest)", "Promise of Wind I"),
+                new UsingSkillRecord("Unknown (Priest)", "Light of Renewal I"),
                 new UsingSkillRecord("Unknown (Chanter)", "Promise of Wind"),
                 new UsingSkillRecord("Unknown (Assassin)", "Blood Rune"),
                 new UsingSkillRecord("Unknown (Sorcerer)", "Wind Cut Down"),

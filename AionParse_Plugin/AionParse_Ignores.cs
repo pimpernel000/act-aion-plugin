@@ -165,6 +165,7 @@ namespace AionParsePlugin
 
             if (str.EndsWith("existing skill.") && str.Contains("conflicted with")) return true;
             if (str.StartsWith("You have played for") && str.EndsWith("Please take a break.")) return true;
+            if (str.StartsWith("You spent ") && str.EndsWith(" Kinah.")) return true;
 
             return false; // unhandled string, we need to parse it or add it to the list of things to ignore
         }

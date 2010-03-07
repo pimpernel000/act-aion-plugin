@@ -173,7 +173,7 @@ namespace AionData
 
         public static bool IsHoT(string skill)
         {
-            throw new NotImplementedException();
+            return hotSkills.Contains(PlayerSkill(skill));
         }
     }
 }
