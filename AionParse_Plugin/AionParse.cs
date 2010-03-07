@@ -22,11 +22,11 @@
      * 
      * TODO: have a UI option that saves your party member's class info while in dungeons
      *         -also determine the class base on their skills
+     *         -add people into your party? how the heck do you know who's in your party???
+     *         
+     * TODO: summoners using skills for thier pets can be indicators of the owner of the pet. (see rSummonerSkill)
      *         
      * TODO: things to parse:
-     * Spirits from Summoners (TODO: pet damage should be summoner's damage)
-     *  The spirit used a skill on Iceghost Priest because Coszet used Spirit Thunderbolt Claw I.
-     *  The spirit used a skill on Brutal Mist Mane Pawsoldier because Hexis used Spirit Erosion I.
      *  
      * Resists to you (and maybe others?)   TODO: put resists in their class specific Unknown (class)... and perhaps in the future, give option to specify name... i.e. all Unknown (Sorcerer) will be defaulted to MyDefaultName
      *  Alpine Gorgon resisted Chastisement I.
@@ -50,7 +50,7 @@
      * Skills not yet implemented:
      *  Draining Blow by Gladiators (this heals)
      *  
-     * TODO: determine if Wind Cut Down has a secondary Magical Wind Damage effect?! (or is it from some other ability?)
+     * TODO: determine if Wind Cut Down has a secondary Magical Wind Damage effect?! (Most likely, it is the effect of a godstone.)
      * 2010.01.31 19:19:08 : Matteous inflicted 1,393 damage on Brutal Mist Mane Pawsoldier by using Wind Cut Down II. 
      * 2010.01.31 19:19:08 : Brutal Mist Mane Pawsoldier is bleeding because Matteous used Wind Cut Down II.
      * 2010.01.31 19:19:13 : Brutal Mist Mane Pawsoldier received 338 bleeding damage after you used Wind Cut Down II. 
@@ -122,6 +122,7 @@
         Regex rSummonServant1 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has summoned (?<pet>[a-zA-Z ']*) to attack (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant2 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has caused you to summon (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant3 = new Regex(@"^(?<summoner>You) summoned (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?) to let it attack (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);  // NOTE: this regex is a subset of rSummonSpirit, so make sure this is matched first before the other
+        Regex rSummonerSkill = new Regex(@"^The spirit used a skill on (?<target)[a-zA-Z \-']*) because (?<summoner>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*\.$", RegexOptions.Compiled);
 
         Regex rProcBuff = new Regex(@"(?<actor>[a-zA-Z ']*) was affected by its own (?<skill>[a-zA-Z \-']*?)\.", RegexOptions.Compiled);
 
@@ -154,6 +155,12 @@
             bool critical = false;
 
             #region misc parse
+            // ignore chats (channels i.e. [3.LFG] or whispers [charname:Drakkon] all start with "[")
+            if (str.StartsWith("[") || str.StartsWith("You Whisper to ") || str.StartsWith(CheckYou("you") + ": "))
+            {
+                return;
+            }
+
             // zone change
             if (ActGlobals.oFormActMain.ZoneChangeRegex.IsMatch(logInfo.logLine))
             {
@@ -584,6 +591,21 @@
 
                 if (this.DebugParse)
                     ui.AddText("NO MATCH on summon: " + str);
+            }
+            #endregion
+
+            #region spirit
+            // match "The spirit used a skill on xtargetx because xsummonerx used xskillx." which indicates later one of the following:
+            // "xElementalx Spirit inflicted xxx damage on xtargetx by using xskillx xelementx." i.e. Thunderbolt Claw I -> Water Spirit uses Thunderbolt Claw I Water
+            // "xElementalx Spirit used xskillx xelementx to inflict the continuous damage effect on xtargetx." i.e. Spirit Erosion I -> Wind Spirit uses Spirit Erosion III Wind.
+            // "xElementalx Spirit is in the boost xbuffx state because xElementalx Spirit used xskillx xelementx." i.e. Spirit Wrath Position I -> Fire Spirit is in Physical and Magical attack state using Spirit Wrath Position III Fire 
+            // "xElementalx Spirit has cast a reflector on you by using Spirit Wall of Protection III xelementx."
+            // NOTE: these skills can be resisted.
+            if (rSummonerSkill.IsMatch(str))
+            {
+                // TODO: use indicator to catch owner of pet.  Store the skill so that the next pet that uses a matching skill will have that pet assigned to the summoner.
+                // NOTE: the skill used by the summoner (i.e. Spirit Erosion I) will not exactly match the skill of the spirit (i.e. Spirit Erosion III Wind)
+                return;
             }
             #endregion
 

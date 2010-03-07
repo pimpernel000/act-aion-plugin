@@ -88,7 +88,7 @@ namespace AionParsePlugin
             System.Diagnostics.Process.Start("http://www.eq2flames.com/plugin-discussion/53384-aion-parse-plugin-act-v-0-1-0-3-a-9.html");
         }
 
-        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void LinkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             this.linkLabel2.LinkVisited = true;
             System.Diagnostics.Process.Start("http://code.google.com/p/act-aion-plugin/wiki/InstallationNotes");

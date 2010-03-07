@@ -47,7 +47,10 @@ namespace AionParsePlugin
                 "Don't enter your Aion account info on any other site, or it will be stolen and your characters will be looted.",
                 "You are too far from the target to use that skill.",
                 "You cannot issue commands in resting.",
-                "You do not have much flight time left. Please land on a secure place."
+                "You do not have much flight time left. Please land on a secure place.",
+                "You cannot do that while you are dead.",
+                "You have resurrected.",
+                "You received Soul Healing."
             };
 
             List<string> startParts = new List<string> 
@@ -67,7 +70,16 @@ namespace AionParsePlugin
                 "Legion Message:",
                 "You learned",
                 "You were killed",
-                "Your spirit uses its skills on"
+                "Your spirit uses its skills on",
+                "Your Magic Boost has been boosted by using ",
+                "You immobilized ",
+                "You gave yourself a defense shield by using ",
+                "You gave yourself the reflection effect by using ",
+                "You received the effect by using ",
+                "Your Stun, Knock Back, Stumble, Spin, and Aether's Hold Resists has been boosted by using ",
+                "Network Status: ",
+                "The current screenshot was saved in ",
+                "You have used ",
             };
 
             List<string> endParts = new List<string> 
@@ -93,7 +105,9 @@ namespace AionParsePlugin
                 "Spirit is in Resting mode.",
                 "Spirit has been dismissed.",
                 "gives up the pursuit.",
-                "MP consumption has changed because he used Lumiel's Wisdom I."
+                "MP consumption has changed because he used Lumiel's Wisdom I.",
+                " exchanged his HP and MP by using Reverse Condition I.",
+                " consumption has changed because he used Grace of Empyrean Lord I."
             };
 
             List<string> containParts = new List<string> 

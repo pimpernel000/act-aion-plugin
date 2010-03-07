@@ -635,7 +635,7 @@ namespace AionParsePlugin
                 "/InstallationNotes";
             this.toolTip1.SetToolTip(this.linkLabel2, "http://code.google.com/p/act-aion-plugin/wiki/InstallationNotes");
             this.linkLabel2.UseCompatibleTextRendering = true;
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
+            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkLabel2_LinkClicked);
             // 
             // AionParseForm
             // 
