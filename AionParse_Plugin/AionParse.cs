@@ -122,7 +122,7 @@
         Regex rSummonServant1 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has summoned (?<pet>[a-zA-Z ']*) to attack (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant2 = new Regex(@"^(?<summoner>[a-zA-Z ']*) has caused you to summon (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?)\.$", RegexOptions.Compiled);
         Regex rSummonServant3 = new Regex(@"^(?<summoner>You) summoned (?<pet>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*?) to let it attack (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);  // NOTE: this regex is a subset of rSummonSpirit, so make sure this is matched first before the other
-        Regex rSummonerSkill = new Regex(@"^The spirit used a skill on (?<target)[a-zA-Z \-']*) because (?<summoner>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*\.$", RegexOptions.Compiled);
+        Regex rSummonerSkill = new Regex(@"^The spirit used a skill on (?<victim>[a-zA-Z ']*) because (?<summoner>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
 
         Regex rProcBuff = new Regex(@"(?<actor>[a-zA-Z ']*) was affected by its own (?<skill>[a-zA-Z \-']*?)\.", RegexOptions.Compiled);
 
@@ -883,8 +883,13 @@
                         else if (GuessDotCasters)
                         {
                             string healerHoT = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
-                            if (!String.IsNullOrEmpty(healerHoT)) attacker = healerHoT;
+                            if (!String.IsNullOrEmpty(healerHoT) && (!healerHoT.StartsWith("Unknown") ||  AionData.Skill.IsHoT(skill))) attacker = healerHoT; // only assign from HeaderRecordSet if the skill is actually a HoT; otherwise, direct healing spells without a target is actually a self-heal.
                         }
+                    }
+
+                    if (AionData.Skill.PlayerSkill(skill) == "Word of Revival")
+                    {
+                        HealerRecordSet.Add(attacker, victim, skill, logInfo.detectedTime, 40); // Word of Revival doesn't trigger the "is in the continuous recovery state" log line, so we have to catch it here when it does the first heal. (It heals like a potion, first payload, then HoT).
                     }
 
                     damage = match.Groups["hp"].Value;
@@ -911,17 +916,16 @@
                                 attacker = chanters[0].Name;
                             }
                         }
-                    }
 
-                    if (string.IsNullOrEmpty(attacker) && AionData.Skill.PlayerSkill(skill) == "Magic Recovery")
-                    {
-                        attacker = "Unknown (Chanter)"; // NOTE: the only example I have of this spell is "Becca recovered 1,500 MP by using Magic Recovery I." which I assume is self-cast.  I need more examples on this spell: i.e. you cast Magic Recovery on yourself, you cast on another player, another player cast on a different player.
-                        ////attacker = victim; // we could guess that most of the time chanter is self-casting this spell
+                        if (AionData.Skill.PlayerSkill(skill) == "Magic Recovery")
+                        { // NOTE: the only example I have of this spell is "Becca recovered 1,500 MP by using Magic Recovery I." which I assume is self-cast.  I need more examples on this spell: i.e. you cast Magic Recovery on yourself, you cast on another player, another player cast on a different player.
+                            ////attacker = victim; // we could guess that most of the time chanter is self-casting this spell
+                        }
                     }
 
                     if (string.IsNullOrEmpty(attacker))
                     {
-                        attacker = victim; // almost any MP recovery spell/potion is self cast
+                        attacker = victim; // almost any MP recovery spell/potion is self cast (i.e. Promise of Aether)
 
                         if (skill == "Recovery Potion")
                         {

@@ -7,8 +7,10 @@ namespace AionParsePlugin
     {
         bool IsIgnore(string str)
         {
+            /*
             if (str.Contains("[charname:")) return true; // ignore chats ([charname:...] is a link to a name
             if (str.StartsWith(CheckYou("you") + ":")) return true; // ignore your own chats
+             */
 
             if (str.StartsWith("You have gained") && (str.Contains("EXP") || str.Contains("Abyss Points"))) return true;
 
@@ -49,6 +51,7 @@ namespace AionParsePlugin
                 "You cannot issue commands in resting.",
                 "You do not have much flight time left. Please land on a secure place.",
                 "You cannot do that while you are dead.",
+                "You are not ready to use that skill.",
                 "You have resurrected.",
                 "You received Soul Healing."
             };
@@ -107,7 +110,8 @@ namespace AionParsePlugin
                 "gives up the pursuit.",
                 "MP consumption has changed because he used Lumiel's Wisdom I.",
                 " exchanged his HP and MP by using Reverse Condition I.",
-                " consumption has changed because he used Grace of Empyrean Lord I."
+                " consumption has changed because he used Grace of Empyrean Lord I.",
+                " has logged out."
             };
 
             List<string> containParts = new List<string> 

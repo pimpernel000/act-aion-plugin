@@ -26,7 +26,24 @@ namespace AionData
 
         static List<string> selfHealSkills = new List<string>() 
         {
-            "Stamina Recovery", "Absorb Vitality" // Stamina Recovery is gladiator self HoT skill; Absorb Vitality is Spiritmaster drain skill
+            "Stamina Recovery", "Absorb Vitality", "Power of Restoration" // list of indirect heal skills that get logged as "You restored": Stamina Recovery is gladiator HoT skill; Absorb Vitality is Spiritmaster drain skill; Power of Restoration is Templar HoT stigma
+            /* TODO: other skills that haven't been parsed: Divine Strike, Darkness Rune I, Crashing Wind Strike I (asmo stigma skill that shares the same name as an aether knockdown skill) is assassin damage & self heal skill */
+        };
+
+        static List<string> hotSkills = new List<string>()
+        {
+           // list of indirect heal skills that can be casted on other people and get logged as "xxx recovered ..."
+           // chanter HoTs
+           "Ancestral Aetheric Field", "Ancestral Word of Spellstoping", "Healing Conduit", "Recovery Spell", "Word of Life", "Word of Revival", "Revival Mantra",
+           
+           // chanter Gain over time
+           "Promise of Aether", "Clement Mind Mantra", "Invincibility Mantra", "Magic Recovery",
+
+           // cleric HoTs
+           "Acquittal", "Yustiel's Light", "Yustiel's Splendor", "Ancestral Yustiel's Light", "Light of Rejuvenation", "Splendor of Rebirth",
+
+           // other HoTs
+           "Spirit Armor of Darkness"
         };
 
         static Dictionary<Player.Classes, string[]> skillList = new Dictionary<Player.Classes, string[]>() 
@@ -152,6 +169,11 @@ namespace AionData
             {
                 return Player.Classes.Unknown;
             }
+        }
+
+        public static bool IsHoT(string skill)
+        {
+            throw new NotImplementedException();
         }
     }
 }

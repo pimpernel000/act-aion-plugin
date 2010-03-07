@@ -138,10 +138,11 @@ namespace AionParsePlugin
         public bool Match(string target, string skill, DateTime time)
         {
             return
-                ((target == Target &&
-                    skill == Skill) ||
+                ((Target == target &&
+                    Skill == skill) ||
                  (Target == null &&
-                    Skill == AionData.Skill.PlayerSkill(skill))) &&
+                    (Skill == skill || 
+                     Skill == AionData.Skill.PlayerSkill(skill)))) &&
                 (time <= End || Duration == 0);
         }
 

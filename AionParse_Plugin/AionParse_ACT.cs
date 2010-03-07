@@ -128,7 +128,10 @@ namespace AionParsePlugin
                 new UsingSkillRecord("Unknown (Spiritmaster)", "Sandblaster"),
                 new UsingSkillRecord("Unknown (Spiritmaster)", "Spirit Erosion"),
                 new UsingSkillRecord("Unknown (Cleric)", "Earth's Wrath"),
-                new UsingSkillRecord("Unknown (Cleric)", "Chastisement")
+                new UsingSkillRecord("Unknown (Cleric)", "Chastise"),
+                new UsingSkillRecord("Unknown (Cleric)", "Chastisement"),
+                new UsingSkillRecord("Unknown (Cleric)", "Chain of Suffering"),
+                new UsingSkillRecord("Unknown (Cleric)", "Word of Destruction")
             };
 
             HealerRecordSet = new UsingSkillRecordSet() 
@@ -137,10 +140,16 @@ namespace AionParsePlugin
                 new UsingSkillRecord("Unknown (Cleric)", "Radiant Cure"),
                 new UsingSkillRecord("Unknown (Cleric)", "Healing Wind"),
                 new UsingSkillRecord("Unknown (Cleric)", "Splendor of Recovery"),
+                new UsingSkillRecord("Unknown (Cleric)", "Splendor of Rebirth"),
                 new UsingSkillRecord("Unknown (Cleric)", "Flash of Recovery"),
                 new UsingSkillRecord("Unknown (Cleric)", "Light of Recovery"),
                 new UsingSkillRecord("Unknown (Cleric)", "Light of Rejuvenation"),
-                new UsingSkillRecord("Unknown (Chanter)", "Promise of Aether"),
+                new UsingSkillRecord("Unknown (Cleric)", "Acquittal"),
+                new UsingSkillRecord("Unknown (Cleric)", "Yustiel's Light"),
+                new UsingSkillRecord("Unknown (Cleric)", "Yustiel's Splendor"),
+                new UsingSkillRecord("Unknown (Cleric)", "Ancestral Yustiel's Light"),
+                new UsingSkillRecord("Unknown (Cleric)", "Brilliant Protection"),
+                ////new UsingSkillRecord("Unknown (Chanter)", "Promise of Aether"), // NOTE: Promise of Aether is self-cast only, therefore, removed from this list. Default handling of mp-gain skills is that it is assumed self-cast.
                 new UsingSkillRecord("Unknown (Chanter)", "Revival Mantra"),
                 new UsingSkillRecord("Unknown (Chanter)", "Word of Life"),
                 new UsingSkillRecord("Unknown (Chanter)", "Word of Revival"),
@@ -149,6 +158,8 @@ namespace AionParsePlugin
                 new UsingSkillRecord("Unknown (Chanter)", "Clement Mind Mantra"),
                 new UsingSkillRecord("Unknown (Chanter)", "Invincibility Mantra"),
                 new UsingSkillRecord("Unknown (Chanter)", "Magic Recovery"),
+                new UsingSkillRecord("Unknown (Chanter)", "Ancestral Word of Spellstoping"),
+                new UsingSkillRecord("Unknown (Chanter)", "Ancestral Aetheric Field"),
                 new UsingSkillRecord("Unknown (Spiritmaster)", "Spirit Armor of Darkness")
             };
 
