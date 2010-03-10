@@ -81,7 +81,7 @@
         Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ']*?)( has)? inflicted (?<damage>(\d+" + ngs + @")?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
         Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ']*) and caused the (?<statuseffect>[a-zA-Z ']*) effect$", RegexOptions.Compiled);
-        Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ']*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // only for Ignite Aether spell
+        Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ']*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Ignite Aether spell
         Regex rReflect = new Regex(@"^(?<victim>[a-zA-Z ']*) by reflecting the attack$", RegexOptions.Compiled);
         Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) damage from (?<attacker>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
         Regex rReceiveEffect = new Regex(@"^(?<victim>[a-zA-Z ']*) received the (?<statuseffect>[a-zA-Z ']*) effect (as (?<attacker>you)|because (?<attacker>[a-zA-Z ']*)) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Delayed Blast spell
