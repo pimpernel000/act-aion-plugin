@@ -81,7 +81,7 @@
         Regex rInflictDamage = new Regex(@"^(?<attacker>[a-zA-Z ']*?)( has)? inflicted (?<damage>(\d+" + ngs + @")?\d+) (?<critical>critical )?damage on (?<targetclause>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rUsingAttack = new Regex(@"^(?<victimclause>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled);
         Regex rPatternEngraving = new Regex(@"^(?<victim>[a-zA-Z ']*) and caused the (?<statuseffect>[a-zA-Z ']*) effect$", RegexOptions.Compiled);
-        Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ']*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Ignite Aether spell
+        Regex rAndDispelled = new Regex(@"^(?<victim>[a-zA-Z ']*) and dispelled some of its magical buffs by using (?<skill>[a-zA-Z \-']*)$", RegexOptions.Compiled); // only for Ignite Aether spell
         Regex rReflect = new Regex(@"^(?<victim>[a-zA-Z ']*) by reflecting the attack$", RegexOptions.Compiled);
         Regex rReceiveDamage = new Regex(@"^(?<victim>[a-zA-Z ']*) received (?<damage>(\d+" + ngs + @")?\d+) damage from (?<attacker>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
         Regex rReceiveEffect = new Regex(@"^(?<victim>[a-zA-Z ']*) received the (?<statuseffect>[a-zA-Z ']*) effect (as (?<attacker>you)|because (?<attacker>[a-zA-Z ']*)) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // only for Delayed Blast spell
@@ -921,22 +921,6 @@
                     skill = match.Groups["skill"].Value;
 
                     attacker = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime);
-                    if (attacker.StartsWith("Unknown"))
-                    {
-                        if (AionData.Skill.IsGainMantra(skill) && PartyMembers.Contains(victim))
-                        {
-                            var chanters = PartyMembers.FindByClass(AionData.Player.Classes.Chanter);
-                            if (chanters.Count == 1)
-                            {
-                                attacker = chanters[0].Name;
-                            }
-                        }
-
-                        if (AionData.Skill.PlayerSkill(skill) == "Magic Recovery")
-                        { // NOTE: the only example I have of this spell is "Becca recovered 1,500 MP by using Magic Recovery I." which I assume is self-cast.  I need more examples on this spell: i.e. you cast Magic Recovery on yourself, you cast on another player, another player cast on a different player.
-                            ////attacker = victim; // we could guess that most of the time chanter is self-casting this spell
-                        }
-                    }
 
                     if (string.IsNullOrEmpty(attacker))
                     {
@@ -953,6 +937,23 @@
                             skill = "Mana Potion";
                             if (attacker == CheckYou("you"))
                                 skill = lastPotion; // oddly enough, healing potions are Healing and mana potions are Mana Treatment.  NOTE: Mana Treatment skills have roman numerals after them, potions are just Mana Treatment.
+                        }
+                    }
+
+                    if (attacker.StartsWith("Unknown"))
+                    {
+                        if (AionData.Skill.IsGainMantra(skill) && PartyMembers.Contains(victim))
+                        {
+                            var chanters = PartyMembers.FindByClass(AionData.Player.Classes.Chanter);
+                            if (chanters.Count == 1)
+                            {
+                                attacker = chanters[0].Name;
+                            }
+                        }
+
+                        if (AionData.Skill.PlayerSkill(skill) == "Magic Recovery")
+                        { // NOTE: the only example I have of this spell is "Becca recovered 1,500 MP by using Magic Recovery I." which I assume is self-cast.  I need more examples on this spell: i.e. you cast Magic Recovery on yourself, you cast on another player, another player cast on a different player.
+                            ////attacker = victim; // we could guess that most of the time chanter is self-casting this spell
                         }
                     }
 
