@@ -241,7 +241,7 @@
                         }
 
                         skill = mIgniteAether.Groups["skill"].Value;
-                        AddCombatAction(logInfo, attacker, victim, skill, critical, string.Empty, Dnum.NoDamage, SwingTypeEnum.CureDispel);
+                        AddCombatAction(logInfo, attacker, victim, skill, critical, string.Empty, Dnum.NoDamage, SwingTypeEnum.CureDispel, "dispel");
                         AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee);
                         return;
                     }
@@ -1160,7 +1160,7 @@
                 attacker = this.CheckYou(attacker);
                 victim = attacker;
                 skill = str.Substring(str.IndexOf("removed its abnormal physical conditions by using") + 50, (str.Length - (str.IndexOf("removed its abnormal physical conditions by using") + 50)) - 2);
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel, "cure");
                 return;
             }
             else if ((str.IndexOf("removed abnormal physical conditions from") != -1) && (str.IndexOf("by using") != -1))
@@ -1170,7 +1170,7 @@
                 victim = str.Substring(str.IndexOf("removed abnormal physical conditions from") + 0x2a, (str.IndexOf("by using") - (str.IndexOf("removed abnormal physical conditions from") + 0x2a)) - 1);
                 victim = this.CheckYou(victim);
                 skill = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel, "cure");
                 return;
             }
             else if ((str.IndexOf("dispelled the magical buffs from") != -1) && (str.IndexOf("by using") != -1))
@@ -1180,7 +1180,7 @@
                 victim = str.Substring(str.IndexOf("dispelled the magical buffs from") + 0x21, (str.IndexOf("by using") - (str.IndexOf("dispelled the magical buffs from") + 0x21)) - 1);
                 victim = this.CheckYou(victim);
                 skill = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "dispel"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "dispel"), SwingTypeEnum.CureDispel, "dispel");
                 return;
             }
             else if ((str.IndexOf("dispelled the magical debuffs from") != -1) && (str.IndexOf("by using") != -1))
@@ -1190,7 +1190,7 @@
                 victim = str.Substring(str.IndexOf("dispelled the magical debuffs from") + 0x21, (str.IndexOf("by using") - (str.IndexOf("dispelled the magical debuffs from") + 0x21)) - 1);
                 victim = this.CheckYou(victim);
                 skill = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel, "dispel");
                 return;
             }
             else if (str.IndexOf("dispelled its magic effect by using") != -1) // Blind Leap
@@ -1199,7 +1199,7 @@
                 attacker = this.CheckYou(attacker);
                 victim = attacker;
                 skill = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel, "dispel");
                 return;
             }
             else if (str.Contains("dispelled its magical debuffs by using"))
@@ -1207,7 +1207,7 @@
                 attacker = CheckYou(str.Substring(0, str.IndexOf("dispelled its magical debuffs") - 1));
                 victim = attacker;
                 skill = str.Substring(str.IndexOf("by using") + 9, (str.Length - (str.IndexOf("by using") + 9)) - 2);
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel, "dispel");
                 return;
             }
             else if (str.StartsWith("Your abnormal physical conditions were removed because"))
@@ -1217,7 +1217,7 @@
                 victim = CheckYou("you");
                 attacker = match.Groups["actor"].Value;
                 skill = match.Groups["skill"].Value;
-                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel);
+                AddCombatAction(logInfo, attacker, victim, skill, critical, special, new Dnum((int)Dnum.NoDamage, "cure"), SwingTypeEnum.CureDispel, "cure");
                 return;
             }
 
