@@ -224,8 +224,30 @@
                 attacker = CheckYou(mInflict.Groups["attacker"].Value); // source
                 damage = mInflict.Groups["damage"].Value; // dmg
 
-                // submatch "using ability"
                 string targetClause = mInflict.Groups["targetclause"].Value; // target & extra info
+
+                // submatch "... xxx and dispelled some of its magical buffs by using Ignite Aether I"
+                if (rAndDispelled.IsMatch(targetClause))
+                {
+                    var mIgniteAether = rAndDispelled.Match(targetClause);
+                    if (mIgniteAether.Success)
+                    {
+                        victim = CheckYou(mIgniteAether.Groups["victim"].Value);
+                        if (TagBlockedAttacks)
+                        {
+                            string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
+                            if (!String.IsNullOrEmpty(blockType))
+                                special = blockType;
+                        }
+
+                        skill = mIgniteAether.Groups["skill"].Value;
+                        AddCombatAction(logInfo, attacker, victim, skill, critical, string.Empty, Dnum.NoDamage, SwingTypeEnum.CureDispel);
+                        AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee);
+                        return;
+                    }
+                }
+
+                // submatch "... xxx by using xxx"
                 if (rUsingAttack.IsMatch(targetClause))
                 {
                     var mUsingAttack = rUsingAttack.Match(targetClause);
@@ -282,25 +304,7 @@
                     return;
                 }
 
-                // submatch "and dispelled buffs using Ignite Aether"
-                var mIgniteAether = rAndDispelled.Match(targetClause);
-                if (mIgniteAether.Success)
-                {
-                    victim = CheckYou(mIgniteAether.Groups["victim"].Value);
-                    if (TagBlockedAttacks)
-                    {
-                        string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
-                        if (!String.IsNullOrEmpty(blockType))
-                            special = blockType;
-                    }
-
-                    skill = mIgniteAether.Groups["skill"].Value;
-                    AddCombatAction(logInfo, attacker, victim, skill, critical, string.Empty, Dnum.NoDamage, SwingTypeEnum.CureDispel);
-                    AddCombatAction(logInfo, attacker, victim, skill, critical, special, damage, SwingTypeEnum.NonMelee);
-                    return;
-                }
-
-                // submatch "reflecting the attack"
+                // submatch "... xxx by reflecting the attack"
                 var mReflect = rReflect.Match(targetClause);
                 if (mReflect.Success)
                 {
