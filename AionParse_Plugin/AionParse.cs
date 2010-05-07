@@ -91,7 +91,7 @@
         Regex rStatusEffectByYou2 = new Regex(@"^(?<attacker>You) caused (?<victim>[a-zA-Z ']*) to bleed by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ']*) poisoned (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) caused (?<victim>you) to bleed by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
-        /*
+        /* NOTE: commented out the following regexs since they don't affect parses
         Regex rStateAbility = new Regex(@"^(?<target>[a-zA-Z ']*) is in the (?<buff>[a-zA-Z ']*) state (because (?<actor>[a-zA-Z ']*)|as it) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // NOTE: the only one we care about is the continuous recovery state caused by Word of Life (the only one I know of); so I put a special handling in the continuous section
         Regex rWeakened = new Regex(@"^(?<actor>[a-zA-Z ']*) has weakened (?<target>[a-zA-Z ']*)'s (?<stat>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffect1 = new Regex(@"^(?<victim>[a-zA-Z ']*) became (?<statuseffect>[a-zA-Z ']*) because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled); // i.e. Brutal Mist Mane Tamer became poisoned because Stalker used Poison Arrow II. (also for stunned, snared (by Aether's Hold), snared in mid-air (by Aerial Lockdown), paralyzed, silenced, bound, blinded)
@@ -101,6 +101,11 @@
         Regex rStatusEffectToYou1 = new Regex(@"^(?<attacker>[a-zA-Z ']*) (?<statuseffect>[a-zA-Z ']*) (?<victim>you) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rStatusEffectToYou2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) caused (?<victim>you) to (?<statuseffect>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*) on you\.$", RegexOptions.Compiled);
          */
+
+        Regex rContHP = new Regex(@"^(?<victim>[a-zA-Z ']*) is in the continuous HP recovery state because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rContHPYou = new Regex(@"^(?<attacker>[a-zA-Z ']*) is continuously restoring your HP by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+        Regex rContHPSelf = new Regex(@"^You are continuously recovering HP because of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
+
         Regex rActivated = new Regex(@"^(?<skill>[a-zA-Z \-']*) Effect has been activated\.$", RegexOptions.Compiled);
         Regex rContDmg1 = new Regex(@"^You inflicted continuous damage on (?<victim>[a-zA-Z ']*) by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
         Regex rContDmg2 = new Regex(@"^(?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z ']*) to inflict the continuous damage effect on (?<victim>[a-zA-Z ']*)\.$", RegexOptions.Compiled);
@@ -430,7 +435,6 @@
                 Match contHPMatch = null; // continuous heals like Word of Life or Light of Rejuvenation
 
                 // match "xxx is in the continuous HP recovery state because he/xxx used xxx."
-                Regex rContHP = new Regex(@"^(?<victim>[a-zA-Z ']*) is in the continuous HP recovery state because (?<attacker>[a-zA-Z ']*) used (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
                 if (rContHP.IsMatch(str))
                 {
                     contHPMatch = rContHP.Match(str);
@@ -440,7 +444,6 @@
                 }
 
                 // match "xxx is continuously restoring your HP by using xxx."
-                Regex rContHPYou = new Regex(@"^(?<attacker>[a-zA-Z ']*) is continuously restoring your HP by using (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
                 if (rContHPYou.IsMatch(str))
                 {
                     contHPMatch = rContHPYou.Match(str);
@@ -449,7 +452,6 @@
                 }
 
                 // match "You are continuously recovering HP because of xxx." (cast HoT on yourself)
-                Regex rContHPSelf = new Regex(@"^You are continuously recovering HP because of (?<skill>[a-zA-Z \-']*)\.$", RegexOptions.Compiled);
                 if (rContHPSelf.IsMatch(str))
                 {
                     contHPMatch = rContHPSelf.Match(str);
@@ -605,10 +607,12 @@
 
             #region spirit
             // match "The spirit used a skill on xtargetx because xsummonerx used xskillx." which indicates later one of the following:
-            // "xElementalx Spirit inflicted xxx damage on xtargetx by using xskillx xelementx." i.e. Thunderbolt Claw I -> Water Spirit uses Thunderbolt Claw I Water
+            // "Brutal Mist Mane Pawsoldier is in the spinning state because Fire Spirit used Spirit Threat III Fire."
+            // "Joyeuse is in the reflection state because Fire Spirit used Spirit Wall of Protection III Fire."
+            // "xElementalx Spirit has cast a reflector on you by using Spirit Wall of Protection III xelementx."
+            // "xElementalx Spirit inflicted xxx damage on xtargetx by using xskillx xelementx." i.e. Thunderbolt Claw I -> Water Spirit uses Thunderbolt Claw I Water; (also Spirit Detonation Claw and Spirit Disturbance deal damage)
             // "xElementalx Spirit used xskillx xelementx to inflict the continuous damage effect on xtargetx." i.e. Spirit Erosion I -> Wind Spirit uses Spirit Erosion III Wind.
             // "xElementalx Spirit is in the boost xbuffx state because xElementalx Spirit used xskillx xelementx." i.e. Spirit Wrath Position I -> Fire Spirit is in Physical and Magical attack state using Spirit Wrath Position III Fire 
-            // "xElementalx Spirit has cast a reflector on you by using Spirit Wall of Protection III xelementx."
             // NOTE: these skills can be resisted.
             if (rSummonerSkill.IsMatch(str))
             {
