@@ -64,7 +64,7 @@ namespace AionParsePlugin
         public string GetAnyActor(string target, string skill, DateTime now)
         {
             string actor = GetActor(target, skill, now);
-            if (String.IsNullOrEmpty(actor))
+            if (string.IsNullOrEmpty(actor))
                 actor = GetPartyCaster(skill, now);
             return actor;
         }

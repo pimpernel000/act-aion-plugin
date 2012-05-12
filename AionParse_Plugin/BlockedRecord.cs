@@ -9,7 +9,7 @@ namespace AionParsePlugin
 
         public void Add(string attacker, string defender, DateTime time, string blockType)
         {
-            if (String.IsNullOrEmpty(attacker)) return;
+            if (string.IsNullOrEmpty(attacker)) return;
 
             if (!attackerHistory.ContainsKey(attacker))
             {

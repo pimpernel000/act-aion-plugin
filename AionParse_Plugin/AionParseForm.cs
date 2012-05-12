@@ -14,7 +14,7 @@ namespace AionParsePlugin
             ToggleAdvancedTabs(CheckboxAdvancedToggle.Checked);
 
             this.plugin = plugin;
-            if (String.IsNullOrEmpty(TextboxDefaultCharacter.Text) || TextboxDefaultCharacter.Text == "YOU")
+            if (string.IsNullOrEmpty(TextboxDefaultCharacter.Text) || TextboxDefaultCharacter.Text == "YOU")
             {
                 TextboxDefaultCharacter.Text = defaultCharName;
             }

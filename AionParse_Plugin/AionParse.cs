@@ -206,7 +206,7 @@
                 if (TagBlockedAttacks)
                 {
                     string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
-                    if (!String.IsNullOrEmpty(blockType))
+                    if (!string.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
 
@@ -241,7 +241,7 @@
                         if (TagBlockedAttacks)
                         {
                             string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
-                            if (!String.IsNullOrEmpty(blockType))
+                            if (!string.IsNullOrEmpty(blockType))
                                 special = blockType;
                         }
 
@@ -272,7 +272,7 @@
                     if (TagBlockedAttacks)
                     {
                         string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
-                        if (!String.IsNullOrEmpty(blockType))
+                        if (!string.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
 
@@ -301,7 +301,7 @@
                     if (victim == "you" && attacker == CheckYou("you"))
                     {
                         string realAttacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
-                        if (!String.IsNullOrEmpty(realAttacker))
+                        if (!string.IsNullOrEmpty(realAttacker))
                             attacker = realAttacker;
                     }
 
@@ -318,7 +318,7 @@
                     if (TagBlockedAttacks)
                     {
                         string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
-                        if (!String.IsNullOrEmpty(blockType))
+                        if (!string.IsNullOrEmpty(blockType))
                             special = blockType;
                     }
 
@@ -340,7 +340,7 @@
                 if (TagBlockedAttacks)
                 {
                     string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
-                    if (!String.IsNullOrEmpty(blockType))
+                    if (!string.IsNullOrEmpty(blockType))
                     {
                         special = blockType;
                         ////damageString = blockType; // nah, I don't want to cover the numbers with damageString
@@ -364,7 +364,7 @@
                 if (TagBlockedAttacks)
                 {
                     string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
-                    if (!String.IsNullOrEmpty(blockType))
+                    if (!string.IsNullOrEmpty(blockType))
                         special = blockType;
                 }
 
@@ -708,7 +708,7 @@
                 else
                     attacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
 
-                if (String.IsNullOrEmpty(attacker))
+                if (string.IsNullOrEmpty(attacker))
                 {
                     attacker = "Unknown";
                 }
@@ -716,7 +716,7 @@
                 if (TagBlockedAttacks)
                 {
                     string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime);
-                    if (!String.IsNullOrEmpty(blockType))
+                    if (!string.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
                 ////special += "DoT";
@@ -733,7 +733,7 @@
                 string damageType = match.Groups["damagetype"].Value;
                 skill = match.Groups["skill"].Value; // only DoT skills: Poison, Poison Arrow, or Wind Cut Down skills match this... often mob skills
                 attacker = ContinuousDamageSet.GetActor(victim, skill, logInfo.detectedTime);
-                if (String.IsNullOrEmpty(attacker))
+                if (string.IsNullOrEmpty(attacker))
                 {
                     /*
                     if (skill.StartsWith("Wind Cut Down"))
@@ -763,7 +763,7 @@
                 if (TagBlockedAttacks)
                 {
                     string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
-                    if (!String.IsNullOrEmpty(blockType))
+                    if (!string.IsNullOrEmpty(blockType))
                         special = blockType + "&";
                 }
 
@@ -784,7 +784,7 @@
                 if (TagBlockedAttacks)
                 {
                     string blockType = BlockedHistory.IsBlocked(attacker, victim, logInfo.detectedTime, false); // block record consume set to false because auto-attacks can be multi-hitting, and multiple attacks can be blocked
-                    if (!String.IsNullOrEmpty(blockType))
+                    if (!string.IsNullOrEmpty(blockType))
                         special = blockType;
                 }
 
@@ -896,7 +896,7 @@
                         else if (GuessDotCasters && skill != "Prayer of Resilience I" /* temp self heal stigma */ && skill != "Improved Stamina I" /* glad self hot */)
                         {
                             string healerHoT = HealerRecordSet.GetActor(victim, skill, logInfo.detectedTime); // check to see if you were recovering because healer placed a HoT on you
-                            if (!String.IsNullOrEmpty(healerHoT) && (!healerHoT.StartsWith("Unknown") || AionData.Skill.IsHoT(skill))) attacker = healerHoT; // only assign from HeaderRecordSet if the skill is actually a HoT; otherwise, direct healing spells without a target is actually a self-heal.
+                            if (!string.IsNullOrEmpty(healerHoT) && (!healerHoT.StartsWith("Unknown") || AionData.Skill.IsHoT(skill))) attacker = healerHoT; // only assign from HeaderRecordSet if the skill is actually a HoT; otherwise, direct healing spells without a target is actually a self-heal.
                         }
                     }
 
@@ -1089,7 +1089,7 @@
                             string newattacker = blob.Substring(0, indexForSkill).Trim(); // example newattacker: "" or "Vyn's"
                             string newskill = blob.Substring(indexForSkill); // example newskill = "Heaven's Judgement" or "Aether's Hold"
 
-                            if (String.IsNullOrEmpty(newattacker)) // attacker not specified? is this a self cast?
+                            if (string.IsNullOrEmpty(newattacker)) // attacker not specified? is this a self cast?
                             {
                                 if (attacker == CheckYou("you")) // in the unlikely event that your character's name is Heaven, then we know your name does not appear in your own spell's resist log, so you must be a cleric and you casted Heaven's Judgment
                                 {
@@ -1236,7 +1236,7 @@
                 Match match = rStateAbility.Match(str);
                 string target = CheckYou(match.Groups["target"].Value);
                 string actor = CheckYou(match.Groups["actor"].Value);
-                if (String.IsNullOrEmpty(actor)) actor = target;
+                if (string.IsNullOrEmpty(actor)) actor = target;
                 string skill = match.Groups["skill"].Value;
                 return;
             }

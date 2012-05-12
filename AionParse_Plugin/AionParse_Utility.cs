@@ -101,7 +101,7 @@ namespace AionParsePlugin
         private static Dnum NewDnum(string damage, string damageString)
         {
             int d = int.Parse(damage, NumberStyles.AllowThousands, CultureInfo.CurrentCulture.NumberFormat);
-            if (String.IsNullOrEmpty(damageString))
+            if (string.IsNullOrEmpty(damageString))
             {
                 return new Dnum(d);
             }

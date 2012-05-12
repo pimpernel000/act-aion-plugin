@@ -15,4 +15,3 @@
 [assembly: System.Reflection.AssemblyCopyright("Creub <vegard_kl@hotmail.com>")]
 [assembly: System.Diagnostics.Debuggable(System.Diagnostics.DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints)]
 [assembly: System.Runtime.CompilerServices.CompilationRelaxations(8)]
-
