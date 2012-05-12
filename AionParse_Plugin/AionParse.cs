@@ -187,10 +187,10 @@
             }
 
             // check for critical
-            if (str.Contains("Critical Hit!"))
+            if (str.StartsWith("Critical Hit!"))
             {
                 critical = true;
-                str = str.Substring(14, str.Length - 14);
+                str = str.Substring(13).TrimStart();
             }
             #endregion
 

@@ -97,7 +97,6 @@ namespace AionParsePlugin
 
         public void InitPlugin(TabPage pluginScreenSpace, Label pluginStatusText)
         {
-            ActGlobals.oFormActMain.SetParserToNull();
             ActGlobals.oFormActMain.LogFileFilter = "Chat*.log";
             ActGlobals.oFormActMain.LogPathHasCharName = false;
             ActGlobals.oFormActMain.ResetCheckLogs();
