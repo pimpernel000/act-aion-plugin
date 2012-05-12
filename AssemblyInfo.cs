@@ -1,7 +1,9 @@
-﻿// Assembly AionParse, Version 0.3.1.12  (<major>.<minor>.<revision>.<build>)
+﻿// Assembly AionParse, Version 0.3.1.13  (<major>.<minor>.<revision>.<build>)
+// Initial copyright goes to Creub <vegard_kl@hotmail.com>
+// Further changes made by Vyn <vknightbd@gmail.com>, source available at http://code.google.com/p/act-aion-plugin
 
 [assembly: System.CLSCompliant(true)]
-[assembly: System.Reflection.AssemblyVersion("0.3.1.12")]
+[assembly: System.Reflection.AssemblyVersion("0.3.1.13")]
 [assembly: System.Reflection.AssemblyTrademark("")]
 [assembly: System.Runtime.InteropServices.ComVisible(false)]
 [assembly: System.Runtime.InteropServices.Guid("16ff0008-e192-4f59-85fc-8fb58f48cdea")]
